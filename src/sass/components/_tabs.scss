@@ -1,0 +1,17 @@
+.tab-content {
+	background-color: var(--bs-white);
+	border-left: var(--bs-border-width) var(--bs-border-style)
+		var(--bs-border-color);
+	border-right: var(--bs-border-width) var(--bs-border-style)
+		var(--bs-border-color);
+	border-bottom: var(--bs-border-width) var(--bs-border-style)
+		var(--bs-border-color);
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+	padding: 1rem;
+}
+
+.nav-tabs .nav-link.active {
+	background-color: var(--bs-white);
+	border-bottom: 1px solid var(--bs-white);
+	margin-bottom: -1px;
+}

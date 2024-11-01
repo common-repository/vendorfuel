@@ -1,0 +1,6 @@
+@use '../settings/global';
+
+@mixin invalid-field {
+	border-color: global.$red;
+	box-shadow: 0 0 2px transparentize(global.$red, 0.2);
+}

@@ -1,0 +1,17 @@
+@use "../../admin.scss";
+
+.revenue {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(40ch, 100%), 1fr));
+  gap: var(--grid-unit);
+
+  .total {
+    font-size: calc(var(--default-font-size) * 2);
+  }
+  .loss {
+    color: var(--accent-red);
+  }
+  .profit {
+    color: var(--wp-admin-theme-color);
+  }
+}

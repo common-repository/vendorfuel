@@ -1,0 +1,29 @@
+<form ng-submit="$ctrl.submit($ctrl.query)">
+	<label for="catalogSearch" class="visually-hidden">
+		{{ $ctrl.placeholder }}
+	</label>
+	<div class="input-group mb-3">
+		<input
+			id="catalogSearch"
+			type="search"
+			class="form-control"
+			minlength="3"
+			aria-label="{{ $ctrl.placeholder }}"
+			ng-attr-placeholder="{{ $ctrl.placeholder }}"
+			ng-model="$ctrl.query"
+			ng-disabled="$ctrl.isLoading"
+		/>
+		<button
+			class="btn btn-outline-secondary"
+			type="submit"
+			id="catalog-button-search"
+			aria-label="Search"
+			ng-disabled="$ctrl.isLoading"
+		>
+			<i class="bi bi-search"></i
+			><span class="d-none d-md-inline ms-1">{{
+				$ctrl.buttonLabel
+			}}</span>
+		</button>
+	</div>
+</form>

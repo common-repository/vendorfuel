@@ -1,0 +1,157 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Vendors</h2>
+<vf-check-auth></vf-check-auth>
+
+<div class="container-fluid p-0">
+    <div ng-hide="true" class="col p-0">
+        <div class="mb-3 text-center">
+            <h2 class="m-0">Vendors</h2>
+            <hr class="col p-0">
+        </div>
+    </div>
+
+    <div class="col p-0">
+        <uib-tabset active="activeTab" resize>
+            <uib-tab index="0" select="TabChanged(0)" heading="Search Vendors">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <div class="col p-3">
+                        <div class="input-group mb-3">
+                            <input ng-model="searchParams.q" ng-keypress="$event.keyCode === 13 && Index()" type="text"
+                                class="form-control form-control-lg" placeholder="Search">
+                            <button ng-click="Index()" class="button"
+                                type="submit">Search</button>
+                        </div>
+                        <hr class="col p-0" ng-if="isXS">
+                        <div class="row px-3">
+                            <div class="col-3" ng-click="SortIndex('id')">ID</div>
+                            <div class="col-3" ng-click="SortIndex('name')">Name</div>
+                            <div class="col-3" ng-click="SortIndex('lead_time')">Lead Time</div>
+                        </div>
+                        <div class="p-3" ng-class="{'min-scroll':!isXS}">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="text-center" ng-if="vendors.data.length <= 0 && !loadingMore">
+                                <span class="col m-auto">
+                                    <h3>No Vendor(s) <span ng-if="searchParams.q.length >= 1">matching
+                                            '{{searchParams.q}}'</span> found.</h3>
+                                </span>
+                            </div>
+                            <div class="col p-3 vf-list-item cursor-pointer" ng-click="$ctrl.selectVendor( vendor.id )"
+                                ng-repeat="vendor in vendors.data track by $index" ng-if="!loadingMore">
+                                <div class="row">
+                                    <div class="col-3">{{vendor.id}}</div>
+                                    <div class="col-3">{{vendor.name}}</div>
+                                    <div class="col-3">{{vendor.lead_time}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row  mb-3">
+                            <div class="col-sm-4">
+                                <span>Showing {{vendors.from || 0}} to {{vendors.to || 0}} of
+                                    {{vendors.total || 0}} entries<span>
+                            </div>
+                            <div class="col-sm-4 text-center mt-2">
+                                <button class="button" ng-if="vendors.prev_page_url"
+                                    ng-click="Index(vendors.current_page - 1)"><span class="dashicons dashicons-arrow-left-alt2"></span>
+                                    Prev</button>
+                                <button class="button" ng-if="vendors.current_page - 2 > 0"
+                                    ng-click="Index(vendors.current_page - 2)">{{vendors.current_page - 2}}</button>
+                                <button class="button" ng-if="vendors.current_page - 1 > 0"
+                                    ng-click="Index(vendors.current_page - 1)">{{vendors.current_page - 1}}</button>
+                                <button class="button"
+                                    ng-disabled="true">{{vendors.current_page}}</button>
+                                <button class="button"
+                                    ng-if="vendors.current_page + 1 <= vendors.last_page"
+                                    ng-click="Index(vendors.current_page + 1)">{{vendors.current_page + 1}}</button>
+                                <button class="button"
+                                    ng-if="vendors.current_page + 2 <= vendors.last_page"
+                                    ng-click="Index(vendors.current_page + 2)">{{vendors.current_page + 2}}</button>
+                                <button class="button" ng-if="vendors.next_page_url"
+                                    ng-click="Index(vendors.current_page + 1)">Next <span
+                                        class="dashicons dashicons-arrow-right-alt2"></span></button>
+                            </div>
+                            <div class="col-sm-4  justify-content-end">
+                                <label for="rpp">Per Page: </label>
+                                <select class="form-control" style="display: inline-block;" id="rpp"
+                                    ng-model="searchParams.rpp" ng-change="Index(1)"
+                                    ng-options="value for value in rppValues">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div uib-alert class="col-6 alert mt-2  p-3" ng-class="'alert-' + (response.type || 'warning')"
+                    ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                    close="localized.RemoveResponseMsg($index)">{{response.message}} </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Add Vendor">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col py-3 vf-tab-body">
+                    <div class="row">
+                        <form class="mf-form col-md-6" name="addForm">
+                            <div class="mb-3">
+                                <label class="form-label" for="add_vendor">Name:</label>
+                                <input class="form-control"
+                                    ng-class="!addParams.name.length || (addParams.name.length < 3) ? 'is-invalid' : ''"
+                                    type="text" id="add_name" name="name" ng-minlength="3" placeholder="Vendor Name"
+                                    ng-model="addParams.name" required>
+                            </div>
+                        </form>
+                        <div class="col-12">
+                            <button class="button button-primary"
+                                ng-disabled="addForm.$invalid"
+                                ng-click="Store()">
+                                Add Vendor
+                            </button>
+                        </div>
+
+                    </div>
+                    <div uib-alert class="col-12 alert mt-2  p-3 ms-auto"
+                        ng-class="'alert-' + (response.type || 'warning')"
+                        ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                        close="localized.RemoveResponseMsg($index)">{{response.message}}
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" ng-show="vendor.id" select="TabChanged(2)" heading="View Vendor">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col py-3 vf-tab-body">
+                    <div class="row">
+                        <form class="mf-form col-md-6" name="viewForm">
+                            <div class="mb-3">
+                                <label class="form-label" for="add_vendor">Name:</label>
+                                <input class="form-control"
+                                    ng-class="!vendor.name.length || (vendor.name.length < 3) ? 'is-invalid' : ''"
+                                    type="text" id="view_name" name="name" ng-minlength="3" placeholder="Vendor Name"
+                                    ng-model="vendor.name" required>
+                            </div>
+                        </form>
+                        <div class="col-12">
+                            <button class="button button-delete mb-3" ng-class="{'col-12':isXS}"
+                                ng-click="Delete(vendor.id)">Delete</button>
+                            <button class="button button-primary" ng-class="{'col-12':isXS}"
+                                ng-disabled="viewForm.$invalid" ng-click="Update(vendor.id)">Update
+                                Vendor</button>
+                        </div>
+                    </div>
+                    <div uib-alert class="col-6 alert mt-2  p-3" ng-class="'alert-' + (response.type || 'warning')"
+                        ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                        close="localized.RemoveResponseMsg($index)">{{response.message}} </div>
+                </div>
+
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

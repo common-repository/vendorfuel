@@ -1,0 +1,61 @@
+<layout-component
+	breadcrumbs="$ctrl.breadcrumbs"
+	heading="Categories utilities"
+>
+	<table class="form-table" role="presentation">
+		<tbody>
+			<tr>
+				<th scope="row">Sync category pages</th>
+				<td>
+					<button
+						class="btn btn-outline-primary"
+						ng-disabled="$ctrl.isBusy"
+						ng-click="$ctrl.handleSyncPages()"
+					>
+						Sync category pages
+					</button>
+					<p class="description">
+						Refresh product category pages so each category with
+						active products has a corresponding public URL (e.g.
+						{{ $ctrl.categoriesRoot }}/my-category). If you've
+						imported or uploaded categories and don't see your
+						categories on the frontend, try this to manually refresh
+						the pages.
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">Generate missing slugs</th>
+				<td>
+					<button
+						class="btn btn-outline-primary"
+						ng-disabled="$ctrl.isBusy"
+						ng-click="$ctrl.handleGenerateSlugs()"
+					>
+						Generate missing slugs for active categories
+					</button>
+					<p class="description">
+						This will generate slugs for any categories where the
+						slug is empty, using the category name.
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">Populate empty images</th>
+				<td>
+					<button
+						class="btn btn-outline-primary"
+						ng-disabled="$ctrl.isBusy"
+						ng-click="$ctrl.handleFillImages()"
+					>
+						Populate empty images
+					</button>
+					<p class="description">
+						This will populate any empty category images using a
+						product image assigned to that specific category.
+					</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</layout-component>

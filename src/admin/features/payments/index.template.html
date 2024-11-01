@@ -1,0 +1,38 @@
+<h1>Payments</h1>
+<spinner-component ng-if="$ctrl.isBusy"></spinner-component>
+
+<div ng-if="!$ctrl.isBusy">
+	<div class="notice notice-error inline" ng-if="$ctrl.hasError">
+		<p>
+			{{ $ctrl.error }} Please check that you have Billing and/or Manager
+			roles for your <a href="?page=vf-users">admin user account</a>.
+		</p>
+	</div>
+	<form>
+		<fieldset ng-disabled="$ctrl.hasError">
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="template"
+								>Select Gateway to Configure</label
+							>
+						</th>
+						<td>
+							<select
+								id="template"
+								ng-model="$ctrl.template"
+								ng-options="t.name for t in $ctrl.templates"
+							>
+								<option value="" hidden disabled>
+									Select a Gateway
+								</option>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+	</form>
+	<div ng-include="$ctrl.template.url" ng-if="gateways"></div>
+</div>

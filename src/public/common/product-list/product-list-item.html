@@ -1,0 +1,92 @@
+<div ng-class="$ctrl.viewAs === 'grid' ? 'card h-100' : 'row g-0 align-items-center'">
+    <div ng-class="{
+    'pt-2 px-2 pt-lg-3 px-lg-3': $ctrl.viewAs === 'grid',
+    'p-1 col-2': $ctrl.viewAs === 'list'
+    }" ng-style="$ctrl.viewAs === 'grid' && {'max-width':'20rem'}">
+        <a tabindex="-1" aria-hidden="true" ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}"
+            ng-attr-title="{{$ctrl.product.description}}">
+            <product-list-item-image image-title="$ctrl.product.description"
+                image-src="$ctrl.product.image['small_url']">
+            </product-list-item-image>
+        </a>
+    </div>
+    <div ng-class="['p-1 p-lg-2', $ctrl.viewAs === 'grid' ? 'h-100' : 'col-6']">
+        <p class="h6 card-title text-break mb-2">
+            <a ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}" ng-attr-title="{{$ctrl.product.description}}">
+                <span ng-if="$ctrl.viewAs === 'grid'">
+                    {{$ctrl.product.description | limitTo: 50 }}{{$ctrl.product.description.length >= 50 ? '&hellip;' :
+                    ''}}
+                </span>
+                <span ng-if="$ctrl.viewAs === 'list'">
+                    {{ $ctrl.product.description }}
+                </span>
+            </a>
+        </p>
+        <p class="card-subtitle small mb-0">
+            <strong>SKU: </strong>{{ $ctrl.product.sku }}
+        </p>
+        <p class="mb-2">
+            <strong>{{$ctrl.product.price | currency}}</strong>
+            <small class="text-nowrap" ng-if="$ctrl.product.uom">/{{$ctrl.product.uom}}</small>
+        </p>
+    </div>
+    <div ng-class="['p-0', $ctrl.viewAs === 'grid' ? 'col' : 'col-4']">
+        <div class="px-1 px-lg-2" ng-if="!$ctrl.hasDisabledGuests &&
+        !$ctrl.product.prop65 &&
+        $ctrl.product.status === 'active' &&
+        $ctrl.getAvailableQty($ctrl.product) !== 0">
+            <label class="form-label mb-1" for="addQty">Quantity</label>
+            <input class="form-control" id="addQty" name="addQty" type="number" min="1"
+                ng-max="$ctrl.product.available_qty || 1000" ng-attr-max="{{ $ctrl.product.available_qty || 1000 }}"
+                step="1"
+                required
+                ng-model="$ctrl.addQty"
+                ng-keydown="$ctrl.onKeydown( $event )"
+                >
+        </div>
+        <div ng-class="['btn-toolbar px-1 px-lg-2', {
+        'p-1 p-lg-2': $ctrl.viewAs === 'grid',
+        'pt-1': $ctrl.viewAs === 'list'
+    }]">
+            <product-list-item-favorite-button product="$ctrl.product">
+            </product-list-item-favorite-button>
+            <a class="btn btn-primary px-1 flex-grow-1" aria-hidden="true" tabindex="-1"
+                ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}" ng-if="$ctrl.hasDisabledGuests ||
+                $ctrl.product.prop65 ||
+                $ctrl.product.additional_shipping ||
+                $ctrl.product.status !== 'active' ||
+                $ctrl.getAvailableQty($ctrl.product) <= 0">
+                <i class="bi bi-zoom-in" aria-hidden="true" ng-hide="$ctrl.viewAs === 'grid'"></i>
+                <span ng-class="{'d-none d-md-inline': $ctrl.viewAs === 'list'}">
+                    View <span class="d-none d-lg-inline">
+                        Details
+                    </span>
+                </span>
+            </a>
+            <button class="btn btn-primary flex-grow-1" ng-if="!$ctrl.hasDisabledGuests &&
+                !$ctrl.product.prop65 &&
+                !$ctrl.product.additional_shipping &&
+                $ctrl.product.status === 'active' &&
+                $ctrl.getAvailableQty($ctrl.product) !== 0" ng-click="$ctrl.onClickAdd($ctrl.product['product_id'])"
+                ng-disabled="!$ctrl.addQty">
+                <i class="bi bi-cart-plus-fill" aria-hidden="true"
+                    ng-hide="$ctrl.isAddingToCart || $ctrl.viewAs === 'grid'"></i>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                    ng-show="$ctrl.isAddingToCart"></span>
+                <span ng-class="{'d-none d-md-inline':$ctrl.viewAs === 'list'}">
+                    {{ $ctrl.isAddingToCart ? 'Adding' : 'Add' }}
+                    <span class="d-none d-lg-inline">
+                        {{ !$ctrl.isAddingToCart ? 'to Cart' : '' }}
+                    </span>
+                </span>
+            </button>
+        </div>
+        <div ng-class="{
+            'card-footer': $ctrl.viewAs === 'grid',
+            'has-text-align-center px-1 px-lg-2': $ctrl.viewAs === 'list'}" ng-show="$ctrl.product['cart_qty'] > 0">
+            <span ng-show="$ctrl.product['cart_qty'] > 0">
+                {{$ctrl.product['cart_qty']}} in your cart
+                <span>
+        </div>
+    </div>
+</div>

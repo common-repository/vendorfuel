@@ -1,0 +1,289 @@
+<layout-component
+	heading="Manufacturers"
+	breadcrumbs="$ctrl.breadcrumbs"
+	action="$ctrl.action"
+>
+	<form ng-submit="$ctrl.submit()">
+		<fieldset class="input-group mb-3" ng-disabled="$ctrl.isLoading">
+			<input
+				type="search"
+				class="form-control"
+				ng-model="$ctrl.params.q"
+				ng-change="$ctrl.changeQuery( $ctrl.params.q )"
+			/>
+			<button class="btn btn-outline-secondary" type="submit">
+				Search
+			</button>
+		</fieldset>
+	</form>
+
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<table
+		class="table table-striped"
+		ng-if="$ctrl.manufacturers && !$ctrl.isLoading"
+	>
+		<colgroup>
+			<col class="col-md-1" />
+			<col span="3" />
+		</colgroup>
+		<thead>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.sortType || 'desc', {
+                'sortable': $ctrl.params.sortBy !== 'id',
+                'sorted': $ctrl.params.sortBy === 'id',
+            }]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('id', $event)"
+				>
+					<span>ID</span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.sortType || 'desc', {
+                'sortable': $ctrl.params.sortBy !== 'name',
+                'sorted': $ctrl.params.sortBy === 'name',
+            }]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('name', $event)"
+				>
+					<span> Name </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th>Logo</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.sortType || 'desc', {
+                'sortable': $ctrl.params.sortBy !== 'info',
+                'sorted': $ctrl.params.sortBy === 'info',
+            }]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('info', $event)"
+				>
+					<span> Description </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.sortType || 'desc', {
+                'sortable': $ctrl.params.sortBy !== 'website',
+                'sorted': $ctrl.params.sortBy === 'website',
+            }]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('website', $event)"
+				>
+					<span> Website </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+		</thead>
+		<tbody>
+			<tr
+				ng-repeat="manufacturer in $ctrl.manufacturers.data track by manufacturer.id"
+			>
+				<td>
+					{{ manufacturer.id }}
+				</td>
+				<td>
+					<strong>
+						<a
+							class="text-decoration-none row-title"
+							ui-sref="catalog.manufacturers.show({ id: manufacturer.id })"
+						>
+							{{ manufacturer.name }}
+						</a>
+					</strong>
+					<div class="hstack gap-2 row-actions visible">
+						<a
+							class="text-decoration-none"
+							ui-sref="catalog.manufacturers.show({ id: manufacturer.id })"
+						>
+							Edit
+						</a>
+						|
+						<a
+							class="text-decoration-none text-danger"
+							href="#"
+							ng-click="$ctrl.confirmDelete( $event, $index )"
+							ng-hide="$ctrl.isConfirmingDeletion[$index]"
+						>
+							Delete
+						</a>
+						<span ng-if="$ctrl.isConfirmingDeletion[$index]">
+							<strong class="text-dark">
+								Delete this manufacturer?
+							</strong>
+							<a
+								class="text-decoration-none"
+								href="#"
+								ng-click="$ctrl.cancelDelete( $event, $index )"
+							>
+								Cancel
+							</a>
+							|
+							<a
+								class="text-decoration-none text-danger"
+								href="#"
+								ng-click="$ctrl.remove( $event, manufacturer.id, $index )"
+							>
+								{{
+									$ctrl.isDeleting[$index]
+										? 'Deleting'
+										: 'Delete'
+								}}
+							</a>
+						</span>
+					</div>
+				</td>
+				<td class="text-end">
+					<img
+						alt=""
+						height="40"
+						style="max-height: 40px"
+						ng-if="manufacturer.images.logo"
+						ng-src="{{ manufacturer.images.logo.thumb }}"
+					/>
+				</td>
+				<td>
+					{{ manufacturer.info }}
+				</td>
+				<td>
+					<span ng-bind-html="manufacturer.website | linky:'_blank'">
+					</span>
+				</td>
+			</tr>
+		</tbody>
+		<caption ng-if="!$ctrl.manufacturers.data.length">
+			No results{{
+				$ctrl.cachedQ ? ' for ' + $ctrl.cachedQ + '.' : ''
+			}}
+		</caption>
+	</table>
+
+	<div class="tablenav" ng-if="$ctrl.manufacturers && !$ctrl.isLoading">
+		<div class="tablenav-pages">
+			<span class="displaying-num">
+				{{ $ctrl.manufacturers.total }} items
+			</span>
+			<span class="pagination-links">
+				<a
+					href="#"
+					class="first-page button"
+					ng-click="$ctrl.changePage( $event, 1 )"
+					ng-if="$ctrl.manufacturers.current_page > 2"
+				>
+					<span class="screen-reader-text"> First page </span>
+					<span aria-hidden="true"> &laquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="$ctrl.manufacturers.current_page < 3"
+				>
+					&laquo;
+				</span>
+				<a
+					href="#"
+					class="prev-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.manufacturers.current_page - 1 )"
+					ng-if="$ctrl.manufacturers.current_page > 1"
+				>
+					<span class="screen-reader-text"> Previous page </span>
+					<span aria-hidden="true"> &lsaquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="$ctrl.manufacturers.current_page === 1"
+				>
+					&lsaquo;
+				</span>
+				<span class="paging-input">
+					<label
+						for="current-page-selector"
+						class="screen-reader-text"
+					>
+						Current Page
+					</label>
+					<input
+						type="number"
+						class="current-page"
+						min="1"
+						name="paged"
+						size="1"
+						max="{{ $ctrl.manufacturers.last_page }}"
+						ng-disabled="$ctrl.manufacturers.last_page === 1"
+						ng-model="$ctrl.params.page"
+					/>
+					<span class="tablenav-paging-text">
+						of
+						<span class="total-pages">
+							{{ $ctrl.manufacturers.last_page }}
+						</span>
+					</span>
+				</span>
+				<a
+					href="#"
+					class="next-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.manufacturers.current_page + 1 )"
+					ng-if="
+						$ctrl.manufacturers.current_page <
+						$ctrl.manufacturers.last_page
+					"
+				>
+					<span class="screen-reader-text"> Next page </span>
+					<span aria-hidden="true"> &rsaquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="
+						$ctrl.manufacturers.current_page ===
+						$ctrl.manufacturers.last_page
+					"
+				>
+					&rsaquo;
+				</span>
+				<a
+					href="#"
+					class="last-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.manufacturers.last_page )"
+					ng-if="
+						$ctrl.manufacturers.current_page <
+						$ctrl.manufacturers.last_page - 1
+					"
+				>
+					<span class="screen-reader-text"> Last page </span>
+					<span aria-hidden="true"> &raquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="
+						$ctrl.manufacturers.current_page >=
+						$ctrl.manufacturers.last_page - 1
+					"
+				>
+					&raquo;
+				</span>
+			</span>
+		</div>
+	</div>
+</layout-component>

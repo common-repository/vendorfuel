@@ -1,0 +1,130 @@
+<div class="row align-items-center">
+	<div class="col-2 col-lg-1">
+		<div class="ratio ratio-1x1">
+			<img
+				class="lazy"
+				loading="lazy"
+				ng-repeat="image in $ctrl.item.images track by $index"
+				ng-if="$first"
+				ng-src="{{ image['thumb_url'] }}"
+			/>
+		</div>
+	</div>
+	<div class="col">
+		<h4 class="h6 mb-1 text-break">{{ $ctrl.item.description }}</h4>
+		<div class="row small">
+			<div class="col-sm">
+				<p class="mb-0">
+					SKU: {{ $ctrl.item.sku }}<br />
+					Price: {{ $ctrl.item.price | currency }}
+				</p>
+			</div>
+			<div class="col-sm">
+				<p class="mb-0">
+					Qty: {{ $ctrl.item.qty }}<br />
+					Item Total: {{ $ctrl.item['extended_price'] | currency }}
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-auto text-end">
+		<div class="btn-toolbar">
+			<button
+				class="btn btn-link btn-sm me-1"
+				ng-click="$ctrl.onClickFavorite()"
+			>
+				<i
+					ng-class="['bi',
+						{'bi-heart-fill': $ctrl.isFavorite,
+						'bi-heart': !$ctrl.isFavorite }]"
+					ng-hide="$ctrl.isTogglingFavorite"
+				></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isTogglingFavorite"
+				></span>
+			</button>
+			<button
+				class="btn btn-secondary btn-sm me-1"
+				ng-click="$ctrl.onClickReturnItem()"
+				ng-disabled="$ctrl.isReturningItem"
+			>
+				<i class="bi bi-arrow-counterclockwise"></i>
+				<span class="d-none d-md-inline">Return Item</span>
+			</button>
+			<button
+				class="btn btn-primary btn-sm"
+				ng-click="$ctrl.onClickAddToCart()"
+				ng-disabled="$ctrl.isAddingToCart"
+			>
+				<i
+					class="bi bi-cart-plus-fill"
+					ng-hide="$ctrl.isAddingToCart"
+				></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isAddingToCart"
+				></span>
+				<span class="d-none d-md-inline"
+					>{{ $ctrl.isAddingToCart ? 'Adding' : 'Add'}} to Cart</span
+				>
+			</button>
+		</div>
+	</div>
+</div>
+<form ng-if="$ctrl.isReturningItem">
+	<div class="row">
+		<div class="col">
+			<div class="mb-3">
+				<label for="reason" class="form-label">Reason for Return</label>
+				<select
+					class="form-control"
+					id="reason"
+					ng-model="$ctrl.reason"
+				>
+					<option value="defective">Defective</option>
+					<option value="wrong item">Wrong Item</option>
+					<option value="exchange">Exchange</option>
+					<option value="other">Other</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-8">
+			<div class="mb-3">
+				<label for="notes" class="form-label">Notes</label>
+				<textarea
+					class="form-control"
+					id="notes"
+					ng-model="$ctrl.notes"
+				></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="btn-toolbar justify-content-end">
+		<button
+			type="button"
+			class="btn btn-secondary mb-2"
+			ng-click="$ctrl.isReturningItem = false"
+		>
+			Cancel
+		</button>
+		<button
+			type="button"
+			class="btn btn-primary ms-1 mb-2"
+			ng-click="$ctrl.onClickSubmitReturn()"
+			ng-disabled="$ctrl.isSubmittingReturn"
+		>
+			<span
+				class="spinner-border spinner-border-sm"
+				role="status"
+				aria-hidden="true"
+				ng-show="$ctrl.isSubmittingReturn"
+			></span>
+			{{ $ctrl.isSubmittingReturn ? 'Submitting' : 'Submit'}}
+		</button>
+	</div>
+</form>

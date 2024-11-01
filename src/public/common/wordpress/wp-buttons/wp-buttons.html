@@ -1,0 +1,12 @@
+<!-- wp:buttons -->
+<div
+	ng-class="['wp-block-buttons d-flex', {
+        'justify-content-start': $ctrl.justification === 'left',
+        'justify-content-center': $ctrl.justification === 'center',
+        'justify-content-end': $ctrl.justification === 'right',
+        'justify-content-between': $ctrl.justification === 'space-between',
+        'flex-column': $ctrl.isVertical
+    }]"
+	ng-transclude
+></div>
+<!-- /wp:buttons -->

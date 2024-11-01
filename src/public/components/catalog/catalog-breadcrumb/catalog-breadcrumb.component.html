@@ -1,0 +1,28 @@
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb mt-3 d-md-none">
+		<li
+			class="breadcrumb-item"
+			ng-repeat="item in $ctrl.list track by $index"
+			ng-if="$index === $ctrl.list.length - 2"
+		>
+			<a ng-href="{{ item.link }}">
+				{{ item.title }}
+			</a>
+		</li>
+		<li class="breadcrumb-item" ng-if="$ctrl.isLoading">&hellip;</li>
+	</ol>
+	<ol class="breadcrumb mt-3 d-none d-md-flex">
+		<li
+			ng-repeat="item in $ctrl.list track by $index"
+			ng-class="['breadcrumb-item', { active: $last }]"
+		>
+			<a
+				ng-href="{{ item.link }}"
+				ng-attr-aria-current="{{ $last && 'page' }}"
+			>
+				{{ item.title }}
+			</a>
+		</li>
+		<li class="breadcrumb-item" ng-if="$ctrl.isLoading">&hellip;</li>
+	</ol>
+</nav>

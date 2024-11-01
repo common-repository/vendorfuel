@@ -1,0 +1,25 @@
+<div class="dropdown">
+	<button
+		class="btn btn-secondary dropdown-toggle me-1"
+		type="button"
+		id="sortByDropdownMenuButton"
+		data-bs-toggle="dropdown"
+		aria-haspopup="true"
+		aria-expanded="false"
+		ng-attr-title="Change sorting"
+	>
+		<i aria-hidden="true" ng-class="$ctrl.orderBy.icon"></i>
+		{{ $ctrl.orderBy.name }}
+	</button>
+	<div class="dropdown-menu" aria-labelledby="sortByDropdownMenuButton">
+		<button
+			class="dropdown-item"
+			ng-repeat="option in $ctrl.sortByOptions"
+			ng-click="$ctrl.change(option)"
+			ng-class="{ active: option.value === $ctrl.orderBy.value }"
+		>
+			<i ng-class="option.icon"></i>
+			{{ option.name }}
+		</button>
+	</div>
+</div>

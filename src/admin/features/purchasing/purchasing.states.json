@@ -1,0 +1,84 @@
+[
+	{
+		"name": "purchasing",
+		"url": "/purchasing",
+		"abstract": true,
+		"template": "<ui-view/>"
+	},
+	{
+		"name": "purchasing.page",
+		"url": "",
+		"component": "purchasingPage"
+	},
+	{
+		"name": "purchasing.document-profiles",
+		"url": "/document-profiles",
+		"abstract": true,
+		"template": "<ui-view/>"
+	},
+	{
+		"name": "purchasing.document-profiles.index",
+		"url": "",
+		"component": "documentProfilesPage"
+	},
+	{
+		"name": "purchasing.document-profiles.create",
+		"url": "/create",
+		"component": "documentProfilePage"
+	},
+	{
+		"name": "purchasing.document-profiles.edit",
+		"url": "/:id",
+		"component": "documentProfilePage"
+	},
+	{
+		"name": "purchasing.cost-sheets",
+		"url": "/cost-sheets",
+		"abstract": true
+	},
+	{
+		"name": "purchasing.cost-sheets.index",
+		"url": "",
+		"component": "purchasingCostSheets"
+	},
+	{
+		"name": "purchasing.cost-sheets.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "purchasing.cost-sheets.uploads.index",
+		"url": "",
+		"component": "costSheetUploadsIndex"
+	},
+	{
+		"name": "purchasing.cost-sheets.uploads.create",
+		"url": "/create",
+		"component": "costSheetUploadCreate"
+	},
+	{
+		"name": "purchasing.cost-sheets.uploads.show",
+		"url": "/:id",
+		"component": "costSheetUploadShow"
+	},
+	{
+		"name": "purchasing.vendors",
+		"url": "/vendors",
+		"abstract": true
+	},
+	{
+		"name": "purchasing.vendors.index",
+		"url": "",
+		"component": "vendorsIndex"
+	},
+	{
+		"name": "purchasing.vendors.create",
+		"url": "/create",
+		"component": "vendorEdit"
+	},
+	{
+		"name": "purchasing.vendors.edit",
+		"url": "/:id",
+		"component": "vendorEdit"
+	}
+]

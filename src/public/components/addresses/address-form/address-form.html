@@ -1,0 +1,219 @@
+<form name="form" ng-submit="$ctrl.onSubmit()">
+	<div class="mb-3">
+		<label for="profile-name" class="form-label">Profile Name</label>
+		<input
+			type="text"
+			class="form-control"
+			id="profile-name"
+			placeholder="Example: Home or Office"
+			ng-model="$ctrl.profile.profileName"
+		/>
+	</div>
+	<fieldset>
+		<legend>Address</legend>
+		<div class="row">
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="first-name" class="form-label"
+						>First Name <small>(required)</small></label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="first-name"
+						required
+						minlength="2"
+						maxlength="250"
+						name="firstName"
+						ng-model="$ctrl.profile.firstName"
+						ng-class="{
+								'is-invalid': form.firstName.$invalid && form.firstName.$touched}"
+					/>
+					<p class="invalid-feedback">Please enter the first name.</p>
+				</div>
+			</div>
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="last-name" class="form-label"
+						>Last Name <small>(required)</small></label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="last-name"
+						required
+						minlength="2"
+						maxlength="250"
+						name="lastName"
+						ng-model="$ctrl.profile.lastName"
+						ng-class="{
+								'is-invalid': form.lastName.$invalid && form.lastName.$touched}"
+					/>
+					<p class="invalid-feedback">Please enter the last name.</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="address1" class="form-label"
+						>Street Address <small>(required)</small></label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="address1"
+						required
+						minlength="2"
+						maxlength="250"
+						name="address1"
+						ng-model="$ctrl.profile.address1"
+						ng-class="{
+								'is-invalid': form.address1.$invalid && form.address1.$touched}"
+					/>
+					<p class="invalid-feedback">
+						Please enter the street address.
+					</p>
+				</div>
+			</div>
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="address2" class="form-label"
+						>Apt., Suite, etc.</label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="address2"
+						maxlength="250"
+						name="address2"
+						ng-model="$ctrl.profile.address2"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="mb-3">
+					<label for="city" class="form-label"
+						>City <small>(required)</small></label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="city"
+						required
+						minlength="2"
+						maxlength="250"
+						name="city"
+						ng-model="$ctrl.profile.city"
+						ng-class="{
+								'is-invalid': form.city.$invalid && form.city.$touched}"
+					/>
+					<p class="invalid-feedback">Please enter the city.</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="mb-3">
+					<label for="state" class="form-label"
+						>State <small>(required)</small></label
+					>
+					<select
+						class="form-control"
+						id="state"
+						autocomplete="address-level1"
+						required
+						ng-options="state as state.name for state in $ctrl.stateOptions track by state.id"
+						name="state"
+						ng-model="$ctrl.profile.state"
+						ng-class="{
+								'is-invalid': form.state.$invalid && form.state.$touched}"
+					></select>
+					<p class="invalid-feedback">Please select the state.</p>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="mb-3">
+					<label for="profileName" class="form-label"
+						>Zip Code <small>(required)</small></label
+					>
+					<input
+						type="text"
+						class="form-control"
+						id="zip"
+						required
+						minlength="5"
+						maxlength="10"
+						name="zip"
+						ng-pattern="$ctrl.zipCodePattern"
+						placeholder="XXXXX-XXXX"
+						ng-model="$ctrl.profile.zip"
+						ng-class="{
+								'is-invalid': form.zip.$invalid && form.zip.$touched}"
+					/>
+					<p class="invalid-feedback">
+						Please enter a valid 5 or 9 digit zip code (e.g.
+						95765-1234).
+					</p>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>Contact Info</legend>
+		<div class="row">
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="profileName" class="form-label"
+						>Email <small>(required)</small></label
+					>
+					<input
+						type="email"
+						class="form-control"
+						id="email"
+						required
+						minlength="5"
+						maxlength="250"
+						name="email"
+						ng-model="$ctrl.profile.email"
+						ng-class="{
+								'is-invalid': form.email.$invalid && form.email.$touched}"
+						ng-pattern="$ctrl.emailPattern"
+					/>
+					<p class="invalid-feedback">
+						Please enter the email address.
+					</p>
+				</div>
+			</div>
+			<div class="col-md">
+				<div class="mb-3">
+					<label for="profileName" class="form-label"
+						>Phone Number</label
+					>
+					<input
+						type="tel"
+						class="form-control"
+						id="phone"
+						name="phone"
+						ng-model="$ctrl.profile.phone"
+						ui-mask="(299) 999-9999"
+					/>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<div class="btn-toolbar">
+		<button
+			type="submit"
+			class="btn btn-primary me-2"
+			ng-disabled="form.$invalid || $ctrl.isInProgress"
+		>
+			{{ $ctrl.isInProgress ? 'Saving' : 'Save' }} Address
+		</button>
+		<button class="btn btn-secondary" ng-click="$ctrl.cancel()">
+			Cancel
+		</button>
+	</div>
+</form>

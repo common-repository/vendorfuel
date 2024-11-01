@@ -1,0 +1,10 @@
+<h2 class="nav-tab-wrapper">
+	<button
+		ng-class="['nav-tab', { 'nav-tab-active': $ctrl.active === tab.id }]"
+		ng-click="$ctrl.handleClick( tab.id )"
+		ng-if="!tab.protected || $ctrl.authed"
+		ng-repeat="tab in $ctrl.tabs"
+	>
+		{{ tab.label }}
+	</button>
+</h2>

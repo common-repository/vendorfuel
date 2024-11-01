@@ -1,0 +1,41 @@
+<h2 class="h5 my-3">Options</h2>
+<div class="hstack justify-content-center" ng-if="$ctrl.isLoading">
+	<div class="spinner is-active"></div>
+</div>
+<form name="form" ng-if="!$ctrl.isLoading">
+	<table class="form-table" role="presentation">
+		<tbody>
+			<tr>
+				<th scope="row">Miscellaneous options</th>
+				<td>
+					<fieldset ng-disabled="$ctrl.isUpdating">
+						<legend class="screen-reader-text">
+							<span>Options</span>
+						</legend>
+						<label
+							ng-repeat-start="option in $ctrl.options track by $index"
+							ng-attr-for="{{ 'option-' + $index }}"
+						>
+							<input
+								type="checkbox"
+								ng-attr-id="{{ 'option-' + $index }}"
+								ng-attr-name="{{ 'option-' + $index }}"
+								ng-model="option.value"
+							/>
+							{{ option.key }}</label
+						><br ng-repeat-end />
+					</fieldset>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-click="$ctrl.update($ctrl.options)"
+			ng-disabled="$ctrl.isUpdating"
+		>
+			Save Changes
+		</button>
+	</p>
+</form>

@@ -1,0 +1,24 @@
+<layout-component>
+	<div class="alert alert-info" role="alert" ng-if="!$ctrl.isSignedIn">
+		Redirecting to login page. Please wait&hellip;
+	</div>
+
+	<div ng-if="$ctrl.isSignedIn">
+		<p class="has-text-align-center has-medium-font-size">
+			Thanks for joining us {{ $ctrl.userName }}.
+		</p>
+		<punchout-suppliers ng-if="$ctrl.hasPunchoutEnabled">
+		</punchout-suppliers>
+
+		<welcome-banner></welcome-banner>
+
+		<div class="btn-toolbar justify-content-center">
+			<a
+				class="btn btn-primary"
+				ng-href="{{ $ctrl.cartUrl }}"
+				ng-if="$ctrl.cartCount"
+				>View Cart</a
+			>
+		</div>
+	</div>
+</layout-component>

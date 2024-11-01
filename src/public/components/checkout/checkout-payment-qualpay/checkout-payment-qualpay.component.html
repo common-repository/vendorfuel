@@ -1,0 +1,28 @@
+<form id="my-payment-form" ng-hide="$ctrl.isComplete">
+	<div id="qp-embedded-container"></div>
+	<input
+		type="submit"
+		name="submit"
+		value="Complete Order"
+		class="btn btn-primary"
+	/>
+</form>
+
+<div
+	class="alert alert-warning"
+	ng-if="$ctrl.isInProgress && !$ctrl.isComplete"
+>
+	Completing order, please wait and do not refresh the page.
+</div>
+
+<div class="alert alert-success" role="alert" ng-if="$ctrl.isComplete">
+	<h3>Checkout Complete for Order {{ $ctrl.orderId }}</h3>
+	<p>
+		{{
+			$ctrl.isPending
+				? 'Your order is now pending approval.'
+				: 'Your order has been submitted!'
+		}}
+	</p>
+	<a class="btn btn-primary" href="/"> Go to Home </a>
+</div>

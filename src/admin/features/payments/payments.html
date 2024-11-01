@@ -1,0 +1,41 @@
+<h2 class="wp-heading-inline">Payments</h2>
+<vf-check-auth></vf-check-auth>
+<wp-notice-list></wp-notice-list>
+
+<div class="container-fluid p-0">
+	<div ng-if="isAuthed" class="col p-0">
+		<uib-tabset active="activeTab" resize>
+			<uib-tab
+				index="0"
+				select="TabChanged(0)"
+				heading="Payment Gateways"
+			>
+				<wp-spinner type="2x" ng-show="loading"> </wp-spinner>
+				<div ng-if="!loading" class="col p-0 vf-tab-body">
+					<div class="col-md-5 mx-auto">
+						<div class="mb-3">
+							<label class="form-label"
+								>Select gateway to configure</label
+							>
+							<select
+								class="form-select"
+								ng-model="template"
+								ng-options="t.name for t in templates"
+							>
+								<option value="" hidden disabled>
+									Select a Gateway
+								</option>
+							</select>
+						</div>
+						<div class="slide-animate-container">
+							<div
+								class="slide-animate"
+								ng-include="template.url"
+							></div>
+						</div>
+					</div>
+				</div>
+			</uib-tab>
+		</uib-tabset>
+	</div>
+</div>

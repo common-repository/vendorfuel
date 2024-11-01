@@ -1,0 +1,48 @@
+[
+	{
+		"title": "Cost Sheets",
+		"link": "?page=vendorfuel#!/purchasing/cost-sheets",
+		"links": [
+			{
+				"text": "All Cost Sheets",
+				"link": "?page=vendorfuel#!/purchasing/cost-sheets"
+			},
+			{
+				"text": "Upload Cost Sheets",
+				"to": "cost-sheets/uploads/create"
+			},
+			{
+				"text": "Manage Cost Sheet Uploads",
+				"to": "cost-sheets/uploads"
+			}
+		]
+	},
+	{
+		"title": "Document Profiles",
+		"to": "document-profiles",
+		"links": [
+			{
+				"text": "All Document Profiles",
+				"to": "document-profiles"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/purchasing/document-profiles/create"
+			}
+		]
+	},
+	{
+		"title": "Vendors",
+		"to": "vendors",
+		"links": [
+			{
+				"text": "All Vendors",
+				"to": "vendors"
+			},
+			{
+				"text": "Add New",
+				"to": "vendors/create"
+			}
+		]
+	}
+]

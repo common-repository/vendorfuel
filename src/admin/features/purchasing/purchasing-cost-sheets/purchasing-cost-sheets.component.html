@@ -1,0 +1,856 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Cost sheets</h2>
+<vf-check-auth></vf-check-auth>
+
+<div class="container-fluid p-0">
+    <div class="col p-0">
+        <uib-tabset active="activeTab" resize>
+            <uib-tab index="0" select="TabChanged(0)" heading="Search Cost Sheets">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col py-3 vf-tab-body">
+                    <div class="col p-3">
+                        <div class="input-group mb-3">
+                            <button class="button dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{searchParams.searchBy === 'id' ? 'ID' : searchParams.searchBy === 'name' ? 'Name'
+                                : searchParams.searchBy || 'Search All'}}
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" ng-click="searchParams.searchBy = ''"
+                                    ng-if="searchParams.searchBy.length >= 1">Search All</a>
+                                <a class="dropdown-item" ng-click="searchParams.searchBy = 'id'"
+                                    ng-if="searchParams.searchBy != 'id'">ID</a>
+                                <a class="dropdown-item" ng-click="searchParams.searchBy = 'name'"
+                                    ng-if="searchParams.searchBy != 'name'">Name</a>
+                            </div>
+                            <input ng-keypress="$event.keyCode === 13 && Index(1)" ng-model="searchParams.q" type="text"
+                                class="form-control form-control-lg" placeholder="Search">
+                            <button ng-click="Index()" class="button"
+                                type="submit">Search</button>
+                            <div uib-alert class="col-4 alert mt-2  p-3 ms-auto"
+                                ng-class="'alert-' + (response.type || 'warning')"
+                                ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                                close="localized.RemoveResponseMsg($index)">{{response.message}}
+                            </div>
+                        </div>
+                        <hr class="col p-0" ng-if="isXS">
+                        <div class="row px-3">
+                            <div class="col-3" ng-click="SortIndex('id')">ID</div>
+                            <div class="col-3" ng-click="SortIndex('name')">Name</div>
+                            <div class="col-3" ng-click="SortIndex('cost_margin')">Cost Margin</div>
+                        </div>
+                        <div class="p-3" ng-class="{'min-scroll':!isXS}">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="text-center" ng-if="costSheets.data.length <= 0 && !loadingMore">
+                                <span class="col m-auto">
+                                    <h3>No Cost Sheet(s) <span
+                                            ng-if="searchParams.q.length >= 1 && searchedBy.length <= 0">matching
+                                            '{{searchParams.q}}'</span><span
+                                            ng-if="searchParams.q.length >= 1 && searchedBy.length >= 1">with the
+                                            {{searchedBy === 'id' ? 'ID' : searchedBy === 'name' ? 'Name'}}
+                                            of '{{searchParams.q}}'</span> found.</h3>
+                                </span>
+                            </div>
+                            <div class="col p-3 vf-list-item cursor-pointer"
+                                ng-click="costSheet.id = sheet.id; TabChanged(2)"
+                                ng-repeat="sheet in costSheets.data track by $index" ng-if="!loadingMore">
+                                <div class="row">
+                                    <div class="col-3">{{sheet.id || '----'}}</div>
+                                    <div class="col-3">{{sheet.name || '----'}} </div>
+                                    <div class="col-3">{{sheet.cost_margin * 100 || '----'}} %</div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row  mb-3">
+                            <div class="col-sm-4">
+                                <span>Showing {{costSheets.from || 0}} to {{costSheets.to || 0}} of
+                                    {{costSheets.total || 0}} entries<span>
+                            </div>
+                            <div class="col-sm-4 text-center mt-2">
+                                <button class="button" ng-if="costSheets.prev_page_url"
+                                    ng-click="Index(costSheets.current_page - 1)"><span class="dashicons dashicons-arrow-left-alt2"></span>
+                                    Prev</button>
+                                <button class="button" ng-if="costSheets.current_page - 2 > 0"
+                                    ng-click="Index(costSheets.current_page - 2)">{{costSheets.current_page -
+                                    2}}</button>
+                                <button class="button" ng-if="costSheets.current_page - 1 > 0"
+                                    ng-click="Index(costSheets.current_page - 1)">{{costSheets.current_page -
+                                    1}}</button>
+                                <button class="button"
+                                    ng-disabled="true">{{costSheets.current_page}}</button>
+                                <button class="button"
+                                    ng-if="costSheets.current_page + 1 <= costSheets.last_page"
+                                    ng-click="Index(costSheets.current_page + 1)">{{costSheets.current_page +
+                                    1}}</button>
+                                <button class="button"
+                                    ng-if="costSheets.current_page + 2 <= costSheets.last_page"
+                                    ng-click="Index(costSheets.current_page + 2)">{{costSheets.current_page +
+                                    2}}</button>
+                                <button class="button" ng-if="costSheets.next_page_url"
+                                    ng-click="Index(costSheets.current_page + 1)">Next <span
+                                        class="dashicons dashicons-arrow-right-alt2"></span></button>
+                            </div>
+                            <div class="col-sm-4  justify-content-end">
+                                <label for="rpp">Per Page: </label>
+                                <select class="form-control" style="display: inline-block;" id="rpp"
+                                    ng-model="searchParams.rpp" ng-change="Index(1)"
+                                    ng-options="value for value in rppValues">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Add Cost Sheet">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col py-3 vf-tab-body">
+                    <form class="row p-3" name="new.costSheet">
+                        <div class="col-12 col-md-4" class="needs-validation">
+                            <div ng-class="new.costSheet.name.$invalid ? 'has-danger' : 'has-success'">
+                                <label class="form-label">
+                                    Name
+                                </label>
+                                <input class="form-control" id="name"
+                                    ng-class="new.costSheet.name.$invalid ? 'is-invalid' : 'is-valid'"
+                                    ng-model="addParams.name" name="name" type="search"
+                                    placeholder="New Cost Sheet Name" minlength="1" required>
+                                <div class="invalid-feedback">
+                                    Please set a name for the Cost Sheet.
+                                </div>
+                            </div>
+                            <hr class="col p-0">
+                            <div class="dropdown mb-3">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Vendor</span>
+                                    <input class="form-control" ng-model="vendor.name" disabled required>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterVendorVal"
+                                            placeholder="Filter Vendors">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterVendor in vendors | toArray | orderBy: 'name' | filter: filterVendorVal as filteredVendors track by $index"
+                                                ng-click="vendor.name = filterVendor.name; addParams.vendor_id = filterVendor.id;">
+                                                {{filterVendor.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filteredVendors.length <= 0">
+                                                No results matching {{filterVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="dropdown mb-3">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Supplier</span>
+                                    <input class="form-control" ng-model="supplier.name" disabled>
+                                    <button class="button" ng-click="filterSupVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterSupplierVal"
+                                            placeholder="Filter Suppliers">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterSupplier in suppliers | toArray | orderBy: 'name' | filter: filterSupplierVal as filterSuppliers track by $index"
+                                                ng-click="supplier.name = filterSupplier.name; addParams.supplier_id = filterSupplier.id;">
+                                                {{filterSupplier.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filterSuppliers.length <= 0">
+                                                No results matching {{filterSupVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="add_cost_margin">Cost Margin %</label>
+                                <input type="number" min="0" id="add_cost_margin" name="add_cost_margin"
+                                    ng-model="addParams.cost_margin" />
+                            </div>
+                            <div class="dropdown mb-3">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Transmitting Document Profile</span>
+                                    <input class="form-control" ng-model="transmitting_document_profile.name" disabled>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterTransmittingDocProfileVal"
+                                            placeholder="Filter Document Profiles">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterTransmittingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterTransmittingDocProfileVal as filteredTransmittingDocProfile track by $index"
+                                                ng-click="transmitting_document_profile.name = filterTransmittingDocProfile.name; addParams.transmitting_document_profile_id = filterTransmittingDocProfile.id;">
+                                                {{filterTransmittingDocProfile.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filteredTransmittingDocProfile.length <= 0">
+                                                No results matching {{filterTransmittingDocProfileVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="dropdown mb-3">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Receiving Document Profile</span>
+                                    <input class="form-control" ng-model="receiving_document_profile.name" disabled>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterReceivingDocProfileVal"
+                                            placeholder="Filter Document Profiles">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterReceivingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterReceivingDocProfileVal as filterReceivingDocProfile track by $index"
+                                                ng-click="receiving_document_profile.name = filterReceivingDocProfile.name; addParams.receiving_document_profile_id = filterReceivingDocProfile.id;">
+                                                {{filterReceivingDocProfile.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filterReceivingDocProfile.length <= 0">
+                                                No results matching {{filterReceivingDocProfileVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div ng-if="!isSM && !isXS">
+                                <button class="button button-primary mb-2" style="min-width: 138px;" type="button"
+                                    ng-click="Store()" ng-disabled="new.costSheet.$invalid">Add
+                                    Cost
+                                    Sheet</button>
+                                <div class=" alert col-12 text-center"
+                                    ng-class="'alert-' + (response.type || 'warning')"
+                                    close="localized.RemoveResponseMsg($index)"
+                                    ng-repeat="response in localized.GetResponseMsgs()">
+                                    {{response.message}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col" ng-if="isSM || isXS">
+                            <button class="button button-primary mb-2 col" type="button" ng-click="Store()"
+                                ng-disabled="new.costSheet.$invalid">Add
+                                Cost
+                                Sheet</button>
+                            <div class=" alert col-12 text-center" ng-class="'alert-' + (response.type || 'warning')"
+                                close="localized.RemoveResponseMsg($index)"
+                                ng-repeat="response in localized.GetResponseMsgs()">
+                                {{response.message}}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="TabChanged(2)" ng-show="costSheet.id" heading="View Cost Sheet">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <form ng-if="!loading" class="col py-3 vf-tab-body" name="view.costSheetForm">
+                    <div class="row p-3">
+                        <div class="col-12 col-md-4">
+                            <div ng-if="editName === false" ng-click="ChangeEdit()">
+                                <h2>{{costSheet.name}} <sup class="dashicons dashicons-edit"></sup></h2>
+                            </div>
+                            <div class="input-group" ng-if="editName === true">
+                                <input class="form-control" ng-class="{'is-invalid':view.costSheetForm.name.$invalid}"
+                                    name="name" ng-model="costSheet.name" required />
+                                <button class="button button-primary" type="button" ng-click="ChangeEdit()"><span
+                                        class="dashicons dashicons-yes"></span></button>
+                            </div>
+                            <hr class="col p-0">
+                            <div class="dropdown">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Vendor</span>
+                                    <input class="form-control" ng-model="costSheet.vendor.name" disabled>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterVendorVal"
+                                            placeholder="Filter Vendors">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterVendor in vendors | toArray | orderBy: 'name' | filter: filterVendorVal as filteredVendors track by $index"
+                                                ng-click="costSheet.vendor.name = filterVendor.name; costSheet.vendor_id = filterVendor.id;">
+                                                {{filterVendor.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filteredVendors.length <= 0">
+                                                No results matching {{filterVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="dropdown">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Supplier</span>
+                                    <input class="form-control" ng-model="costSheet.supplier.name" disabled>
+                                    <button class="button" ng-click="filterSupVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterSupplierVal"
+                                            placeholder="Filter Suppliers">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterSupplier in suppliers | toArray | orderBy: 'name' | filter: filterSupplierVal as filterSuppliers track by $index"
+                                                ng-click="costSheet.supplier.name = filterSupplier.name; costSheet.supplier_id = filterSupplier.id;">
+                                                {{filterSupplier.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filterSuppliers.length <= 0">
+                                                No results matching {{filterSupVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="view_cost_margin">Cost Margin %</label>
+                                <input type="number" min="0" id="add_cost_margin" name="view_cost_margin"
+                                    ng-model="costSheet.cost_margin" />
+                            </div>
+                            <div class="dropdown">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Transmitting Document Profile</span>
+                                    <input class="form-control" ng-model="costSheet.transmitting_document_profile.name"
+                                        disabled required>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterTransmittingDocProfileVal"
+                                            placeholder="Filter Document Profiles">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterTransmittingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterTransmittingDocProfileVal as filteredTransmittingDocProfile track by $index"
+                                                ng-click="costSheet.transmitting_document_profile.name = filterTransmittingDocProfile.name; costSheet.transmitting_document_profile_id = filterTransmittingDocProfile.id;">
+                                                {{filterTransmittingDocProfile.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filteredTransmittingDocProfile.length <= 0">
+                                                No results matching {{filterTransmittingDocProfileVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="dropdown">
+                                <div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <span class="input-group-text w-135">Receiving Document Profile</span>
+                                    <input class="form-control" ng-model="costSheet.receiving_document_profile.name"
+                                        disabled required>
+                                    <button class="button" ng-click="filterVal = ''">
+                                        <i class="dashicons dashicons-arrow-down"></i>
+                                    </button>
+                                </div>
+                                <ul class="vf-dropdown-search dropdown-menu">
+                                    <li class="input-group p-1">
+                                        <span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+                                        <input class="form-control" ng-model="filterReceivingDocProfileVal"
+                                            placeholder="Filter Document Profiles">
+                                    </li>
+                                    <li class="border-top">
+                                        <ul class="p-1" style="max-height: 300px; overflow: auto;">
+                                            <li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+                                                ng-repeat="filterReceivingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterReceivingDocProfileVal as filterReceivingDocProfile track by $index"
+                                                ng-click="costSheet.receiving_document_profile.name = filterReceivingDocProfile.name; costSheet.receiving_document_profile_id = filterReceivingDocProfile.id;">
+                                                {{filterReceivingDocProfile.name}}
+                                            </li>
+                                            <li class="text-center" ng-if="filterReceivingDocProfile.length <= 0">
+                                                No results matching {{filterReceivingDocProfileVal}}.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <hr class="col p-0" ng-if="isXS">
+                            <div class="mb-3">
+                                <button class="button button-primary" type="button" ng-if="updatedCosts.length >= 1"
+                                    ng-click="ShowChanges()">
+                                    <span ng-if="!showChanges">Show Changes ({{updatedCosts.length}})</span>
+                                    <span ng-if="showChanges">Show Current</span>
+                                </button>
+                            </div>
+                            <div ng-if="!isXS && !isSM">
+                                <div>
+                                    <button class="button mb-2" style="min-width: 135px"
+                                        ng-click="OpenSearchModalUpdate()">
+                                        <span ng-if="costSheet.costs.data.length">Edit Cost
+                                            Sheet</span><span ng-if="!costSheet.costs.data.length">Add
+                                            Products</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button class="button button-delete mb-2" style="min-width: 135px"
+                                        ng-click="Delete(costSheet.id)">Delete</button>
+                                    <button class="button button-primary mb-2" style="min-width: 135px"
+                                        type="button" ng-click="Update(costSheet.id)"
+                                        ng-disabled="view.costSheetForm.$invalid">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8" ng-class="{'mt-3':isXS || isSM}"
+                            style="display: inline-grid; position: relative;">
+                            <div ng-show="!showChanges">
+                                <div class="row" ui-keypress="{13:'Show(costSheet.id)'}">
+                                    <label class="form-label" for="searchProducts">Search:</label>
+                                    <div class="input-group" ng-form>
+                                        <input class="form-control" type="text" id="searchProducts"
+                                            placeholder="Search 'Labels'" ng-model="searchParams.q">
+                                        <button class="button"
+                                            ng-click="Show(costSheet.id)">Search</button>
+                                    </div>
+                                </div>
+                                <wp-spinner
+                                    type="2x"
+                                    ng-show="productsLoading">
+                                </wp-spinner>
+                                <div ng-if="!productsLoading">
+                                    <div class="row min-scroll">
+                                        <div class="col text-center p-20" ng-if="!costSheet.costs.data.length">
+                                            <h3>Click 'Add Products' to get started.</h3>
+                                        </div>
+                                        <div class="col-6 col-md-3 vf-item-card-outer"
+                                            ng-repeat="item in costSheet.costs.data track by $index">
+                                            <div class="vf-item-card-inner" ng-click="editIndex = $index;">
+                                                <div class="row">
+                                                    <p class="col-12"><b>{{item.sku}}</b></p>
+                                                    <div class="col-12" ng-if="!item.image">
+                                                        <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                                                    </div>
+                                                    <div class="col-12" ng-if="item.image">
+                                                        <img class="img-fluid vf-item-image"
+                                                            ng-src="{{item.image.thumb_url}}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <p>{{item.product.description | limitTo:
+                                                            30}}{{item.product.description.length >= 30 ? '...' : ''}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Cost
+                                                        <input class="form-control"
+                                                            ng-class="{'is-invalid':view.costSheetForm['cost'+$index].$invalid || !item.cost}"
+                                                            name="cost{{$index}}" format="currency"
+                                                            ng-change="editParams(item)" ng-model="item.cost"
+                                                            ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                            required />
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Unit of Measure
+                                                        <div class="row">
+
+                                                            <div class="col col-5">
+                                                                <input class="form-control" placeholder="Qty"
+                                                                    ng-class="{'is-invalid':view.costSheetForm['uomqty'+$index].$invalid || !item.uomqty}"
+                                                                    name="uomqty{{$index}}" ng-change="editParams(item)"
+                                                                    ng-model="item.uomqty" required />
+                                                            </div>
+                                                            <div class="col col-2 text-center"
+                                                                style="text-align: center;">
+                                                                /
+                                                            </div>
+                                                            <div class="col col-5">
+                                                                <input class="form-control" placeholder="ID"
+                                                                    ng-class="{'is-invalid':view.costSheetForm['uomid'+$index].$invalid || !item.uomid}"
+                                                                    name="uomid{{$index}}" ng-change="editParams(item)"
+                                                                    ng-model="item.uomid" required />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Vendor SKU
+                                                        <input class="form-control" placeholder="Vendor SKU"
+                                                            ng-class="{'is-invalid':view.costSheetForm['vendorSku'+$index].$invalid || !item.vendor_sku}"
+                                                            name="vendorSku{{$index}}" ng-change="editParams(item)"
+                                                            ng-model="item.vendor_sku" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="col p-0" ng-if="isXS">
+                                <div class="row  mb-3" ng-hide="productsLoading">
+                                    <div class="col-sm-4">
+                                        <span>Showing {{costSheet.costs.from || 0}} to
+                                            {{costSheet.costs.to || 0}} of
+                                            {{costSheet.costs.total || 0}} entries</span>
+                                    </div>
+                                    <div class="col text-center mb-3">
+                                        <button class="button" ng-if="costSheet.costs.prev_page_url"
+                                            ng-click="searchParams.page = costSheet.costs.current_page - 1; Show(costSheet.id);"><span
+                                                class="dashicons dashicons-arrow-left-alt2"></span> Prev</button>
+                                        <button class="button"
+                                            ng-if="costSheet.costs.current_page - 2 > 0"
+                                            ng-click="searchParams.page = costSheet.costs.current_page - 2; Show(costSheet.id);">{{costSheet.costs.current_page
+                                            - 2}}</button>
+                                        <button class="button"
+                                            ng-if="costSheet.costs.current_page - 1 > 0"
+                                            ng-click="searchParams.page = costSheet.costs.current_page - 1; Show(costSheet.id);">{{costSheet.costs.current_page
+                                            - 1}}</button>
+                                        <button class="button"
+                                            ng-disabled="true">{{costSheet.costs.current_page}}</button>
+                                        <button class="button"
+                                            ng-if="costSheet.costs.current_page + 1 <= costSheet.costs.last_page"
+                                            ng-click="searchParams.page = costSheet.costs.current_page + 1; Show(costSheet.id);">{{costSheet.costs.current_page
+                                            + 1}}</button>
+                                        <button class="button"
+                                            ng-if="costSheet.costs.current_page + 2 <= costSheet.costs.last_page"
+                                            ng-click="searchParams.page = costSheet.costs.current_page + 2; Show(costSheet.id);">{{costSheet.costs.current_page
+                                            + 2}}</button>
+                                        <button class="button" ng-if="costSheet.costs.next_page_url"
+                                            ng-click="searchParams.page = costSheet.costs.current_page + 1; Show(costSheet.id);">Next
+                                            <span class="dashicons dashicons-arrow-right-alt2"></span></button>
+                                    </div>
+                                    <div class="col-sm-4  justify-content-end">
+                                        <label for="rpp">Per Page: </label>
+                                        <select class="form-control" style="display: inline-block;" id="rpp"
+                                            ng-model="searchParams.rpp"
+                                            ng-change="searchParams.page = 1;Show(costSheet.id);"
+                                            ng-options="value for value in rppValues">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-show="showChanges">
+                                <div class="row " ng-hide="productsLoading">
+                                    <div class="input-group col-12 p-0">
+                                        <input class="form-control" type="text" id="filterChanges"
+                                            ng-model="filterEdited" placeholder="Filter Changes">
+                                    </div>
+                                </div>
+                                <hr class="col p-0" ng-if="isXS">
+                                <wp-spinner
+                                    type="2x"
+                                    ng-show="productsLoading">
+                                </wp-spinner>
+                                <div ng-if="!productsLoading">
+                                    <div class="row min-scroll">
+                                        <div class="col text-center p-20" ng-if="results.length <= 0">
+                                            <h3>No results matching '{{filterBy}}'.</h3>
+                                        </div>
+                                        <div class="col-6 col-md-4 col-lg-3 vf-item-card-outer"
+                                            ng-repeat="item in updatedCosts | filter: filterEdited as results track by $index">
+                                            <div class="vf-item-card-inner" ng-class="item.action">
+                                                <div class="row">
+                                                    <p class="col-12"><b>{{item.value.sku}}</b></p>
+                                                    <div class="col-12" style="min-height: 80px;"
+                                                        ng-if="!item.value.image">
+                                                        <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                                                    </div>
+                                                    <div class="col-12" ng-if="item.value.image">
+                                                        <img class="img-fluid vf-item-image"
+                                                            ng-src="{{item.value.image.thumb_url}}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <p>{{item.value.product.description | limitTo:
+                                                            30}}{{item.value.product.description.length >= 30 ? '...' :
+                                                            ''}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Cost
+                                                        <input
+                                                            ng-disabled="item.action == 'edited' || item.action == 'remove'"
+                                                            class="form-control"
+                                                            ng-class="{'is-invalid':view.costSheetForm['newCost'+$index].$invalid || !item.value.cost}"
+                                                            format="currency" name="newCost{{$index}}"
+                                                            ng-model="item.value.cost"
+                                                            ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                            required />
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Unit of Measure
+                                                        <div class="row">
+                                                            <div class="col col-5">
+                                                                <input
+                                                                    ng-disabled="item.action == 'edited' || item.action == 'remove'"
+                                                                    class="form-control" placeholder="Qty"
+                                                                    ng-class="{'is-invalid':view.costSheetForm['newUomqty'+$index].$invalid || !item.value.uomqty}"
+                                                                    name="newUomqty{{$index}}"
+                                                                    ng-model="item.value.uomqty" required />
+                                                            </div>
+                                                            <div class="col col-2 text-center"
+                                                                style="text-align: center;">
+                                                                /
+                                                            </div>
+                                                            <div class="col col-5">
+                                                                <input
+                                                                    ng-disabled="item.action == 'edited' || item.action == 'remove'"
+                                                                    class="form-control" placeholder="ID"
+                                                                    ng-class="{'is-invalid':view.costSheetForm['newUomid'+$index].$invalid || !item.value.uomid}"
+                                                                    name="newUomid{{$index}}"
+                                                                    ng-model="item.value.uomid" required />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        Vendor SKU
+                                                        <input
+                                                            ng-disabled="item.action == 'edited' || item.action == 'remove'"
+                                                            class="form-control" placeholder="Vendor SKU"
+                                                            ng-class="{'is-invalid':view.costSheetForm['newVendorSku'+$index].$invalid || !item.value.vendor_sku}"
+                                                            name="newVendorSku{{$index}}"
+                                                            ng-model="item.value.vendor_sku" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col" ng-if="isXS || isSM">
+                        <button class="button mb-2 col" ng-click="OpenSearchModalUpdate()">
+                            <span ng-if="costSheet.costs.data.length">Edit Cost Sheet</span><span
+                                ng-if="!costSheet.costs.data.length">Add Products</span>
+                        </button>
+                        <button class="button button-delete mb-2 col"
+                            ng-click="Delete(costSheet.id)">Delete</button>
+                        <button class="button button-primary mb-2 col" type="button" ng-click="Update(costSheet.id)"
+                            ng-disabled="view.costSheetForm.$invalid">Save Changes</button>
+                        <div class=" alert col-12 text-center" ng-class="'alert-' + (response.type || 'warning')"
+                            close="localized.RemoveResponseMsg($index)"
+                            ng-repeat="response in localized.GetResponseMsgs()">
+                            {{response.message}}
+                        </div>
+                    </div>
+                </form>
+            </uib-tab>
+            <uib-tab index="3" select="TabChanged(3)" heading="Upload Sheet(s)">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <form class="row p-3" enctype="multipart/form-data" name="psUploadForm">
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Cost Sheet</span>
+                                <input class="form-control" ng-class="{'is-invalid':psUploadForm.psID.$invalid}"
+                                    type="text" id="psName" name="psID" placeholder="Select a Cost Sheet"
+                                    ng-model="uploadCostSheetName" disabled required />
+                                <button class="button"
+                                    ng-click="OpenSearchModalCostSheetsIndex()">Browse</button>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-104">File</span>
+                                <input class="form-control" ng-class="{'is-invalid':psUploadForm.psName.$invalid}"
+                                    name="psName" ng-model="theFile.name" placeholder="Upload a File" disabled required>
+                                <label class="button m-0">
+                                    Browse <input class="custom-file" type="file" name="file" id="uploadInput"
+                                        onchange="angular.element(this).scope().setFile(this), angular.element(this).scope().setUploading()"
+                                        hidden />
+                                </label>
+                            </div>
+                            <div ng-if="uploading" class="text-center">
+                                Generating your Cost Sheet, please wait <img class="h-46"
+                                    ng-src="{{rootUrl}}/assets/img/loading.gif">
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-3 table-responsive">
+                            <div class="min-scroll-table" ng-if="batchUpload && !uploading">
+                                <table class="table table-striped table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Cost</th>
+                                            <th>Vendor SKU</th>
+                                            <th>UoM ID</th>
+                                            <th>UoM Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="product in batchUpload  | limitTo: 5 track by $index">
+                                        <tr>
+                                            <td ng-repeat="attribute in product track by $index ">
+                                                <span ng-if="attribute.length >= 1" title="{{attribute}}">{{attribute |
+                                                    limitTo: 25}}{{attribute.length >= 25 ? '...' : ''}}</span>
+                                                <span ng-if="attribute.length <= 0">----</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-12" ng-class="{'text-end':batchUpload}">
+                            <button class="button button-delete mb-3" ng-class="{'col': isXS || isSM}"
+                                ng-click="RemoveUploadFile()" ng-if="batchUpload">Remove</button>
+                            <button class="button button-primary mb-3" ng-class="{'col': isXS || isSM}"
+                                ng-disabled="psUploadForm.$invalid" ng-click="UploadBatch()" ng-if="batchUpload">Upload
+                                Cost Sheet</button>
+                        </div>
+                    </form>
+                </div>
+                <div uib-alert class="col-4 alert mt-2  p-3 ms-auto"
+                    ng-class="'alert-' + (response.type || 'warning')"
+                    ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                    close="localized.RemoveResponseMsg($index)">{{response.message}}
+                </div>
+            </uib-tab>
+            <uib-tab index="4" select="TabChanged(4)" heading="Batches">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <div class="col p-3">
+                        <div class="input-group">
+                            <span class="input-group-text">Status</span>
+                            <select class="form-control"
+                                ng-options="key as value for (key, value) in batchListOptions"
+                                ng-model="sortBatchParams.status" ng-change="SortBatchIndex('batch_id')"></select>
+                        </div>
+                        <div class="row px-3 pt-3">
+                            <div class="col" ng-click="SortBatchIndex('batch_id')">Batch ID</div>
+                            <div class="col" ng-click="SortBatchIndex('time_uploaded')">Upload Date</div>
+                            <div class="col" ng-click="SortBatchIndex('filename')">File Name</div>
+                            <div class="col" ng-click="SortBatchIndex('status')">Status</div>
+                            <div class="col">Progress</div>
+                        </div>
+                        <div class="p-3" ng-class="{'min-scroll':!isXS}">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="text-center" ng-if="!loadingMore && batches.length <= 0">
+                                <span class="col m-auto">
+                                    <h3>No Batches found.</h3>
+                                </span>
+                            </div>
+                            <div ng-if="!loadingMore" class="col p-3 vf-list-item cursor-pointer"
+                                ng-click="batch.status == 'pending' || batch.status == 'confirmed' ? ChangeBatchTab(batch.batch_id) : return;"
+                                ng-repeat="batch in batches track by $index">
+                                <div class="row">
+                                    <div class="col">{{batch.batch_id}}</div>
+                                    <div class="col">{{batch.time_uploaded}}</div>
+                                    <div class="col">{{batch.filename}}</div>
+                                    <div class="col">{{batch.status}}</div>
+                                    <div ng-if="batch.recordsProcessed" class="col">
+                                        {{((batch.recordsProcessed / batch.total_records) * 100).toFixed(2)}}%</div>
+                                    <div ng-if="!batch.recordsProcessed && batch.status == 'processed'" class="col">Done
+                                    </div>
+                                    <div ng-if="!batch.recordsProcessed && batch.status != 'processed'" class="col">
+                                        {{batch.total_records ? '0%' : 'N/A'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="5" select="TabChanged(5)" ng-show="selectedBatch.id">
+                <uib-tab-heading>
+                    Batch {{selectedBatch.id}} <span class="dashicons dashicons-update"></span>
+                </uib-tab-heading>
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <div class="row p-3">
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Batch ID</span>
+                                <input class="form-control" ng-model="selectedBatch.id" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Cost Sheet ID</span>
+                                <input class="form-control" ng-model="selectedBatch.cost_sheet_id" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">File Name</span>
+                                <input class="form-control" ng-model="selectedBatch.filename" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Time Uploaded</span>
+                                <input class="form-control" ng-model="selectedBatch.time_uploaded" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Status</span>
+                                <input class="form-control" ng-model="selectedBatch.status" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 my-3 table-responsive scrollbar">
+                            <div class="min-scroll-table">
+                                <table class="table table-striped table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="padding: 10px;"
+                                                ng-repeat="(key, value) in batchHeaders">
+                                                {{value}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="data in selectedBatch.items  | limitTo: 5">
+                                            <td scope="row" class="padding: 10px;" ng-repeat="(x, y) in batchHeaders">
+                                                {{data[x]}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="button button-primary mb-3" ng-class="{'col-12': isXS || isSM}"
+                                ng-click="ConfirmBatch()" ng-if="selectedBatch.status == 'pending'">Confirm
+                                Batch</button>
+                        </div>
+                    </div>
+                </div>
+                <div uib-alert class="col-4 alert mt-2  p-3 ms-auto"
+                    ng-class="'alert-' + (response.type || 'warning')"
+                    ng-repeat="response in localized.GetResponseMsgs() track by $index"
+                    close="localized.RemoveResponseMsg($index)">{{response.message}}
+                </div>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

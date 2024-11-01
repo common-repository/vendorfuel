@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h4><strong ng-bind-html="modalTitle"></strong></h4>
+</div>
+<div class="modal-body">
+  <img ng-if="modalImg" ng-src="{{modalImg}}" />
+  <input
+    type="text"
+    placeholder="Authenticator Code"
+    ng-model="callbackParams.code_2fa"
+  />
+  <p compile-html="modalMessage"></p>
+</div>
+<div class="modal-footer">
+  <button
+    ng-class="highlightedButton == 0 ? 'button button-primary' : 'button'"
+    ng-style="width: {{optionWidth}}px"
+    ng-click="Cancel()"
+  >
+    {{optionCancel}}
+  </button>
+  <button
+    ng-class="highlightedButton == 1 ? 'button button-primary' : 'button'"
+    ng-style="width: {{optionWidth}}px"
+    ng-click="Confirm()"
+  >
+    {{optionConfirm}}
+  </button>
+</div>

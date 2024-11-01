@@ -1,0 +1,22 @@
+[
+  {
+    "header": "Flat rates",
+    "icon": "list-view",
+    "href": "#!/shipping/flat-rates/0",
+    "links": [
+      { "text": "Manage flat rates", "href": "#!/shipping/flat-rates/0" },
+      { "text": "Add new flat rate", "href": "#!/shipping/flat-rates/1" }
+    ]
+  },
+  {
+    "header": "Parcels",
+    "icon": "grid-view",
+    "href": "#!/shipping/parcels/0",
+    "links": [
+      { "text": "Manage parcels", "href": "#!/shipping/parcels/0" },
+      { "text": "Add new parcel", "href": "#!/shipping/parcels/1" },
+      { "text": "Manage gateways", "href": "#!/shipping/parcels/3" },
+      { "text": "Manage warehouse", "href": "#!/shipping/parcels/4" }
+    ]
+  }
+]

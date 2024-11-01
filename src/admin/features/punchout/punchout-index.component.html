@@ -1,0 +1,300 @@
+<layout-component heading="Suppliers" breadcrumbs="$ctrl.breadcrumbs">
+	<uib-tabset active="activeTab">
+		<uib-tab index="0" select="TabChanged(0)" heading="Suppliers">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-if="!loading" class="col p-0 vf-tab-body">
+				<div class="input-group mb-3">
+					<input ng-model="searchParams.q" ng-keypress="$event.keyCode === 13 && Index()" type="text"
+						class="form-control" placeholder="Search">
+					<button ng-click="Index()" class="btn btn-outline-secondary"
+						type="submit">Search</button>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<th ng-click="SortIndex('id')">ID</th>
+						<th ng-click="SortIndex('name')">Name</th>
+					</thead>
+					<tbody class="p-3 min-scroll">
+						<spinner-component ng-if="loadingMore"></spinner-component>
+
+						<tr ng-if="models.data.length <= 0 && !loadingMore">
+							<td colspan="2">
+								No results found<span ng-if="searchParams.q.length >= 1"> for
+										'{{searchParams.q}}'</span>.
+							</td>
+						</tr>
+						<tr class="cursor-pointer"
+							ng-repeat="model in models.data track by $index" ng-if="!loadingMore">
+							<td>
+								{{model.id}}
+							</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="$ctrl.selectSupplier( model.id, $event )">
+										{{model.name}}
+									</a>
+								</strong>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{models.from || 0}} to {{models.to || 0}} of
+							{{models.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="btn btn-secondary" ng-if="models.prev_page_url"
+							ng-click="Index(models.current_page - 1)"><span class="dashicons dashicons-arrow-left-alt2"></span>
+							Prev</button>
+						<button class="btn btn-secondary" ng-if="models.current_page - 2 > 0"
+							ng-click="Index(models.current_page - 2)">{{models.current_page - 2}}</button>
+						<button class="btn btn-secondary" ng-if="models.current_page - 1 > 0"
+							ng-click="Index(models.current_page - 1)">{{models.current_page - 1}}</button>
+						<button class="btn btn-secondary"
+							ng-disabled="true">{{models.current_page}}</button>
+						<button class="btn btn-secondary"
+							ng-if="models.current_page + 1 <= models.last_page"
+							ng-click="Index(models.current_page + 1)">{{models.current_page + 1}}</button>
+						<button class="btn btn-secondary"
+							ng-if="models.current_page + 2 <= models.last_page"
+							ng-click="Index(models.current_page + 2)">{{models.current_page + 2}}</button>
+						<button class="btn btn-secondary" ng-if="models.next_page_url"
+							ng-click="Index(models.current_page + 1)">Next <span
+								class="dashicons dashicons-arrow-right-alt2"></span></button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label class="form-label" for="rpp">Per Page: </label>
+						<select class="form-select" id="rpp"
+							ng-model="searchParams.rpp" ng-change="Index(1)"
+							ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add new">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<form name="addForm">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="mb-3">
+								<label class="form-label" for="add_name">Name</label>
+								<input class="form-control"
+									ng-class="!addParams.name.length || (addParams.name.length < 3) ? 'is-invalid' : ''"
+									type="text" id="add_name" name="name" ng-minlength="3" 								ng-model="addParams.name" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_logo">Logo URL</label>
+								<input class="form-control" type="text" id="add_logo" name="logo" ng-minlength="3"
+									placeholder="None" ng-model="addParams.logo">
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_domain_type">Domain Type</label>
+								<select class="form-select"
+									ng-class="!addParams.domain_type.length ? 'is-invalid' : ''" id="add_domain_type"
+									name="domain_type" ng-model="addParams.domain_type" required>
+									<option value="DUNS" selected>DUNS</option>
+									<option value="NetworkID">NetworkID</option>
+								</select>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_domain_identity">Domain Identity</label>
+								<input class="form-control" type="text" id="add_domain_identity" name="domain_identity"
+									ng-class="!addParams.domain_identity.length || (addParams.domain_identity.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3" ng-model="addParams.domain_identity"
+									required>
+
+							</div>
+							<div class="mb-3" ng-init="showDomainSecret = false">
+								<label class="form-label" for="add_domain_shared_secret">Domain Shared Secret</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_domain_shared_secret"
+										name="domain_shared_secret"
+										ng-class="!addParams.domain_secret.length || (addParams.domain_secret.length < 3) ? 'is-invalid' : ''"
+										ng-minlength="3"
+										ng-attr-type="{{ showDomainSecret ? 'text':'password'}}"
+										ng-model="addParams.domain_secret" required>
+									<button ng-click="showDomainSecret = !showDomainSecret"
+										class="btn btn-outline-secondary" type="button">
+										<span ng-class="showDomainSecret ? 'dashicons dashicons-visibility' : 'dashicons dashicons-hidden'"></span>
+									</button>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_punchout_identity">Punchout Identity</label>
+								<input class="form-control" type="text" id="add_punchout_identity"
+									name="punchout_identity"
+									ng-class="!addParams.punchout_identity.length || (addParams.punchout_identity.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3"
+									ng-model="addParams.punchout_identity" required>
+							</div>
+							<div class="mb-3" ng-init="showAccountSecret = false">
+								<label class="form-label" for="add_punchout_secret">Punchout Shared Secret</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_punchout_secret"
+										name="punchout_shared_secret"
+										ng-class="!addParams.punchout_secret.length || (addParams.punchout_secret.length < 3) ? 'is-invalid' : ''"
+										ng-attr-type="{{ showAccountSecret ? 'text':'password'}}" ng-minlength="3"
+										ng-model="addParams.punchout_secret" required>
+									<button ng-click="showAccountSecret = !showAccountSecret"
+										class="btn btn-outline-secondary" type="button">
+										<span ng-class="showAccountSecret ? 'dashicons dashicons-visibility' : 'dashicons dashicons-hidden'"></span>
+									</button>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_sku_prefix">SKU prefix</label>
+								<input class="form-control" type="text" id="add_sku_prefix" name="sku_prefix"
+									ng-minlength="1" ng-model="addParams.prefix">
+							</div>
+
+					</div>
+					<div class="col-lg-8">
+						<h3>Endpoints</h3>
+							<div class="form-check mb-3">
+								<input class="form-check-input" type="checkbox" id="update_endpoints_daily"
+									ng-model="addParams.update_endpoints_daily"
+									ng-init="addParams.update_endpoints_daily = true">
+								<label class="form-check-label" for="update_endpoints_daily">Update endpoints daily</label>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_domain_identity">Endpoint base</label>
+								<input class="form-control" type="text" id="add_endpoint_base" name="endpoint_base"
+									ng-class="!addParams.endpoint_base.length || (addParams.endpoint_base.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3" ng-model="addParams.endpoint_base"
+									required>
+							</div>
+					</div>
+					</div>
+					<button class="btn btn-primary"
+						ng-disabled="addForm.$invalid"
+						ng-click="Store()">
+						Save
+					</button>
+				</form>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" ng-show="model.id" select="TabChanged(2)" heading="Edit supplier">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="viewForm">
+							<div class="mb-3">
+								<label class="form-label" for="add_model">Name</label>
+								<input class="form-control"
+									ng-class="!model.name.length || (model.name.length < 3) ? 'is-invalid' : ''"
+									type="text" id="view_name" name="name" ng-minlength="3"
+									ng-model="model.name" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_logo">Logo URL</label>
+								<input class="form-control" type="text" id="add_logo" name="logo" ng-minlength="3"
+									placeholder="None" ng-model="model.logo">
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_domain_type">Domain Type</label>
+								<select class="form-select" ng-class="!model.domain_type.length ? 'is-invalid' : ''"
+									id="add_domain_type" name="domain_type" ng-model="model.domain_type" required>
+									<option value="DUNS" selected>DUNS</option>
+									<option value="NetworkID">NetworkID</option>
+								</select>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_domain_identity">Domain Identity</label>
+								<input class="form-control" type="text" id="add_domain_identity" name="domain_identity"
+									ng-class="!model.domain_identity.length || (model.domain_identity.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3" ng-model="model.domain_identity"
+									required>
+							</div>
+							<div class="mb-3" ng-init="showDomainSecret = false">
+								<label class="form-label" for="add_domain_shared_secret">Domain Shared Secret</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_domain_shared_secret"
+										name="domain_shared_secret"
+										ng-class="!model.domain_secret.length || (model.domain_secret.length < 3) ? 'is-invalid' : ''"
+										ng-attr-type="{{ showDomainSecret ? 'text':'password'}}" ng-minlength="3"
+										ng-minlength="3" ng-model="model.domain_secret"
+										required>
+									<button ng-click="showDomainSecret = !showDomainSecret"
+										class="btn btn-outline-secondary" type="button">
+										<span ng-class="showDomainSecret ? 'dashicons dashicons-visibility' : 'dashicons dashicons-hidden'"></span>
+									</button>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_punchout_identity">Punchout Identity</label>
+								<input class="form-control" type="text" id="add_punchout_identity"
+									name="punchout_identity"
+									ng-class="!model.punchout_identity.length || (model.punchout_identity.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3" ng-model="model.punchout_identity"
+									required>
+							</div>
+							<div class="mb-3" ng-init="showAccountSecret = false">
+								<label class="form-label" for="add_punchout_secret">Punchout Shared Secret</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_punchout_secret"
+										name="punchout_shared_secret"
+										ng-class="!model.punchout_secret.length || (model.punchout_secret.length < 3) ? 'is-invalid' : ''"
+										ng-attr-type="{{ showAccountSecret ? 'text':'password'}}" ng-minlength="3"
+										ng-minlength="3"
+										ng-model="model.punchout_secret" required>
+									<button ng-click="showAccountSecret = !showAccountSecret"
+										class="btn btn-outline-secondary" type="button">
+										<span ng-class="showAccountSecret ? 'dashicons dashicons-visibility' : 'dashicons dashicons-hidden'"></span>
+									</button>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="add_sku_prefix">SKU Prefix</label>
+								<input class="form-control" type="text" id="add_sku_prefix" name="sku_prefix"
+									ng-minlength="1" ng-model="model.prefix">
+							</div>
+						</form>
+					</div>
+					<div class="col-lg-8">
+						<h3>Endpoints</h3>
+						<div class="form-check mb-3">
+							<input id="update_endpoints_daily" class="form-check-input" type="checkbox"
+								ng-model="model.update_endpoints_daily">
+							<label for="update_endpoints_daily" class="form-check-label">Update endpoints daily</label>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="add_domain_identity">Endpoint base</label>
+							<div class="input-group">
+								<input class="form-control" type="text" id="add_endpoint_base" name="endpoint_base"
+									ng-class="!model.endpoint_base.length || (model.endpoint_base.length < 3) ? 'is-invalid' : ''"
+									ng-minlength="3" ng-model="model.endpoint_base"
+									required>
+								<button class="btn btn-secondary" ng-click="RefreshEndpoints(model.id)">Refresh
+									endpoints</button>
+							</div>
+						</div>
+						<div class="row mb-3" ng-repeat="endpoint in model.endpoints track by $index">
+							<div class="input-group">
+								<span class="input-group-text">Transaction</span>
+								<input class="form-control" ng-model="endpoint.transaction" ng-required="true" />
+								<span class="input-group-text">URL</span>
+								<input class="form-control" ng-model="endpoint.url" ng-required="true" />
+								<button class="btn btn-danger"
+									ng-click="RemoveEndpoint( model.endpoints,$index )">
+									Delete
+								</button>
+							</div>
+						</div>
+						<button class="btn btn-secondary" ng-click="AddEndpoint( model.endpoints )">Add Endpoint</button>
+					</div>
+				</div>
+				<button class="btn btn-primary"
+					ng-disabled="viewForm.$invalid" ng-click="Update(model.id)">Update
+				</button>
+				<button class="btn btn-danger mb-3"
+					ng-click="Delete(model.id)">Delete</button>
+			</div>
+
+		</uib-tab>
+	</uib-tabset>
+</layout-component>

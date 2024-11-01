@@ -1,0 +1,301 @@
+<h2>Billing Address</h2>
+
+<form name="billingAddressForm" novalidate>
+	<fieldset class="border-0 p-0" ng-disabled="$ctrl.isShippingSameAsBilling">
+		<div class="row mb-3">
+			<div class="col-sm-6">
+				<label for="billing-first-name" class="form-label"
+					>First Name <small>(required)</small></label
+				>
+				<input
+					type="text"
+					class="form-control"
+					id="billing-first-name"
+					ng-model="$ctrl.billingAddress.first_name"
+					name="firstName"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.firstName.$invalid
+					}"
+					autocomplete="given-name"
+					required
+				/>
+				<div class="invalid-feedback">
+					Please enter your First Name.
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<label for="billing-last-name" class="form-label"
+					>Last Name <small>(required)</small></label
+				>
+				<input
+					type="text"
+					class="form-control"
+					id="billing-last-name"
+					ng-model="$ctrl.billingAddress.last_name"
+					autocomplete="family-name"
+					name="lastName"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.lastName.$invalid
+					}"
+					required
+				/>
+				<div class="invalid-feedback">Please enter your Last Name.</div>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<div class="col-sm-6">
+				<label for="billing-email" class="form-label"
+					>Email Address <small>(required)</small></label
+				>
+				<input
+					type="email"
+					class="form-control"
+					id="billing-email"
+					ng-model="$ctrl.billingAddress.email"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.email.$invalid
+					}"
+					ng-pattern="$ctrl.emailPattern"
+					autocomplete="email"
+					name="email"
+					required
+				/>
+				<div class="invalid-feedback">
+					Please enter a valid email address.
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<label for="billing-phone" class="form-label"
+					>Phone <small>(required)</small></label
+				>
+				<input
+					autocomplete="tel"
+					id="billing-phone"
+					name="phone"
+					ng-class="[
+						'form-control',
+						{
+							'is-invalid':
+								billingAddressForm.$submitted &&
+								billingAddressForm.phone.$invalid
+						}
+					]"
+					ng-model="$ctrl.billingAddress.phone"
+					required
+					type="tel"
+					ui-mask="(299) 999-9999"
+				/>
+				<div class="form-text text-muted small">
+					Please enter a valid phone number to prevent possible delays
+					in your order.
+				</div>
+			</div>
+		</div>
+		<div
+			class="alert alert-info"
+			ng-if="$ctrl.checkoutCtrl.hasLockedBilling"
+		>
+			Locked Shipping is enabled for your account. Please click the button
+			below to select a saved address or contact your administrator.
+		</div>
+		<button
+			class="btn btn-primary mb-3"
+			ng-if="!$ctrl.isGuest && $ctrl.isAuthed"
+			ng-click="$ctrl.toggleShowSavedAddresses()"
+		>
+			{{ $ctrl.isShowingSavedAddresses ? 'Hide' : 'Show' }} saved
+			addresses
+		</button>
+
+		<div
+			id="saved-billing-addresses"
+			ng-show="$ctrl.isShowingSavedAddresses"
+		>
+			<checkout-address-book
+				type="billing"
+				address="$ctrl.billingAddress"
+				is-address-book-updated="$ctrl.isAddressBookUpdated"
+				is-locked="$ctrl.checkoutCtrl.hasLockedBilling"
+				on-select="$ctrl.onSelectedAddress()"
+			>
+			</checkout-address-book>
+		</div>
+
+		<div
+			class="mb-3"
+			ng-if="!$ctrl.isGuest && $ctrl.isAuthed"
+			ng-hide="
+				$ctrl.checkoutCtrl.hasLockedBilling &&
+				!$ctrl.billingAddress.profileName
+			"
+		>
+			<label for="billing-profile-name" class="form-label">
+				Saved Address Name
+			</label>
+			<input
+				type="text"
+				class="form-control"
+				id="billing-profile-name"
+				name="profileName"
+				ng-model="$ctrl.billingAddress.profileName"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+				ng-attr-placeholder="{{
+					$ctrl.checkoutCtrl.hasLockedBilling
+						? ''
+						: 'Example: Home or Office'
+				}}"
+			/>
+		</div>
+
+		<div class="row mb-3">
+			<div class="col-sm-6">
+				<label for="billing-address-1" class="form-label"
+					>Address Line 1 <small>(required)</small></label
+				>
+				<input
+					type="text"
+					autocomplete="address-line1"
+					class="form-control"
+					id="billing-address-1"
+					ng-model="$ctrl.billingAddress.address1"
+					name="address1"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.address1.$invalid
+					}"
+					ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+					required
+				/>
+				<div class="invalid-feedback">
+					Please enter your Street Address.
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<label for="billing-address-2" class="form-label"
+					>Address Line 2</label
+				>
+				<input
+					type="text"
+					autocomplete="address-line2"
+					class="form-control"
+					id="billing-address-2"
+					name="address2"
+					ng-model="$ctrl.billingAddress.address2"
+					ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+				/>
+			</div>
+		</div>
+
+		<div class="row mb-3">
+			<div class="col-sm-4">
+				<label for="billing-city" class="form-label"
+					>City <small>(required)</small></label
+				>
+				<input
+					type="text"
+					autocomplete="address-level2"
+					class="form-control"
+					id="billing-city"
+					ng-model="$ctrl.billingAddress.city"
+					name="city"
+					required
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.city.$invalid
+					}"
+					ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+				/>
+				<div class="invalid-feedback">Please enter your City.</div>
+			</div>
+			<div class="col-sm-4">
+				<label for="billing-state" class="form-label"
+					>State <small>(required)</small></label
+				>
+				<select
+					class="form-control"
+					id="billing-state"
+					autocomplete="address-level1"
+					name="state"
+					required
+					ng-options="item as item.name for item in $ctrl.stateOptions track by item.id"
+					ng-model="$ctrl.billingAddress.state"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.state.$invalid
+					}"
+					ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+				></select>
+				<div class="invalid-feedback">Please select your State.</div>
+			</div>
+			<div class="col-sm-4">
+				<label for="billing-zip" class="form-label"
+					>Postal Code <small>(required)</small></label
+				>
+				<input
+					type="text"
+					autocomplete="postal-code"
+					class="form-control"
+					id="billing-zip"
+					ng-model="$ctrl.billingAddress.zip"
+					name="zip"
+					ng-class="{
+						'is-invalid':
+							billingAddressForm.$submitted &&
+							billingAddressForm.zip.$invalid
+					}"
+					ng-disabled="$ctrl.checkoutCtrl.hasLockedBilling"
+					pattern="\d{5}(?:[- ]?\d{4})?$"
+					autocomplete="postal-code"
+					required
+					minlength="5"
+					maxlength="10"
+				/>
+				<div class="invalid-feedback">
+					Please enter a valid Postal or Zip Code.
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</form>
+<div class="row">
+	<div class="col">
+		<button
+			class="btn btn-link"
+			ng-click="$ctrl.checkoutCtrl.showTab('shipping')"
+		>
+			<i class="bi bi-chevron-left"></i> Go back to Shipping
+		</button>
+	</div>
+	<div class="col-md text-end">
+		<div class="d-flex align-items-baseline justify-content-end">
+			<checkout-update-saved-address
+				class="me-2"
+				address="$ctrl.billingAddress"
+				is-address-book-updated="$ctrl.isAddressBookUpdated"
+				type="billing"
+				form="billingAddressForm"
+				ng-if="
+					billingAddressForm.$dirty &&
+					!$ctrl.checkoutCtrl.hasLockedBilling
+				"
+				handle-change="$ctrl.handleChange()"
+				handle-save="$ctrl.handleSave()"
+			></checkout-update-saved-address>
+			<button
+				class="btn btn-primary"
+				ng-click="$ctrl.confirmBillingAddress(billingAddressForm)"
+			>
+				Go to Delivery Method
+			</button>
+		</div>
+	</div>
+</div>

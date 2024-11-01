@@ -1,0 +1,44 @@
+<!-- wp:button -->
+<div
+	ng-class="['wp-block-button mb-2', {
+        'has-custom-font-size': $ctrl.customFontSize,
+        'has-custom-width': $ctrl.customWidth,
+        'has-small-font-size': $ctrl.customFontSize === 'small',
+        'is-style-outline': $ctrl.isStyleOutline,
+        'wp-block-button__width-100': $ctrl.customWidth === 100,
+    }]"
+>
+	<a
+		ng-class="['wp-block-button__link', {
+			'has-vivid-red-color has-text-color': $ctrl.isStyleDelete
+		}]"
+		ng-if="$ctrl.link"
+		ng-href="{{ $ctrl.link }}"
+		ng-style="$ctrl.customStyles"
+		ng-transclude
+	></a>
+	<button
+		ng-class="['wp-block-button__link', {
+			'has-vivid-red-color has-text-color': $ctrl.isStyleDelete
+		}]"
+		ng-attr-type="{{ $ctrl.type ? $ctrl.type : 'button' }}"
+		ng-click="$ctrl.onClick()"
+		ng-disabled="$ctrl.isDisabled || $ctrl.isLoading"
+		ng-if="$ctrl.onClick || $ctrl.type === 'submit'"
+		ng-style="$ctrl.customStyles"
+	>
+		<ng-transclude></ng-transclude>
+	</button>
+	<a
+		ng-class="['wp-block-button__link', {
+			'has-vivid-red-color has-text-color': $ctrl.isStyleDelete
+		}]"
+		href="#"
+		ng-click="$event.preventDefault()"
+		ng-if="!$ctrl.link && !$ctrl.onClick && $ctrl.type !== 'submit'"
+		ng-style="$ctrl.customStyles"
+		ng-transclude
+	>
+	</a>
+</div>
+<!-- /wp:button -->

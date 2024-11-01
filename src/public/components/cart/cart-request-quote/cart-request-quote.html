@@ -1,0 +1,34 @@
+<wp-buttons ng-if="!$ctrl.isRequestingQuote" justification="center">
+	<wp-button
+		class="w-100"
+		custom-font-size="small"
+		custom-width="100"
+		is-style-outline="true"
+		on-click="$ctrl.requestQuote()"
+		>Request Quote</wp-button
+	>
+</wp-buttons>
+<form name="form" ng-if="$ctrl.isRequestingQuote">
+	<fieldset ng-disabled="$ctrl.isLoading">
+		<legend>Request Quote</legend>
+		<p>
+			<label for="name">Name <small>(required)</small></label>
+			<input type="text" id="name" required ng-model="$ctrl.name" />
+		</p>
+		<p>
+			<label for="contact">Email <small>(required)</small></label>
+			<input
+				type="email"
+				id="contact"
+				required
+				ng-model="$ctrl.contact"
+				ng-pattern="$ctrl.emailPattern"
+			/>
+		</p>
+	</fieldset>
+	<wp-buttons justification="center">
+		<wp-button is-disabled="form.$invalid" is-loading="$ctrl.isLoading" on-click="$ctrl.submit()"
+			>{{ $ctrl.isLoading ? 'Submitting' : 'Submit' }}</wp-button
+		>
+	</wp-buttons>
+</form>

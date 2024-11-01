@@ -1,0 +1,130 @@
+[
+	{
+		"header": "Categories",
+		"icon": "category",
+		"href": "#!/catalog/categories",
+		"links": [
+			{
+				"text": "Manage categories",
+				"href": "#!/catalog/categories"
+			},
+			{
+				"text": "Add new category",
+				"href": "#!/catalog/categories/create"
+			},
+			{
+				"text": "Upload categories",
+				"href": "#!/catalog/categories/uploads/create"
+			},
+			{
+				"text": "Manage category uploads",
+				"href": "#!/catalog/categories/uploads"
+			},
+			{
+				"text": "Upload category tree",
+				"href": "#!/catalog/categories/tree/create"
+			},
+			{
+				"text": "Manage category tree uploads",
+				"href": "#!/catalog/categories/tree"
+			},
+			{
+				"text": "Utilities",
+				"href": "#!/catalog/categories/utilities"
+			}
+		]
+	},
+	{
+		"header": "Products",
+		"icon": "admin-page",
+		"href": "#!/catalog/products",
+		"links": [
+			{ "text": "Manage products", "href": "#!/catalog/products" },
+			{ "text": "Add new product", "href": "#!/catalog/products/create" },
+			{
+				"text": "Upload products",
+				"href": "#!/catalog/products/uploads/create"
+			},
+			{
+				"text": "Manage batch uploads",
+				"href": "#!/catalog/products/uploads"
+			},
+			{
+				"text": "Manage product reviews",
+				"href": "#!/catalog/products/reviews"
+			},
+			{ "text": "Utilities", "href": "#!/catalog/products/utilities" }
+		]
+	},
+	{
+		"header": "Collections",
+		"icon": "tag",
+		"href": "#!/catalog/collections",
+		"links": [
+			{
+				"text": "Manage collections",
+				"href": "#!/catalog/collections"
+			},
+			{
+				"text": "Add new collection",
+				"href": "#!/catalog/collections/create"
+			}
+		]
+	},
+	{
+		"header": "Manufacturers",
+		"icon": "building",
+		"href": "#!/catalog/manufacturers",
+		"links": [
+			{
+				"text": "Manage product manufacturers",
+				"href": "#!/catalog/manufacturers"
+			},
+			{
+				"text": "Add new manufacturer",
+				"href": "#!/catalog/manufacturers/create"
+			}
+		]
+	},
+	{
+		"header": "Banner areas",
+		"icon": "screenoptions",
+		"href": "#!/catalog/banners/0",
+		"links": [
+			{ "text": "Manage banner areas", "href": "#!/catalog/banners/0" },
+			{ "text": "Add new banner area", "href": "#!/catalog/banners/1" }
+		]
+	},
+	{
+		"header": "Price sheets",
+		"icon": "media-spreadsheet",
+		"href": "#!/catalog/pricesheets",
+		"links": [
+			{ "text": "Manage price sheets", "href": "#!/catalog/pricesheets" },
+			{
+				"text": "Add new price sheet",
+				"href": "#!/catalog/pricesheets/create"
+			},
+			{
+				"text": "Upload price sheets",
+				"href": "#!/catalog/pricesheets/uploads/create"
+			},
+			{
+				"text": "Manage batch uploads",
+				"href": "#!/catalog/pricesheets/uploads"
+			}
+		]
+	},
+	{
+		"header": "Promo codes",
+		"icon": "tickets-alt",
+		"href": "#!/catalog/promo-codes/0",
+		"links": [
+			{
+				"text": "Manage promo codes",
+				"href": "#!/catalog/promo-codes/0"
+			},
+			{ "text": "Add new promo code", "href": "#!/catalog/promo-codes/1" }
+		]
+	}
+]

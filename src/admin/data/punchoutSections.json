@@ -1,0 +1,11 @@
+[
+  {
+    "header": "Suppliers",
+    "icon": "building",
+    "href": "#!/punchout/suppliers/0",
+    "links": [
+      { "text": "Manage suppliers", "href": "#!/punchout/suppliers/0" },
+      { "text": "Add new supplier", "href": "#!/punchout/suppliers/1" }
+    ]
+  }
+]

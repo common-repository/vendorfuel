@@ -1,0 +1,206 @@
+<layout-component>
+	<p class="alert alert-info" role="alert" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</p>
+
+	<p
+		class="alert alert-info"
+		role="alert"
+		ng-if="$ctrl.isSignedIn && !$ctrl.isAdmin"
+	>
+		You must be have Administrator permissions to view this page.
+	</p>
+
+	<div ng-if="$ctrl.isSignedIn && $ctrl.isAdmin">
+		<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+
+		<div ng-hide="$ctrl.isLoading">
+			<form>
+				<select-group on-change="$ctrl.getGroupAccounts()">
+				</select-group>
+				<div class="input-group mb-3">
+					<label for="permissionSearchBar" class="input-group-text">
+						Filter Users
+					</label>
+					<input
+						type="search"
+						id="permissionSearchBar"
+						class="form-control"
+						name="s"
+						ng-model="$ctrl.filterBy"
+					/>
+				</div>
+			</form>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>
+							<a
+								href="#"
+								class="text-decoration-none"
+								title="Sort by Name"
+								ng-click="$ctrl.changeOrderBy( $event, 'name' )"
+							>
+								Name
+								<span ng-show="$ctrl.orderBy === 'name'">
+									{{
+										$ctrl.reverseOrderby
+											? '&dtrif;'
+											: '&utrif;'
+									}}
+								</span>
+							</a>
+						</th>
+						<th>
+							<a
+								href="#"
+								class="text-decoration-none"
+								title="Sort by Email"
+								ng-click="$ctrl.changeOrderBy( $event, 'email' )"
+							>
+								Email
+								<span ng-show="$ctrl.orderBy === 'email'">
+									{{
+										$ctrl.reverseOrderby
+											? '&dtrif;'
+											: '&utrif;'
+									}}
+								</span>
+							</a>
+						</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						ng-repeat="user in $ctrl.accounts | orderBy: $ctrl.orderBy: $ctrl.reverseOrderby | filter: $ctrl.filterBy track by $index"
+					>
+						<td>
+							{{ user.name }}
+						</td>
+						<td>
+							<a ng-href="mailto:{{ user.email }}">
+								{{ user.email }}
+							</a>
+						</td>
+						<td>
+							<form name="form">
+								<fieldset
+									class="mb-3"
+									ng-disabled="$ctrl.userEmail === user.email || $ctrl.isUpdating[user.customer_id]"
+								>
+									<div class="form-check mb-2">
+										<input
+											class="form-check-input"
+											type="checkbox"
+											id="active"
+											ng-model="user.active"
+											ng-true-value="'active'"
+											ng-false-value="'inactive'"
+										/>
+										<label
+											class="form-check-label"
+											for="active"
+											>Active</label
+										>
+									</div>
+									<fieldset>
+										<legend class="fs-6 mb-0">
+											Permissions
+										</legend>
+										<div
+											class="form-check form-check-inline"
+										>
+											<input
+												class="form-check-input"
+												type="checkbox"
+												id="approver"
+												ng-model="user.approver"
+												ng-disabled="user.requestor"
+											/>
+											<label
+												class="form-check-label"
+												for="approver"
+												>Approver</label
+											>
+										</div>
+										<div
+											class="form-check form-check-inline"
+										>
+											<input
+												class="form-check-input"
+												type="checkbox"
+												id="requestor"
+												ng-model="user.requestor"
+												ng-disabled="user.approver || user.admin"
+											/>
+											<label
+												class="form-check-label"
+												for="requestor"
+												>Requestor</label
+											>
+										</div>
+										<div
+											class="form-check form-check-inline"
+										>
+											<input
+												class="form-check-input"
+												type="checkbox"
+												id="pending-emails"
+												ng-model="user['pending_emails']"
+												ng-disabled="!user.approver"
+											/>
+											<label
+												class="form-check-label"
+												for="pending-emails"
+												>Pending Emails</label
+											>
+										</div>
+										<div
+											class="form-check form-check-inline"
+										>
+											<input
+												class="form-check-input"
+												type="checkbox"
+												id="admin"
+												ng-model="user.admin"
+												ng-disabled="user.requestor"
+											/>
+											<label
+												class="form-check-label"
+												for="admin"
+												>Admin</label
+											>
+										</div>
+									</fieldset>
+								</fieldset>
+								<button
+									class="btn btn-primary btn-sm"
+									ng-disabled="form.$pristine"
+									ng-click="$ctrl.updateAccount(user)"
+								>
+									{{
+										$ctrl.isUpdating[user.customer_id]
+											? 'Updating'
+											: 'Update'
+									}}
+								</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</layout-component>

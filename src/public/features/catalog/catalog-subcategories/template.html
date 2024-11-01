@@ -1,0 +1,32 @@
+<div class="d-none d-sm-block" ng-if="$ctrl.subcategories.length">
+	<div class="row g-2 row-cols-2 row-cols-sm-4 row-cols-md-5 row-cols-lg-6">
+		<div
+			class="col"
+			ng-repeat="category in $ctrl.subcategories | orderBy:'title' | limitTo: $ctrl.limit track by $index"
+		>
+			<div class="card h-100">
+				<div class="card-img-top p-1 ratio ratio-1x1">
+					<img
+						loading="lazy"
+						alt=""
+						width="200"
+						height="200"
+						ng-src="{{ category.img_url || $ctrl.placeholder }}"
+					/>
+				</div>
+				<div class="card-body pt-0 px-1 pb-2 text-center lh-sm">
+					<a
+						class="card-link stretched-link text-decoration-none"
+						ng-href="/{{ $ctrl.rootSlug }}/{{ category.slug }}"
+						ng-attr-title="Go to {{ category.title }}"
+					>
+						{{ category.title }}
+					</a>
+					<span class="text-muted small" ng-if="category.results"
+						>({{ category.results | number }})</span
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

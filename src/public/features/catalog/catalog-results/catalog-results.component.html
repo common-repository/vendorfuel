@@ -1,0 +1,10 @@
+<p class="mb-2">
+	Displaying
+	<span ng-if="$ctrl.isBusy">&ensp;&hellip;&ensp;results</span>
+	<span ng-if="!$ctrl.isBusy">
+		{{ $ctrl.composeResults() }}
+		<span ng-if="$ctrl.query"
+			>for <q class="fw-bold">{{ $ctrl.query }}</q></span
+		>
+	</span>
+</p>

@@ -1,0 +1,130 @@
+<div class="row align-items-center">
+	<div class="col-auto px-1 px-md-3">
+		<div class="form-check">
+			<input
+				class="form-check-input position-static"
+				type="checkbox"
+				value=""
+				ng-model="$ctrl.item.isSelected"
+			/>
+		</div>
+	</div>
+	<div class="col-3 px-0 col-md-2 has-text-align-center">
+		<a
+			ng-href="/{{ $ctrl.productSlug }}/{{ $ctrl.item.slug }}"
+			ng-attr-title="{{ $ctrl.item.title }}"
+		>
+			<img
+				class="img-fluid lazy"
+				loading="lazy"
+				ng-if="$ctrl.item.image"
+				ng-src="{{ $ctrl.item.image }}"
+			/>
+			<div
+				class="bg-light img-thumbnail py-4 py-md-5 mx-0 mx-md-4"
+				ng-if="!$ctrl.item.image"
+			>
+				<i class="bi bi-camera has-cyan-bluish-gray-color"></i>
+			</div>
+		</a>
+	</div>
+	<div class="col col-md-9">
+		<div class="row align-items-center">
+			<div class="col-12 col-md-6 col-lg-7 order-md-1">
+				<a
+					ng-href="/{{ $ctrl.productSlug }}/{{ $ctrl.item.slug }}"
+					title="{{ $ctrl.item.description }}"
+				>
+					<h2 class="h6 d-md-none border-bottom pb-2 mb-2">
+						{{ $ctrl.item.title }}
+					</h2>
+					<h2 class="h5 d-none d-md-block">
+						{{ $ctrl.item.title }}
+					</h2>
+				</a>
+				<p class="small"><strong>SKU: </strong>{{ $ctrl.item.sku }}</p>
+				<div class="btn-group btn-group-sm d-none d-md-block">
+					<saved-cart-toggle-favorite
+						item="$ctrl.item"
+						product-id="$ctrl.item.id"
+						is-favorite="$ctrl.item.isFavorite"
+					>
+					</saved-cart-toggle-favorite>
+					<button
+						class="btn btn-sm btn-link"
+						title="Remove Item from Saved Cart"
+						ng-click="$ctrl.delete()"
+					>
+						Remove Saved Item
+					</button>
+				</div>
+			</div>
+			<div class="col-12 col-md-2 order-md-3">
+				<p class="border-bottom pb-2 mb-2 d-md-none">
+					<small>Unit Price:</small>
+					<span class="fw-bold"
+						>{{ $ctrl.item.price | currency
+						}}<small>/{{ $ctrl.item.uom }}</small></span
+					>
+				</p>
+				<p class="d-none d-md-block has-text-align-center fw-bold">
+					{{ $ctrl.item.price | currency
+					}}<small>/{{ $ctrl.item.uom }}</small>
+				</p>
+			</div>
+			<div class="col-12 col-md-4 col-lg-3 order-md-2">
+				<p class="small has-text-align-center">
+					<span ng-if="$ctrl.item.status === 'backordered'">
+						Backordered
+					</span>
+					<span ng-if="$ctrl.item.status === 'discontinued'">
+						Discontinued
+					</span>
+					<span
+						ng-if="
+							$ctrl.item.isActive &&
+							$ctrl.item.hasStockQty &&
+							$ctrl.item.stockQty === 0
+						"
+					>
+						Out of Stock
+					</span>
+					<span
+						ng-if="
+							$ctrl.item.hasStockQty &&
+							$ctrl.item.cartQty >= $ctrl.item.stockQty
+						"
+					>
+						Available stock is already in your cart.
+					</span>
+				</p>
+				<saved-cart-add-to-cart
+					ng-if="
+						$ctrl.item.isActive &&
+						(!$ctrl.item.hasStockQty ||
+							($ctrl.item.hasStockQty &&
+								$ctrl.item.stockQty > 0 &&
+									$ctrl.item.stockQty > $ctrl.item.cartQty))
+					"
+					item="$ctrl.item"
+				>
+				</saved-cart-add-to-cart>
+				<div class="btn-group btn-group-sm d-md-none">
+					<saved-cart-toggle-favorite
+						item="$ctrl.item"
+						product-id="$ctrl.item.id"
+						is-favorite="$ctrl.item.isFavorite"
+					>
+					</saved-cart-toggle-favorite>
+					<button
+						class="btn btn-sm btn-link"
+						title="Remove Item from Saved Cart"
+						ng-click="$ctrl.delete()"
+					>
+						Remove Saved Item
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

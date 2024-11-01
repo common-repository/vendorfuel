@@ -1,0 +1,153 @@
+<layout-component heading="Add group" breadcrumbs="$ctrl.breadcrumbs">
+	<form class="groupForm" name="groupAddForm">
+		<div class="row">
+			<div class="col-lg-4">
+				<div class="mb-3">
+					<label for="group_name" class="form-label">Name</label>
+					<input
+						id="group_name"
+						name="group_name"
+						class="form-control"
+						ng-class="{
+							'is-invalid': groupAddForm.group_name.$invalid
+						}"
+						type="text"
+						ng-model="$ctrl.group.name"
+						required
+					/>
+				</div>
+				<div class="mb-3">
+					<div class="hstack gap-1">
+						<span class="form-label">Parent group</span>
+						<button
+							type="button"
+							class="btn btn-outline-primary border-0 btn-sm ms-auto"
+							ng-click="OpenGroupSearchModal()"
+						>
+							Select
+						</button>
+						<button
+							type="button"
+							class="btn btn-outline-danger border-0 btn-sm"
+							ng-if="$ctrl.group.parent_group_id"
+							ng-click="$ctrl.removeParent()"
+						>
+							Remove
+						</button>
+					</div>
+					<div class="hstack gap-1">
+						<span
+							ng-if="
+								!$ctrl.group.group_id ||
+								!$ctrl.group.parent_group
+							"
+							ng-class="{
+								'text-muted': !$ctrl.group.parent_group
+							}"
+						>
+							{{
+								$ctrl.group.parent_group
+									? $ctrl.group.parent_group.name
+									: 'None'
+							}}
+						</span>
+						<a
+							ng-href="?page=vendorfuel#!/customers/groups/{{
+								$ctrl.group.parent_group.group_id
+							}}"
+							ng-if="
+								$ctrl.group.group_id && $ctrl.group.parent_group
+							"
+						>
+							{{ $ctrl.group.parent_group.name }}
+						</a>
+					</div>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Terms</label>
+					<input
+						class="form-control"
+						type="text"
+						name="terms"
+						placeholder="NET 30, NET 90, etc."
+						ng-model="$ctrl.group.terms"
+					/>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Authorized emails</label>
+					<input
+						class="form-control"
+						type="text"
+						name="auth_email"
+						placeholder="test.com, vendorfuel.com"
+						ng-model="$ctrl.group.authorized_emails"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="inv_code" class="form-label"
+						>Group invite code</label
+					>
+					<input
+						id="inv_code"
+						name="inv_code"
+						class="form-control"
+						type="text"
+						ng-model="$ctrl.group.group_invite_code"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="prefix" class="form-label">Order prefix</label>
+					<input
+						id="prefix"
+						name="prefix"
+						class="form-control"
+						type="text"
+						ng-model="$ctrl.group.order_prefix"
+					/>
+				</div>
+				<div class="mb-3">
+					<label class="form-label" for="grp_reg"
+						>Group Registration</label
+					>
+					<select
+						class="form-select"
+						name="grp_reg"
+						id="grp_reg"
+						ng-options="item.key as item.value for item in regValues"
+						ng-model="$ctrl.group.group_registration_available"
+					></select>
+				</div>
+				<div class="mb-3">
+					<label class="form-label" for="price_sheet"
+						>Price sheet</label
+					>
+					<select
+						class="form-select"
+						type="text"
+						name="price_sheet"
+						id="price_sheet"
+						ng-model="$ctrl.group.default_price_sheet"
+						ng-options="priceSheet.price_sheet_id as priceSheet.sheet for priceSheet in $ctrl.pricesheets"
+					></select>
+				</div>
+				<div class="mb-3">
+					<label class="form-label" for="shipping_mode"
+						>Shipping mode</label
+					>
+					<select
+						class="form-select"
+						type="text"
+						name="shipping_mode"
+						id="shipping_mode"
+						ng-model="$ctrl.group.shipping_mode"
+						ng-options="key as value for (key, value) in shippingModes"
+					></select>
+				</div>
+				<button class="btn btn-primary" ng-click="AddGroup()">
+					Save
+				</button>
+			</div>
+			<div class="col-lg-8"></div>
+		</div>
+	</form>
+</layout-component>

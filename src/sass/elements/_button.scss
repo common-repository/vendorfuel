@@ -1,0 +1,119 @@
+.btn-primary {
+	background: var(--wp--color--blue-50);
+	border-color: var(--wp--color--blue-50);
+
+	&:active,
+	&:hover {
+		background: var(--wp--color--blue-60);
+		border-color: var(--wp--color--blue-60);
+	}
+
+	&:focus {
+		background: var(--wp--color--blue-60);
+		border-color: var(--wp--color--blue-60);
+		box-shadow: 0 0 0 1px white, 0 0 0 3px var(--wp--color--blue-50);
+		color: white;
+	}
+}
+
+.btn-secondary {
+	background: var(--wp--color--gray-0);
+	border-color: var(--wp--color--blue-50);
+	color: var(--wp--color--blue-50);
+
+	&:active,
+	&:focus {
+		background: var(--wp--color--gray-0);
+	}
+
+	&:active {
+		border-color: var(--wp--color--gray-30);
+		color: var(--wp--color--blue-50);
+	}
+
+	&:focus {
+		border-color: var(--wp--color--blue-40);
+		box-shadow: 0 0 0 1px var(--wp--color--blue-40);
+		color: var(--wp--color--blue-70);
+		outline: 2px solid transparent;
+		outline-offset: 0;
+	}
+
+	&:hover {
+		background: var(--wp--color--gray-2);
+		border-color: var(--wp--color--blue-70);
+		color: var(--wp--color--blue-70);
+	}
+}
+
+.btn-danger {
+	background-color: var(--wp--color--red-50);
+	border-color: var(--wp--color--red-50);
+}
+
+.btn-outline-danger {
+	color: var(--wp--color--red-50);
+}
+
+.btn-danger,
+.btn-outline-danger {
+	&:hover {
+		background-color: var(--wp--color--red-60);
+	}
+
+	&:focus {
+		background: var(--wp--color--red-60);
+		border-color: var(--wp--color--red-60);
+		box-shadow: 0 0 0 1px white, 0 0 0 3px var(--wp--color--red-50);
+		color: white;
+	}
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-outline-danger {
+	&:disabled {
+		color: var(--wp--color--gray-20);
+	}
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+	&:disabled {
+		border-color: var(--wp--color--gray-5);
+		background: var(--wp--color--gray-0);
+	}
+}
+
+.btn-link {
+	color: var(--wp--color--accent-orange);
+
+	&:hover {
+		color: var(--wp--color--fire-orange);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 0.25rem rgb(245 110 40 / 25%);
+	}
+}
+
+.btn-sm {
+	line-height: 2;
+	padding: 0 10px;
+	border-radius: 3px;
+
+	.table & {
+		line-height: 1.5;
+	}
+}
+
+.button.button-delete {
+	&,
+	&:hover {
+		color: var(--wp--color--red-50);
+		background: none;
+		border: none;
+	}
+}

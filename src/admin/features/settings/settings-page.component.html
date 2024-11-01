@@ -1,0 +1,53 @@
+<layout-component heading="Settings">
+	<div
+		class="alert alert-warning is-dismissible"
+		ng-if="!$ctrl.isAuthed && $ctrl.hasAPIKey"
+	>
+		You must be signed in to VendorFuel to view all the store settings.
+		<a class="alert-link" href="#!/login">Sign In</a>
+	</div>
+
+	<div class="alert alert-danger" ng-if="!$ctrl.hasAPIKey">
+		A VendorFuel API is required to access your VendorFuel store settings
+		and data. Please enter your provided VendorFuel API key below. For help,
+		please contact
+		<a class="alert-link" href="mailto:support@vendorfuel.com"
+			>support@vendorfuel.com</a
+		>.
+	</div>
+
+	<uib-tabset>
+		<uib-tab heading="Plugin" select="$ctrl.setActiveTab(0)">
+			<settings-plugin ng-if="$ctrl.activeTab === 0"></settings-plugin>
+		</uib-tab>
+		<uib-tab
+			heading="Store"
+			select="$ctrl.setActiveTab(1)"
+			ng-if="$ctrl.isAuthed"
+		>
+			<settings-store ng-if="$ctrl.activeTab === 1"></settings-store>
+		</uib-tab>
+		<uib-tab
+			heading="Options"
+			select="$ctrl.setActiveTab(2)"
+			ng-if="$ctrl.isAuthed"
+		>
+			<settings-options ng-if="$ctrl.activeTab === 2"></settings-options>
+		</uib-tab>
+		<uib-tab
+			select="$ctrl.setActiveTab(3)"
+			heading="Analytics"
+			ng-if="$ctrl.isAuthed"
+		>
+			<settings-analytics ng-if="$ctrl.activeTab === 3">
+			</settings-analytics>
+		</uib-tab>
+		<uib-tab
+			select="$ctrl.setActiveTab(4)"
+			heading="Page Mapping"
+			ng-if="$ctrl.isAuthed"
+		>
+			<settings-mapping ng-if="$ctrl.activeTab === 4"></settings-mapping>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>

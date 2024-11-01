@@ -1,0 +1,42 @@
+<layout-component>
+	<div class="alert alert-info" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<bs-spinner ng-if="$ctrl.isLoading && $ctrl.isSignedIn"> </bs-spinner>
+
+	<div ng-if="!$ctrl.isLoading && $ctrl.isSignedIn">
+		<h1>Your Saved Carts</h1>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th class="text-end">Items in cart</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="cart in $ctrl.carts track by $index">
+					<td>
+						<a
+							ng-href="{{ $ctrl.pageUrls.savedCart }}?id={{
+								cart.saved_cart_id
+							}}"
+						>
+							{{ cart.cart_title }}
+						</a>
+					</td>
+					<td class="text-end">{{ cart.num_items | number }}</td>
+				</tr>
+			</tbody>
+			<caption ng-if="!$ctrl.carts.length">
+				You have not saved any carts yet.
+			</caption>
+		</table>
+	</div>
+</layout-component>

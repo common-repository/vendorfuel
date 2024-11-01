@@ -1,0 +1,312 @@
+<layout-component hide-alert-list="true">
+	<div
+		class="alert alert-info"
+		role="alert"
+		ng-if="!$ctrl.isSignedIn"
+	>
+		Please <a class="alert-link" ng-href="{{$ctrl.pageUrls.login}}">Sign In</a> or
+		<a class="alert-link" ng-href="{{$ctrl.pageUrls.register}}">Create an Account</a> to view this page.
+	</div>
+
+	<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<div ng-hide="$ctrl.isLoading || !$ctrl.isSignedIn">
+		<div
+			class="row"
+			ng-if="$ctrl.defaultProfiles.billing ||
+					$ctrl.defaultProfiles.shipping"
+		>
+			<div class="col-sm-6" ng-repeat="profile in $ctrl.defaultProfiles" ng-if="profile">
+				<div class="card mb-3">
+					<div class="card-header">
+						<i
+							ng-class="['bi', {
+								'bi-wallet': profile.billing_id,
+								'bi-truck': profile.shipping_id }]"
+						></i>
+						Default {{ profile.billing_id ? 'Billing' : 'Shipping'}} Profile
+					</div>
+					<div class="card-body">
+						<address class="card-text">
+							{{profile.first_name}} {{profile.last_name}}<br />
+							{{profile.address1}}<br ng-if="profile.address2" />
+							{{profile.address2}}<br />
+							{{profile.city}}, {{profile.state}} {{profile.zip}}
+						</address>
+					</div>
+				</div>
+			</div>
+		</div>
+		<alert-list></alert-list>
+		<nav>
+			<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+				<a
+					class="nav-item nav-link active"
+					id="nav-billing-tab"
+					data-bs-toggle="tab"
+					href="#nav-billing"
+					role="tab"
+					aria-controls="nav-billing"
+					aria-selected="true"
+				>
+					<i class="bi bi-wallet"></i>
+					Billing
+				</a>
+				<a
+					class="nav-item nav-link"
+					id="nav-shipping-tab"
+					data-bs-toggle="tab"
+					href="#nav-shipping"
+					role="tab"
+					aria-controls="nav-shipping"
+					aria-selected="false"
+				>
+					<i class="bi bi-truck"></i>
+					Shipping
+				</a>
+			</div>
+		</nav>
+		<div class="tab-content" id="nav-tabContent">
+			<div
+				class="tab-pane fade show active"
+				id="nav-billing"
+				role="tabpanel"
+				aria-labelledby="nav-billing-tab"
+			>
+				<div
+					class="alert alert-info"
+					role="alert"
+					ng-if="!$ctrl.profiles.billing.length"
+				>
+					You don't have any billing profiles saved. Click the button below to create a new one.
+		</div>
+
+				<button class="btn btn-primary mb-3"
+					ng-click="$ctrl.onClickCreate('billing')"
+					ng-if="!$ctrl.isEditingProfile['billing'] && !$ctrl.hasLockedBilling"
+				>
+					Create New Billing Profile
+				</button>
+
+				<address-form
+					type="billing"
+					profile="$ctrl.profile"
+					ng-if="$ctrl.isEditingProfile['billing']"
+				>
+				</address-form>
+
+				<div ng-if="!$ctrl.isEditingProfile['billing']">
+					<form role="search">
+						<div class="input-group">
+							<label for="filter-billing" class="input-group-text">Filter Addresses</label>
+							<input
+								type="search"
+								id="filter-billing"
+								class="form-control"
+								name="q"
+								ng-model="$ctrl.q"
+							/>
+
+						</div>
+					</form>
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Address</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-repeat="profile in $ctrl.profiles.billing | filter: $ctrl.q as results track by $index"
+							>
+								<td class="align-baseline">
+									<div ng-if="profile.billing_name"><em>{{ profile.billing_name }}</em></div>
+									{{ profile.first_name }} {{ profile.last_name }}
+									<span class="has-cyan-bluish-gray-color"
+									ng-if="!profile.billing_name &&
+									!profile.shipping_name &&
+									!profile.first_name &&
+									!profile.last_name">&mdash;</span>
+								</td>
+								<td class="align-baseline">
+									{{ profile.address1 }}<br ng-if="profile.address2" />
+									{{ profile.address2 }}<br />
+									{{ profile.city }}, {{ profile.state }} {{ profile.zip }}
+									<div class="small" ng-if="profile.email || profile.phone">
+										{{ profile.email }}<br ng-if="profile.phone" />
+										{{ profile.phone | tel }}
+									</div>
+								</td>
+								<td class="align-middle">
+									<div
+									class="btn-toolbar justify-content-end"
+									role="toolbar"
+									aria-label="Toolbar for editing address profile"
+									>
+									<div class="btn-toolbar gap-2" ng-hide="$ctrl.isConfirmingDeletion[ profile.billing_id ]">
+										<button class="btn btn-outline-primary btn-sm"
+											ng-click="$ctrl.onClickEdit( profile, 'billing')"
+											ng-if="!$ctrl.isLocked"
+											>Edit</button
+										>
+										<button class="btn btn-outline-primary border-0 btn-sm"
+										is-loading="$ctrl.isMakingDefault[ profile.billing_id ]"
+											ng-click="$ctrl.onClickMakeDefault( profile.billing_id, 'billing' )"
+											ng-if="profile.billing_id !== $ctrl.defaultBillingProfileId"
+										>
+											Make Default
+										</button>
+										<button class="btn btn-outline-danger border-0 btn-sm"
+											ng-if="!$ctrl.isLocked"
+											ng-click="$ctrl.isConfirmingDeletion[ profile.billing_id ] = true"
+											>Delete</button
+										>
+									</div>
+									<div ng-if="$ctrl.isConfirmingDeletion[ profile.billing_id ]">
+										<div class="btn-toolbar align-items-baseline">
+											<span class="small me-2">Delete profile?</span>
+											<button class="btn btn-outline-primary border-0 btn-sm"  ng-click="$ctrl.isConfirmingDeletion[ profile.billing_id ] = false"
+												>Cancel</button
+											>
+											<button class="btn btn-danger btn-sm ms-1"
+												ng-disabled="$ctrl.isRemoving[ profile.billing_id ]"
+												ng-if="!$ctrl.isLocked"
+												ng-click="$ctrl.onClickRemove( profile.billing_id, 'billing' )"
+												>{{ $ctrl.isRemoving[ profile.billing_id ] ? 'Deleting' : 'Delete' }}</button
+											>
+										</div>
+									</div>
+								</div>
+								</td>
+							</tr>
+							<tr ng-if="!results.length">
+								<td colspan="3">No results found<span ng-if="$ctrl.q"> for <q>{{ $ctrl.q }}</span>.</q></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane fade" id="nav-shipping" role="tabpanel" aria-labelledby="nav-shipping-tab">
+				<div
+					class="alert alert-info"
+					role="alert"
+					ng-if="!$ctrl.profiles.shipping.length"
+				>
+					You don't have any shipping profiles saved. Click the button below to create a new one.
+				</div>
+
+				<button class="btn btn-primary mb-3"
+					ng-click="$ctrl.onClickCreate('shipping')"
+					ng-if="!$ctrl.isEditingProfile['shipping'] && !$ctrl.hasLockedShipping"
+				>
+					Create New Shipping Profile
+				</button>
+
+				<address-form
+					type="shipping"
+					profile="$ctrl.profile"
+					ng-if="$ctrl.isEditingProfile['shipping']"
+				>
+				</address-form>
+				<div ng-if="!$ctrl.isEditingProfile['shipping']">
+					<form role="search">
+						<div class="input-group">
+							<label for="filter-shipping" class="input-group-text">Filter Addresses</label>
+							<input
+								type="search"
+								id="filter-shipping"
+								class="form-control"
+								name="q"
+								ng-model="$ctrl.q"
+							/>
+						</div>
+					</form>
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Address</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-repeat="profile in $ctrl.profiles.shipping | filter: $ctrl.q as results track by $index"
+							>
+								<td class="align-baseline">
+									<div ng-if="profile.shipping_name"><em>{{ profile.shipping_name }}</em></div>
+									{{ profile.first_name }} {{ profile.last_name }}
+									<span class="has-cyan-bluish-gray-color"
+									ng-if="!profile.billing_name &&
+									!profile.shipping_name &&
+									!profile.first_name &&
+									!profile.last_name">&mdash;</span>
+								</td>
+								<td class="align-baseline">
+									{{ profile.address1 }}<br ng-if="profile.address2" />
+									{{ profile.address2 }}<br />
+									{{ profile.city }}, {{ profile.state }} {{ profile.zip }}
+									<div class="small" ng-if="profile.email || profile.phone">
+										{{ profile.email }}<br ng-if="profile.phone" />
+										{{ profile.phone | tel }}
+									</div>
+								</td>
+								<td class="align-middle">
+									<div
+									class="btn-toolbar justify-content-end"
+									role="toolbar"
+									aria-label="Toolbar for editing address profile"
+								>
+									<div class="btn-toolbar gap-2" ng-hide="$ctrl.isConfirmingDeletion[ profile.shipping_id ]">
+										<button class="btn btn-outline-primary btn-sm"
+											ng-click="$ctrl.onClickEdit( profile, 'shipping')"
+											ng-if="!$ctrl.isLocked"
+											>Edit</button
+										>
+										<button class="btn btn-outline-primary border-0 btn-sm"
+											ng-disabled="$ctrl.isMakingDefault[ profile.shipping_id ]"
+											ng-click="$ctrl.onClickMakeDefault( profile.shipping_id, 'shipping' )"
+											ng-if="profile.shipping_id !== $ctrl.defaultShippingProfileId"
+										>
+											Make Default
+										</button>
+										<button class="btn btn-outline-danger border-0 btn-sm"
+											ng-if="!$ctrl.isLocked"
+											ng-click="$ctrl.isConfirmingDeletion[ profile.shipping_id ] = true"
+											>Delete</button
+										>
+									</div>
+									<div ng-if="$ctrl.isConfirmingDeletion[ profile.shipping_id ]">
+										<div class="btn-toolbar align-items-baseline">
+											<span class="small me-2">Delete profile?</span>
+											<button class="btn btn-secondary btn-sm" ng-click="$ctrl.isConfirmingDeletion[ profile.shipping_id ] = false"
+												>Cancel</button
+											>
+											<button class="btn btn-danger btn-sm ms-1"
+												ng-disabled="$ctrl.isRemoving[ profile.shipping_id ]"
+												ng-if="!$ctrl.isLocked"
+												ng-click="$ctrl.onClickRemove( profile.shipping_id, 'shipping' )"
+												>{{ $ctrl.isRemoving[ profile.shipping_id ] ? 'Deleting' : 'Delete' }}</button
+											>
+										</div>
+									</div>
+								</div>
+								</td>
+							</tr>
+							<tr ng-if="!results.length">
+								<td colspan="3">No results found<span ng-if="$ctrl.q"> for <q>{{ $ctrl.q }}</span>.</q></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</layout-component>
+

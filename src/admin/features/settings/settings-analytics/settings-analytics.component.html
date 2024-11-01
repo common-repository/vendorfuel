@@ -1,0 +1,199 @@
+<h2>Analytics settings</h2>
+<form name="form">
+	<fieldset ng-disabled="$ctrl.isUpdating || $ctrl.isLoading">
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">Google Analytics</th>
+					<td>
+						<fieldset>
+							<legend class="screen-reader-text">
+								<span>Google Analytics</span>
+							</legend>
+							<label for="enableUA">
+								<input
+									type="checkbox"
+									name="enableUA"
+									id="enableUA"
+									ng-model="$ctrl.settings.UA.enabled"
+								/>
+								Enable Google Analytics</label
+							>
+						</fieldset>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.UA.enabled">
+					<th scope="row">
+						<label for="ua-id">Analytics ID</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="ua-id"
+							ng-model="$ctrl.settings.UA.id"
+						/>
+						<p class="description">
+							If you are still using Universal Analytics, Google
+							recommends migrating to Google Analytics 4. On July
+							1, 2023 all standard Universal Analytics properties
+							will stop processing new hits.
+							<a
+								href="https://support.google.com/analytics/answer/11583528"
+								target="_blank"
+								>Learn more.</a
+							>
+						</p>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.UA.enabled">
+					<th scope="row">
+						<label for="verification-code"
+							>Site Verification Code</label
+						>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="verification-code"
+							ng-model="$ctrl.settings.verification.code"
+						/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3 class="h5 my-3">Google Ads</h3>
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">Google Ads</th>
+					<td>
+						<fieldset>
+							<legend class="screen-reader-text">
+								<span>Google Ads</span>
+							</legend>
+							<label for="enableAW">
+								<input
+									type="checkbox"
+									name="enableAW"
+									id="enableAW"
+									ng-model="$ctrl.settings.AW.enabled"
+								/>
+								Enable Google Ads (formerly Google
+								AdWords)</label
+							>
+						</fieldset>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.AW.enabled">
+					<th scope="row">
+						<label for="aw-id">Google Ads ID</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="aw-id"
+							ng-model="$ctrl.settings.AW.id"
+						/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3 class="h5 my-3">Conversions</h3>
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">Phone leads</th>
+					<td>
+						<fieldset>
+							<legend class="screen-reader-text">
+								<span>Phone leads</span>
+							</legend>
+							<label for="enable-phone-leads">
+								<input
+									type="checkbox"
+									name="enable-phone-leads"
+									id="enable-phone-leads"
+									ng-model="$ctrl.settings.conversions.phone.enabled"
+								/>
+								Enable phone lead conversions</label
+							>
+						</fieldset>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.conversions.phone.enabled">
+					<th scope="row">
+						<label for="phone-number">Phone Number</label>
+					</th>
+					<td>
+						<input
+							type="tel"
+							class="regular-text"
+							id="phone-number"
+							ng-model="$ctrl.settings.conversions.phone.number"
+						/>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.conversions.phone.enabled">
+					<th scope="row">
+						<label for="phone-tag">Phone Number Tag</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="phone-tag"
+							ng-model="$ctrl.settings.conversions.phone.tag"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Purchases</th>
+					<td>
+						<fieldset>
+							<legend class="screen-reader-text">
+								<span>Purchases</span>
+							</legend>
+							<label for="purchase-enabled">
+								<input
+									type="checkbox"
+									name="purchase-enabled"
+									id="purchase-enabled"
+									ng-model="$ctrl.settings.conversions.purchase.enabled"
+								/>
+								Enable purchase conversions</label
+							>
+						</fieldset>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.settings.conversions.purchase.enabled">
+					<th scope="row">
+						<label for="purchase-tag">Purchase Tag</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="purchase-tag"
+							ng-model="$ctrl.settings.conversions.purchase.tag"
+						/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</fieldset>
+
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-click="$ctrl.update($ctrl.settings)"
+			ng-disabled="$ctrl.isUpdating"
+		>
+			Save Changes
+		</button>
+	</p>
+</form>

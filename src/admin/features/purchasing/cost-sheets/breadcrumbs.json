@@ -1,0 +1,7 @@
+[
+	{ "label": "Purchasing", "href": "?page=vf-purchasing" },
+	{
+		"label": "Cost sheets",
+		"href": "?page=vendorfuel#!/purchasing/cost-sheets"
+	}
+]

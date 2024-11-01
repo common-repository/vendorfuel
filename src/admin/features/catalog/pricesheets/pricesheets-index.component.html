@@ -1,0 +1,699 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Price sheets</h2>
+<vf-check-auth></vf-check-auth>
+
+<div class="container-fluid p-0">
+    <div ng-if="isAuthed" class="col p-0">
+        <uib-tabset active="activeTab" resize>
+            <uib-tab index="0" select="TabChanged(0)" heading="Search Price Sheets">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>            
+                <div ng-if="!loading">
+                    <div>
+
+                        <bs-search-box-legacy
+                            q="$ctrl.allPrShSearchParams.q"
+                            on-submit="$ctrl.setQuery(query, searchBy)"
+                            is-loading="loadingMore"
+                            search-options="$ctrl.searchOptions">
+                        </bs-search-box-legacy>   
+
+                        <table class="wp-list-table widefat fixed striped table-view-list">
+                            <thead>
+                                <tr>
+                                    <th class="col-1">
+                                        <a href="#" class="text-decoration-none"
+                                            ng-click="$ctrl.changeSortBy('price_sheet_id', $event)">
+                                            ID
+                                            <i ng-class="['bi', {
+                                                'bi-sort-numeric-down': $ctrl.sortAscending,
+                                                'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+                                            }]"
+                                                ng-if="$ctrl.allPrShSearchParams.sortBy === 'price_sheet_id'">
+                                            </i>							
+                                        </a>
+                                    </th>                                
+                                    <th class="col-5">
+                                        <a href="#" class="text-decoration-none"
+                                            ng-click="$ctrl.changeSortBy('sheet', $event)">
+                                            Name
+                                            <i ng-class="['bi', {
+                                                'bi-sort-alpha-down': $ctrl.sortAscending,
+                                                'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+                                            }]"
+                                                ng-if="$ctrl.allPrShSearchParams.sortBy === 'sheet'">
+                                            </i>							
+                                        </a>
+                                    </th>
+                                    <th class="col-3">
+                                        <a href="#" class="text-decoration-none"
+                                            ng-click="$ctrl.changeSortBy('site_id', $event)">
+                                            Site ID
+                                            <i ng-class="['bi', {
+                                                'bi-sort-numeric-down': $ctrl.sortAscending,
+                                                'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+                                            }]"
+                                                ng-if="$ctrl.allPrShSearchParams.sortBy === 'site_id'">
+                                            </i>							
+                                        </a>
+                                    </th>                                                                    
+                                    <th class="col-3">
+                                        <a href="#" class="text-decoration-none"
+                                            ng-click="$ctrl.changeSortBy('gp_price_sheet', $event)">
+                                            GP Price Sheet
+                                            <i ng-class="['bi', {
+                                                'bi-sort-alpha-down': $ctrl.sortAscending,
+                                                'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+                                            }]"
+                                                ng-if="$ctrl.allPrShSearchParams.sortBy === 'gp_price_sheet'">
+                                            </i>							
+                                        </a>
+                                    </th>                                                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-if="!pricesheets.data.length && !loadingMore">
+                                    <td colspan="4">
+                                        No pricesheets found<span
+                                            ng-if="searchTerm.length >= 1 && searchedBy.length <= 0"> matching
+                                            '{{searchTerm}}'</span><span
+                                            ng-if="searchTerm.length >= 1 && searchedBy.length >= 1">with the
+                                            {{searchedBy === 'price_sheet_id' ? 'ID' : searchedBy === 'sheet' ? 'Price
+                                            Sheet' : searchedBy === 'site_id' ? 'Site ID' : searchedBy ===
+                                            'gp_price_sheet' ? 'GP Price Sheet' : searchedBy }}
+                                            of '{{searchTerm}}'</span>.
+                                    </td>
+                                </tr>
+                                <tr class="cursor-pointer"
+                                    ng-if="!loadingMore" 
+                                    ng-click="$ctrl.changeTab(2, $index)"
+                                    ng-repeat="pricesheet in pricesheets.data track by $index">
+                                    <td>{{pricesheet.price_sheet_id}}</td>
+                                    <td>
+                                        {{pricesheet.sheet}}
+                                        <span class="badge bg-primary"
+                                            ng-if="pricesheet.default_price_sheet">
+                                            Default
+                                        </span>
+                                    </td>
+                                    <td>{{pricesheet.site_id}}</td>
+                                    <td>{{pricesheet.gp_price_sheet}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <wp-spinner
+                            type="2x"
+                            ng-show="loadingMore">
+                        </wp-spinner>
+                            
+                        <div class="row  mb-3">
+                            <div class="col-sm-4">
+                                <span>Showing {{pricesheets.from || 0}} to {{pricesheets.to || 0}} of
+                                    {{pricesheets.total || 0}} entries<span>
+                            </div>
+                            <div class="col-sm-4 text-center mt-2">
+                                <button class="button" ng-if="pricesheets.prev_page_url"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page - 1)">&lsaquo; Prev</button>
+                                <button class="button" ng-if="pricesheets.current_page - 2 > 0"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page - 2)">{{pricesheets.current_page
+                                    - 2}}</button>
+                                <button class="button" ng-if="pricesheets.current_page - 1 > 0"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page - 1)">{{pricesheets.current_page
+                                    - 1}}</button>
+                                <button class="button"
+                                    ng-disabled="true">{{pricesheets.current_page}}</button>
+                                <button class="button"
+                                    ng-if="pricesheets.current_page + 1 <= pricesheets.last_page"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page + 1)">{{pricesheets.current_page
+                                    + 1}}</button>
+                                <button class="button"
+                                    ng-if="pricesheets.current_page + 2 <= pricesheets.last_page"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page + 2)">{{pricesheets.current_page
+                                    + 2}}</button>
+                                <button class="button" ng-if="pricesheets.next_page_url"
+                                    ng-click="$ctrl.setPage(pricesheets.current_page + 1)">Next &rsaquo;</button>
+                            </div>
+                            <div class="col-sm-4  justify-content-end">
+                                <label class="form-label" for="rpp">Per Page: </label>
+                                <select class="form-control" style="display: inline-block;" id="rpp"
+                                    ng-model="$ctrl.allPrShSearchParams.rpp" ng-change="$ctrl.setRpp( $ctrl.allPrShSearchParams.rpp )"
+                                    ng-options="value for value in rppValues">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Add Price Sheet">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <form class="row" name="new.priceSheet">
+                        <div class="col-12 col-md-4" class="needs-validation">
+                            <div class=""
+                                ng-class="new.priceSheet.name.$invalid ? 'has-danger' : 'has-success'">
+                                <div class="input-group">
+                                    <span class="input-group-text">Name</span>
+                                    <input class="form-control"
+                                        ng-class="new.priceSheet.name.$invalid ? 'is-invalid' : 'is-valid'"
+                                        ng-model="addParams.name" name="name" type="search"
+                                        placeholder="New Price Sheet Name" minlength="1" required>
+                                    <div class="invalid-feedback">
+                                        Please set a name for the Price Sheet.
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="col p-0">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Site ID</span>
+                                    <input class="form-control" type="text" id="add_site_id" placeholder="Site ID"
+                                        ng-model="addParams.site_id">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">GP Price Sheet</span>
+                                    <input class="form-control" type="text" id="add_gp_ps" placeholder="GP Price Sheet"
+                                        ng-model="addParams.gp_price_sheet">
+                                </div>
+                            </div>
+                            <div ng-if="!isSM && !isXS">
+                                <div class="mb-2">
+                                    <button class="button" 
+                                        ng-click="OpenSearchModalAdd()">
+                                        Add Products
+                                    </button>
+                                    <button class="button"
+                                        ng-click="SetDefault()" ng-disabled="addParams.default_price_sheet === true">
+                                        <span ng-if="addParams.default_price_sheet != true">Set </span>
+                                        Default
+                                        <span class="dashicons dashicons-yes"
+                                            ng-if="addParams.default_price_sheet === true"></span>
+                                    </button>
+                                </div>
+                                <button class="button button-primary" type="button"
+                                    title="{{!addParams.products ? 'A price sheet must have items in order to be added.' : ''}}"
+                                    ng-click="AddPricesheet()"
+                                    ng-disabled="new.priceSheet.$invalid || !addParams.products">
+                                    Add New Price
+                                    Sheet
+                                </button>
+                                <wp-notice-list></wp-notice-list>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8" style="display: inline-grid; position: relative;">
+                            <hr class="col p-0" ng-if="addParams.products.length && isXS">
+                            <div class="row min-scroll" ng-class="{'mt-0':!isXS && !isSM}">
+                                <div class="col text-center p-20" style="cursor: pointer"
+                                    ng-click="OpenSearchModalAdd()" ng-if="!addParams.products.length">
+                                    <h3>Click Here or 'Add Products' to get started.</h3>
+                                </div>
+                                <div class="col-6 col-md-3 vf-item-card-outer"
+                                    ng-repeat="product in addParams.products track by $index">
+                                    <div class="vf-item-card-inner" ng-click="EditPrice($index)">
+                                        <div class="row">
+                                            <p class="col-12"><b>{{product.value.sku}}</b></p>
+                                            <div class="col-12" ng-if="!product.value.image">
+                                                <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                                            </div>
+                                            <div class="col-12" ng-if="product.value.image">
+                                                <img class="img-fluid vf-item-image"
+                                                    ng-src="{{product.value.image.thumb_url}}">
+                                            </div>
+                                            <div class="col-12">
+                                                <p>{{product.value.description | limitTo:
+                                                    30}}{{product.value.description.length >= 30 ? '...' : ''}}
+                                                </p>
+                                            </div>
+                                            <div class="col-12 text-center vf-item-card-input">
+                                                <input class="form-control" maxlength="10"
+                                                    ng-class="{'is-invalid':new.priceSheet['price'+$index].$invalid}"
+                                                    name="price{{$index}}" placeholder="Add Price"
+                                                    ng-model="product.value.price" format="currency"
+                                                    ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                    required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col" ng-if="isSM || isXS">
+                            <button class="button"
+                                ng-click="OpenSearchModalAdd()">
+                                Add Products
+                            </button>
+                            <button class="button"
+                                ng-click="SetDefault()"
+                                ng-disabled="addParams.default_price_sheet === true">
+                                <span ng-if="addParams.default_price_sheet != true">Set </span>
+                                Default
+                                <span class="dashicons dashicons-yes" ng-if="addParams.default_price_sheet === true"></span>
+                            </button>
+                            <button class="button button-primary" type="button"
+                                title="{{!addParams.products ? 'A price sheet must have items in order to be added.' : ''}}"
+                                ng-click="AddPricesheet()"
+                                ng-disabled="new.priceSheet.$invalid || !addParams.products">Add New Price Sheet</button>
+                                <wp-notice-list></wp-notice-list>
+                        </div>
+                    </form>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="TabChanged(2)" ng-show="selectedPricesheet" heading="View Price Sheet">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <form ng-if="!loading" name="view.priceForm">
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div ng-if="editName === false" ng-click="ChangeEdit()">
+                                <h2>{{selectedPricesheet.sheet}} <span class="dashicons dashicons-edit"></span></h2>
+                            </div>
+                            <div class="input-group" ng-if="editName === true">
+                                <input class="form-control" ng-class="{'is-invalid':view.priceForm.name.$invalid}"
+                                    name="name" ng-model="selectedPricesheet.sheet" required />
+                                <button class="button button-primary" type="button" ng-click="ChangeEdit()"><span
+                                        class="dashicons dashicons-yes"></span></button>
+                            </div>
+                            <hr class="col p-0">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Site ID</span>
+                                    <input class="form-control" type="text" id="view_site_id" placeholder="Site ID"
+                                        ng-model="selectedPricesheet.site_id">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">GP Price Sheet</span>
+                                    <input class="form-control" type="text" id="view_gp_ps"
+                                        placeholder="Set GP Price Sheet" ng-model="selectedPricesheet.gp_price_sheet">
+                                </div>
+                            </div>
+                            <hr class="col p-0" ng-if="isXS">
+                            <div class="mb-3">
+                                <button class="button" type="button"
+                                    ng-if="updatedPricesheetItems.length >= 1" ng-click="ShowChanges()">
+                                    <span ng-if="!showChanges">Show Changes ({{updatedPricesheetItems.length}})</span>
+                                    <span ng-if="showChanges">Show Current</span>
+                                </button>
+                            </div>
+                            <div>
+                                <div class="mb-2">
+                                    <button class="button"
+                                        ng-click="SetDefault()"
+                                        ng-disabled="selectedPricesheet.default_price_sheet === true">
+                                        <span ng-if="selectedPricesheet.default_price_sheet != true">Set </span>
+                                        Default
+                                        <span class="dashicons dashicons-yes"
+                                            ng-if="selectedPricesheet.default_price_sheet === true"></span>
+                                    </button>
+                                    <button class="button" 
+                                        ng-click="OpenSearchModalUpdate()">
+                                        <span ng-if="selectedPricesheet.pricesheetItems.data.length">Edit Price
+                                            Sheet</span><span
+                                            ng-if="!selectedPricesheet.pricesheetItems.data.length">Add Products</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button class="button button-primary"
+                                    type="button"
+                                        ng-click="AddPricesheet(selectedPricesheet.price_sheet_id)"
+                                        ng-disabled="view.priceForm.$invalid">
+                                        Update
+                                    </button>
+                                    <button class="button button-delete"
+                                        ng-click="$ctrl.isConfirmingDeletion = true"
+                                        ng-hide="$ctrl.isConfirmingDeletion">
+                                        Delete
+                                    </button>
+                                    <div class="mt-2" 
+                                        ng-if="$ctrl.isConfirmingDeletion">
+                                        <p class="mb-2">
+                                            Delete this price sheet?
+                                        </p>
+                                        <div class="btn-toolbar">
+                                            <button class="btn btn-danger me-2"
+                                                ng-click="$ctrl.deletePricesheet(selectedPricesheet.price_sheet_id)"
+                                                ng-disabled="$ctrl.isDeleting">
+                                                <wp-spinner
+                                                    type="loading"
+                                                    ng-if="$ctrl.isDeleting">
+                                                </wp-spinner>
+                                                {{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+                                            </button>
+                                            <button class="button"
+                                                ng-click="$ctrl.isConfirmingDeletion = false">
+                                                Cancel
+                                            </button>               
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8" ng-class="{'mt-3':isXS || isSM}"
+                            style="display: inline-grid; position: relative;">
+                            <div ng-show="!showChanges">
+                                <div class="row" ui-keypress="{13:'SearchPricesheet(searchParams.rpp, 1)'}">
+                                    <label class="form-label" for="searchProducts">Search</label>
+                                    <div class="input-group" ng-form>
+                                        <input class="form-control" type="text" id="searchProducts"
+                                            placeholder="Search 'Labels'" ng-model="searchParams.q">
+                                        <button class="button"
+                                            ng-click="SearchPricesheet(1)">Search</button>
+                                    </div>
+                                </div>
+                                <wp-spinner
+                                    type="2x"
+                                    ng-show="productsLoading">
+                                </wp-spinner>
+                                <div ng-if="!productsLoading">
+                                    <div class="row min-scroll">
+                                        <div class="col text-center p-20"
+                                            ng-if="!selectedPricesheet.pricesheetItems.data.length">
+                                            <h3>Click 'Add Products' to get started.</h3>
+                                        </div>
+                                        <div class="col-6 col-md-3 vf-item-card-outer"
+                                            ng-repeat="item in selectedPricesheet.pricesheetItems.data track by $index">
+                                            <div class="vf-item-card-inner" ng-click="EditPrice($index)">
+                                                <div class="row">
+                                                    <p class="col-12"><b>{{item.sku}}</b></p>
+                                                    <div class="col-12" ng-if="!item.product.image">
+                                                        <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                                                    </div>
+                                                    <div class="col-12" ng-if="item.product.image">
+                                                        <img class="img-fluid vf-item-image"
+                                                            ng-src="{{item.product.image.thumb_url}}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <p>{{item.product.description | limitTo:
+                                                            30}}{{item.product.description.length >= 30 ? '...' : ''}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        <input class="form-control"
+                                                            ng-class="{'is-invalid':view.priceForm['price'+$index].$invalid || !item.price}"
+                                                            name="price{{$index}}" format="currency" maxlength="10"
+                                                            ng-change="editParams(item)" ng-model="item.price"
+                                                            ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                            required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="col p-0" ng-if="isXS">
+                                <div class="row  mb-3" ng-hide="productsLoading">
+                                    <div class="col-sm-4">
+                                        <span>Showing {{selectedPricesheet.pricesheetItems.from || 0}} to
+                                            {{selectedPricesheet.pricesheetItems.to || 0}} of
+                                            {{selectedPricesheet.pricesheetItems.total || 0}} entries</span>
+                                    </div>
+                                    <div class="col text-center mb-3">
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.prev_page_url"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page - 1)">&lsaquo; Prev</button>
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.current_page - 2 > 0"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page - 2)">{{selectedPricesheet.pricesheetItems.current_page
+                                            - 2}}</button>
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.current_page - 1 > 0"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page - 1)">{{selectedPricesheet.pricesheetItems.current_page
+                                            - 1}}</button>
+                                        <button class="button"
+                                            ng-disabled="true">{{selectedPricesheet.pricesheetItems.current_page}}</button>
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.current_page + 1 <= selectedPricesheet.pricesheetItems.last_page"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page + 1)">{{selectedPricesheet.pricesheetItems.current_page
+                                            + 1}}</button>
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.current_page + 2 <= selectedPricesheet.pricesheetItems.last_page"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page + 2)">{{selectedPricesheet.pricesheetItems.current_page
+                                            + 2}}</button>
+                                        <button class="button"
+                                            ng-if="selectedPricesheet.pricesheetItems.next_page_url"
+                                            ng-click="SearchPricesheet(selectedPricesheet.pricesheetItems.current_page + 1)">Next
+                                            &rsaquo;</button>
+                                    </div>
+                                    <div class="col-sm-4  justify-content-end">
+                                        <label class="form-label" for="rpp">Per Page: </label>
+                                        <select class="form-control" style="display: inline-block;" id="rpp"
+                                            ng-model="searchParams.rpp" ng-change="SearchPricesheet(1)"
+                                            ng-options="value for value in rppValues">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-show="showChanges">
+                                <div class="row " ng-hide="productsLoading">
+                                    <div class="input-group col-12 p-0">
+                                        <input class="form-control" type="text" id="filterChanges"
+                                            ng-model="filterEdited" placeholder="Filter Changes">
+                                    </div>
+                                </div>
+                                <hr class="col p-0" ng-if="isXS">
+                                <wp-spinner
+                                    type="2x"
+                                    ng-show="productsLoading">
+                                </wp-spinner>
+                                <div ng-if="!productsLoading">
+                                    <div class="row min-scroll">
+                                        <div class="col text-center p-20" ng-if="results.length <= 0">
+                                            <h3>No results matching '{{filterBy}}'.</h3>
+                                        </div>
+                                        <div class="col-6 col-md-4 col-lg-3 vf-item-card-outer"
+                                            ng-repeat="item in updatedPricesheetItems | filter: filterEdited as results track by $index">
+                                            <div class="vf-item-card-inner" ng-class="item.action">
+                                                <div class="row">
+                                                    <p class="col-12"><b>{{item.value.sku}}</b></p>
+                                                    <div class="col-12" style="min-height: 80px;"
+                                                        ng-if="!item.value.product.image">
+                                                        <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                                                    </div>
+                                                    <div class="col-12" ng-if="item.value.product.image">
+                                                        <img class="img-fluid vf-item-image"
+                                                            ng-src="{{item.value.product.image.thumb_url}}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <p>{{item.value.product.description | limitTo:
+                                                            30}}{{item.value.product.description.length >= 30 ? '...' :
+                                                            ''}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 text-center vf-item-card-input">
+                                                        <input
+                                                            ng-disabled="item.action == 'edited' || item.action == 'remove'"
+                                                            class="form-control" maxlength="10"
+                                                            ng-class="{'is-invalid':view.priceForm['newPrice'+$index].$invalid || !item.value.price}"
+                                                            format="currency" name="newPrice{{$index}}"
+                                                            ng-model="item.value.price"
+                                                            ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                            required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </uib-tab>
+            <uib-tab index="3" select="TabChanged(3)" heading="Upload Sheet(s)">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <form class="row" enctype="multipart/form-data" name="psUploadForm">
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Price Sheet</span>
+                                <input class="form-control" ng-class="{'is-invalid':psUploadForm.psID.$invalid}"
+                                    type="text" id="psName" name="psID" placeholder="Select a Pricesheet"
+                                    ng-model="uploadPricesheetName" disabled required />
+                                <button class="button"
+                                    ng-click="OpenSearchModalPricesheet()">Select</button>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-104">File</span>
+                                <input class="form-control" ng-class="{'is-invalid':psUploadForm.psName.$invalid}"
+                                    name="psName" ng-model="theFile.name" placeholder="Upload a File" disabled required>
+                                <label class="button">
+                                    Browse 
+                                    <input class="custom-file" type="file" name="file" id="uploadInput"
+                                        onchange="angular.element(this).scope().setFile(this), angular.element(this).scope().setUploading()"
+                                        hidden />
+                                </label>
+                            </div>
+
+                            <div class="d-flex align-items-center"
+                                ng-if="uploading">
+                                <strong>Generating your Price Sheet, please wait...</strong>
+                                <div class="spinner is-active ml-auto" role="status" aria-hidden="true"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-3 table-responsive">
+                            <div class="min-scroll-table" ng-if="pricesheetUpload && !uploading">
+                                <table class="table table-striped table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Price</th>
+                                            <th>GSA</th>
+                                            <th>Ability One</th>
+                                            <th>Core List</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="product in pricesheetUpload  | limitTo: 5 track by $index">
+                                        <tr>
+                                            Displaying {{(pricesheetUpload.length > 5)?5:pricesheetUpload.length}}
+                                            results
+                                            of
+                                            total {{pricesheetUpload.length | number}}
+                                        </tr>
+                                        <tr>
+                                            <td ng-repeat="attribute in product track by $index ">
+                                                <span ng-if="attribute.length >= 1" title="{{attribute}}">{{attribute |
+                                                    limitTo: 25}}{{attribute.length >= 25 ? '...' : ''}}</span>
+                                                <span ng-if="attribute.length <= 0">----</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-12" ng-class="{'text-end':pricesheetUpload}">
+                            <button class="button button-primary mb-3" ng-class="{'col': isXS || isSM}"
+                            ng-disabled="psUploadForm.$invalid" ng-click="UploadPricesheet()"
+                            ng-if="pricesheetUpload">Upload Pricesheet</button>
+                            <button class="button button-delete mb-3" ng-class="{'col': isXS || isSM}"
+                                ng-click="RemoveUploadFile()" ng-if="pricesheetUpload">Remove</button>
+                        </div>
+                    </form>
+                </div>
+                <wp-notice-list></wp-notice-list>
+            </uib-tab>
+            <uib-tab index="4" select="TabChanged(4)" heading="Batches">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-text">Status</span>
+                            <select class="form-control"
+                                ng-options="key as value for (key, value) in batchListOptions"
+                                ng-model="sortBatchParams.status" ng-change="SortBatchIndex('batch_id')"></select>
+                        </div>
+                        <div class="row px-3 pt-3">
+                            <div class="col" ng-click="SortBatchIndex('batch_id')">Batch ID</div>
+                            <div class="col" ng-click="SortBatchIndex('time_uploaded')">Upload Date</div>
+                            <div class="col" ng-click="SortBatchIndex('filename')">File Name</div>
+                            <div class="col" ng-click="SortBatchIndex('status')">Status</div>
+                            <div class="col">Progress</div>
+                        </div>
+                        <div ng-class="{'min-scroll':!isXS}">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="text-center" ng-if="!loadingMore && batches.length <= 0">
+                                <span class="col m-auto">
+                                    <h3>No Batches found.</h3>
+                                </span>
+                            </div>
+                            <div ng-if="!loadingMore" class="col p-3 vf-list-item cursor-pointer"
+                                ng-click="batch.status == 'pending' || batch.status == 'confirmed' ? ChangeBatchTab(5, $index) : return;"
+                                ng-repeat="batch in batches track by $index">
+                                <div class="row">
+                                    <div class="col">{{batch.batch_id}}</div>
+                                    <div class="col">{{batch.time_uploaded}}</div>
+                                    <div class="col">{{batch.filename}}</div>
+                                    <div class="col">{{batch.status}}</div>
+                                    <div ng-if="batch.recordsProcessed" class="col">
+                                        {{((batch.recordsProcessed / batch.total_records) * 100).toFixed(2)}}%</div>
+                                    <div ng-if="!batch.recordsProcessed && batch.status == 'processed'" class="col">Done
+                                    </div>
+                                    <div ng-if="!batch.recordsProcessed && batch.status != 'processed'" class="col">
+                                        {{batch.total_records ? '0%' : 'N/A'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="5" select="TabChanged(5)" ng-show="selectedBatch">
+                <uib-tab-heading>
+                    Batch {{selectedBatch.batch_id}} <i class="dashicons dashicons-update"></i>
+                </uib-tab-heading>
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading" class="col p-0 vf-tab-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Batch ID</span>
+                                <input class="form-control" ng-model="selectedBatch.batch_id" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Price Sheet ID</span>
+                                <input class="form-control" ng-model="selectedBatch.price_sheet_id" type="text"
+                                    disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">File Name</span>
+                                <input class="form-control" ng-model="selectedBatch.filename" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Time Uploaded</span>
+                                <input class="form-control" ng-model="selectedBatch.time_uploaded" type="text" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Status</span>
+                                <input class="form-control" ng-model="selectedBatch.status" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 my-3 table-responsive scrollbar">
+                            <div class="min-scroll-table">
+                                <table class="table table-striped table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="padding: 10px;"
+                                                ng-repeat="(key, value) in batchHeaders">{{value}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="data in selectedBatch.items  | limitTo: 5">
+                                            <td scope="row" class="padding: 10px;" ng-repeat="(x, y) in batchHeaders">
+                                                {{data[x]}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="button button-primary mb-3" ng-class="{'col-12': isXS || isSM}"
+                                ng-click="ConfirmBatch()" ng-if="selectedBatch.status == 'pending'">Confirm
+                                Batch</button>
+                        </div>
+                    </div>
+                </div>
+                <wp-notice-list></wp-notice-list>                
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

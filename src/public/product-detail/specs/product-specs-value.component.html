@@ -1,0 +1,10 @@
+<a
+	ng-attr-title="{{ $ctrl.value.title }}"
+	ng-href="{{ $ctrl.value.href }}"
+	ng-if="$ctrl.value.href"
+>
+	{{ $ctrl.value.name }}
+</a>
+<span ng-if="!$ctrl.value.href">
+	{{ $ctrl.value.name }}
+</span>

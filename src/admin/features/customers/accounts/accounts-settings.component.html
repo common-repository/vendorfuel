@@ -1,0 +1,38 @@
+<layout-component
+	heading="Customer account settings"
+	breadcrumbs="$ctrl.breadcrumbs"
+>
+	<form name="settingsForm">
+		<fieldset ng-disabled="$ctrl.isLoading">
+			<div class="mb-3">
+				<label class="form-label" for="default_customer_prefix"
+					>Default Customer Prefix</label
+				>
+				<input
+					id="default_customer_prefix"
+					type="text"
+					class="form-control"
+					name="name"
+					ng-model="$ctrl.settings.store.saved.default_customer_prefix"
+					required
+				/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="default_order_prefix"
+					>Default Order Prefix</label
+				>
+				<input
+					id="default_order_prefix"
+					type="text"
+					class="form-control"
+					name="name"
+					ng-model="$ctrl.settings.store.saved.default_order_prefix"
+					required
+				/>
+			</div>
+			<button class="btn btn-primary" ng-click="$ctrl.update()">
+				{{ $ctrl.isLoading ? 'Updating' : 'Update' }}
+			</button>
+		</fieldset>
+	</form>
+</layout-component>

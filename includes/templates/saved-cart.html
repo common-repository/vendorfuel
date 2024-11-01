@@ -1,0 +1,72 @@
+<vf-saved-cart class="d-block alignwide"></vf-saved-cart>
+
+<!-- Saved Cart: Add to Cart template -->
+<script type="text/ng-template" id="savedCartAddToCart.html">
+	   <div class="input-group input-group-sm">
+			<span class="input-group-text">
+				Qty
+			</span>
+			<button class="btn btn-primary" type="button"
+				ng-click="$ctrl.item.qty = $ctrl.item.qty + 1"
+			ng-disabled="$ctrl.isAddingToCart ||
+				( $ctrl.item.hasStockQty && $ctrl.item.stockQty === 0 ) ||
+				( $ctrl.item.hasStockQty && $ctrl.item.qty >= ( $ctrl.item.stockQty - $ctrl.item.cartQty ) )">
+				<i class="bi bi-plus"></i>
+			</button>
+		   <input class="form-control" name="qtyAdd" type="number"
+			   min="0" ng-min="0" required
+			   max="$ctrl.item.stockQty"
+			   ng-max="$ctrl.item.stockQty"
+			   ng-model="$ctrl.item.qty"
+			   ng-disabled="$ctrl.item.hasStockQty && $ctrl.item.stockQty === 0">
+		<button class="btn btn-primary" type="button"
+			ng-click="$ctrl.item.qty = $ctrl.item.qty - 1"
+		 ng-disabled="$ctrl.item.qty === 0">
+			<i class="bi bi-dash"></i>
+		</button>
+	   </div>
+	   <button id="addToCart" class="btn btn-primary w-100 btn-sm my-2"
+		   ng-click="$ctrl.onAddToCart($ctrl.item.id, $ctrl.item.qty)"
+		ng-disabled="$ctrl.item.qty === 0 ||
+			$ctrl.isAddingToCart ||
+			( $ctrl.item.hasStockQty && $ctrl.item.stockQty === 0 ) ||
+			( $ctrl.item.hasStockQty && $ctrl.item.qty > ( $ctrl.item.stockQty - $ctrl.item.cartQty ) )">
+		   <span ng-show="!$ctrl.isAddingToCart">
+			   Add <span ng-if="$ctrl.item.qty">{{$ctrl.item.qty}}</span> to Cart <i class="bi bi-cart-plus-fill"></i>
+		   </span>
+		   <span ng-show="$ctrl.isAddingToCart">
+			Adding to Cart<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+		   </span>
+	</button>
+	   <div class="alert alert-warning alert-dismissible fade show" role="alert"
+		   ng-repeat="error in $ctrl.errors track by $index">
+		   {{error}}
+
+		   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	   </div>
+	   <div ng-if="$ctrl.item.cartQty > 0" class="my-2 small">
+		   <i class="bi bi-check"></i>
+		   <a ng-href="{{ $ctrl.pageUrls.cart }}">
+			   {{$ctrl.item.cartQty}} in your Cart
+		   </a>
+	   </div>
+</script>
+
+<!-- Saved Cart: Toggle Favorite component -->
+<script type="text/ng-template" id="savedCartToggleFavorite.html">
+	  <button class="btn btn-link btn-sm"
+		  ng-click="$ctrl.onToggleFavorite()"
+		  ng-class="{'active':$ctrl.isFavorite}"
+		  ng-attr-title="{{$ctrl.title}}">
+		  <i ng-show="!$ctrl.isTogglingFavorite"
+			  ng-class="{'bi bi-heart-fill':$ctrl.isFavorite, 'bi bi-heart':!$ctrl.isFavorite}">
+		  </i>
+	<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+		ng-show="$ctrl.isTogglingFavorite">
+	</span>
+		  <span class="d-none d-md-inline ms-1">
+			  {{$ctrl.title}}
+		  </span>
+	  </button>
+	  <span ng-show="$ctrl.showPrompt" class="small">You must be logged in to Add to Favorites.</span>
+</script>

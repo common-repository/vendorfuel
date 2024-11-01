@@ -1,0 +1,10 @@
+@use "~@wordpress/base-styles/colors";
+@use "~@wordpress/base-styles/variables";
+
+:root {
+	--toastify-color-error: #{colors.$alert-red};
+	--toastify-color-warning: #{colors.$alert-yellow};
+	--toastify-color-info: #0073aa;
+	--toastify-color-success: #{colors.$alert-green};
+	--toastify-font-family: #{variables.$default-font};
+}

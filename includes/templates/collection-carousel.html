@@ -1,0 +1,77 @@
+<collection-carousel
+	class="d-block alignwide"
+	collection-id="'ID_OF_CATALOG'"
+></collection-carousel>
+
+<!-- Collection Carousel template -->
+<script type="text/ng-template" id="collectionCarousel.html">
+	<div class="d-flex justify-content-center py-3"
+		ng-show="$ctrl.isLoading">
+		<div class="spinner-border" role="status">
+		  	<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<div class="carousel slide" data-ride="carousel" data-interval="false"
+		ng-attr-id="{{ 'collection-carousel-' + $id }}"
+		ng-hide="$ctrl.isLoading">
+		<div class="align-items-center">
+			<ul class="col-auto pagination">
+				<li class="page-item">
+					<a class="page-link" role="button" aria-label="Previous"
+						data-slide="prev"
+						ng-href="{{ '#collection-carousel-' + $id }}">
+						<i class="bi bi-chevron-left" aria-hidden="true"></i>
+					</a>
+				</li>
+			</ul>
+			<div class="col">
+				<div class="carousel-inner">
+					<div ng-class="['carousel-item', { 'active': $first }]"
+						ng-repeat="slide in $ctrl.slides">
+						<div class="row-cols-2 row-cols-md-4 justify-content-md-center">
+							<div class="col mb-2"
+								ng-repeat="product in slide">
+								<div class="col card flex-lg-row h-100 p-0 p-lg-2 align-items-center">
+									<div class="ratio ratio-1x1">
+										<a class="stretched-link"
+											ng-href="{{ product.url }}"
+											ng-attr-title="View {{ product.name }}">
+											<img class="lazy" loading="lazy" style="object-fit:contain;" width="140" height="140"
+												ng-src="{{ product.imgSrc }}"
+												ng-attr-alt="{{ product.name }}">
+										</a>
+									</div>
+									<div class="d-none d-lg-block col-lg-6 card-header p-0 ps-1 bg-white small border-bottom-0">
+										<a class="stretched-link text-decoration-none"
+											ng-href="{{ product.url }}"
+											ng-attr-title="View {{ product.name }}">
+											{{ product.name | limitTo: 60 }}{{ product.name.length > 60 ? '&hellip;' : '' }}
+										</a>
+									</div>
+									<div class="card-img-overlay p-1 d-flex flex-column align-items-end justify-content-end">
+										<span class="badge text-bg-light">
+											{{product.price | currency}}
+											<span class="small d-none d-md-inline">
+												<span ng-if="product.uomQty > 1">{{product.uomQty}}/</span>{{product.uomDesc}}
+											</span>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<ul class="col-auto pagination">
+				<li class="page-item">
+					<a class="page-link" role="button" aria-label="Next"
+						data-slide="next"
+						ng-href="{{ '#collection-carousel-' + $id }}">
+						<i class="bi bi-chevron-right" aria-hidden="true"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</script>

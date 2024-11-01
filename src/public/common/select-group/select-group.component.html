@@ -1,0 +1,18 @@
+<div ng-if="$ctrl.groupOptions" class="mb-3">
+	<label class="form-label" for="selected-group">Selected Group</label>
+	<select
+		class="form-select"
+		name="selectGroup"
+		id="selected-group"
+		ng-model="$ctrl.currentGroupId"
+		ng-change="$ctrl.changeGroup($ctrl.currentGroupId)"
+	>
+		<option
+			ng-repeat="group in $ctrl.groupOptions | orderBy:'default' track by $index"
+			ng-selected="group.default"
+			ng-value="group.id"
+		>
+			{{ group.default ? '' : '&nbsp;&nbsp;&nbsp;' }}{{ group.name }}
+		</option>
+	</select>
+</div>

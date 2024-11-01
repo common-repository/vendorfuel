@@ -1,0 +1,322 @@
+<layout-component heading="Email">
+	<uib-tabset active="activeTab">
+		<uib-tab
+			index="0"
+			select="TabChanged(0)"
+			heading="Email Template Editor"
+		>
+			<spinner-component
+				ng-if="loading || savingTemplate"
+			></spinner-component>
+
+			<div ng-show="!loading">
+				<form name="emailForm">
+					<div class="row" ng-if="!loading && !savingTemplate">
+						<div class="col-md-6">
+							<div class="mb-3">
+								<label for="fullName" class="form-label"
+									>Sender name</label
+								>
+								<input
+									id="fullName"
+									class="form-control"
+									name="fullName"
+									ng-class="{
+										'is-invalid':
+											emailForm.username.$invalid
+									}"
+									ng-model="selectedEmail.sender_name"
+									minlength="3"
+									ng-pattern="/[A-Za-z0-9\-\s_\.\']/"
+									required
+								/>
+							</div>
+							<div class="mb-3">
+								<label for="senderEmail" class="form-label"
+									>Sender Email</label
+								>
+								<input
+									id="senderEmail"
+									class="form-control"
+									name="email"
+									ng-class="{
+										'is-invalid': emailForm.email.$invalid
+									}"
+									type="email"
+									ng-pattern='/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'
+									ng-model="selectedEmail.sender_email"
+									required
+								/>
+								<p
+									class="description text-danger"
+									ng-if="emailForm.email.$invalid"
+								>
+									Your email does not match the correct
+									format.
+								</p>
+							</div>
+							<div class="mb-3">
+								<label for="subject" class="form-label"
+									>Subject Line</label
+								>
+								<input
+									class="form-control"
+									id="subject"
+									name="subject"
+									ng-class="{
+										'is-invalid': emailForm.subject.$invalid
+									}"
+									ng-model="selectedEmail.subject"
+									ng-minlength="3"
+									placeholder="Welcome to ..."
+									ng-pattern="/[A-Za-z0-9\-\s_\.\']/"
+									required
+								/>
+							</div>
+							<div class="mb-3">
+								<label
+									for="notification-emails"
+									class="form-label"
+									>Notification Email(s)</label
+								>
+								<input
+									type="text"
+									class="form-control"
+									name="notification_emails"
+									ng-class="{
+										'is-invalid':
+											emailForm.notification_emails
+												.$invalid
+									}"
+									placeholder="email1@example.com, email2@example.com, ..."
+									ng-model="selectedEmail.notification_emails"
+								/>
+								<p class="description">
+									Enter comma separated email addresses to
+									receive Admin copy of email.
+								</p>
+							</div>
+
+							<div class="mb-3">
+								<label for="fileUpload" class="form-label"
+									>Upload
+									<abbr title="JavaScript Object Notation"
+										>JSON</abbr
+									>
+									file</label
+								>
+								<input
+									class="form-control"
+									type="file"
+									id="fileUpload"
+									onchange="angular.element(this).scope().UploadTemplate(this)"
+								/>
+							</div>
+
+							<div class="btn-toolbar mb-3 gap-1">
+								<button
+									class="btn btn-outline-primary"
+									ng-click="DownloadHtmlTemplate();"
+								>
+									Download HTML
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									ng-click="DownloadJsonTemplate();"
+								>
+									Download JSON
+								</button>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-3">
+								<label for="chooseTemplate" class="form-label"
+									>Select Template</label
+								>
+								<select
+									class="form-select"
+									id="chooseTemplate"
+									name="select"
+									ng-model="selectedEmail"
+									ng-options="email as email.type for email in emailTemplates"
+									ng-change="SelectTemplate(selectedEmail)"
+									ng-disabled="savingTemplate"
+								>
+									<option value="" hidden disabled>
+										Select Template
+									</option>
+								</select>
+							</div>
+
+							<div class="mb-3">
+								<label for="clipboardVal" class="form-label"
+									>Short-Codes</label
+								>
+								<div class="input-group">
+									<select
+										id="clipboardVal"
+										class="form-select"
+										ng-model="clipboardVal"
+										ng-options="shortCode.value as shortCode.name for shortCode in shortCodes"
+									>
+										<option value="" hidden disabled>
+											Copy Short-Code
+										</option>
+									</select>
+									<a
+										class="btn btn-outline-primary"
+										copy-to-clipboard="{{ clipboardVal }}"
+										>Copy</a
+									>
+								</div>
+							</div>
+
+							<div
+								class="input-group"
+								ng-if="shortCodesConditional.length >= 1"
+							>
+								<span class="input-group-text min-w-25"
+									>Conditionals</span
+								>
+								<select
+									class="form-select"
+									ng-model="clipboardValConditional"
+									ng-options="shortCodeCond.value as shortCodeCond.name for shortCodeCond in shortCodesConditional"
+								>
+									<option value="" hidden disabled>
+										Select Short-Code
+									</option>
+								</select>
+								<a
+									class="btn btn-outline-primary"
+									copy-to-clipboard="{{
+										clipboardValConditional
+									}}"
+									>Copy</a
+								>
+							</div>
+						</div>
+						<clipboard
+							style="height: 0.5px; overflow: hidden; opacity: 0"
+						></clipboard>
+					</div>
+					<div
+						ng-hide="savingTemplate"
+						style="
+							min-height: 1120px;
+							position: relative;
+							overflow: auto;
+						"
+					>
+						<div id="bee-plugin-container"></div>
+					</div>
+				</form>
+			</div>
+			<hr class="col-xs-12 p-0 mb-3" />
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="SMTP Settings">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-show="!loading" class="row">
+				<div class="w-100 my-0 mx-auto">
+					<form name="settingsForm">
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								value="default"
+								id="default"
+								ng-model="emailSettings.mode"
+							/>
+							<label class="form-check-label" for="default"
+								>Default</label
+							>
+						</div>
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								value="smtp"
+								id="smtp"
+								ng-model="emailSettings.mode"
+							/>
+							<label class="form-check-label" for="smtp"
+								>SMTP</label
+							>
+						</div>
+						<div ng-show="emailSettings.mode === 'smtp'">
+							<div class="mb-3">
+								<label class="form-label" for="host"
+									>Host</label
+								>
+								<input
+									id="host"
+									class="form-control"
+									type="text"
+									ng-model="emailSettings.credentials.mail_host"
+									ng-required="emailSettings.mode === 'smtp'"
+								/>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="username"
+									>Username</label
+								>
+								<input
+									id="username"
+									class="form-control"
+									type="text"
+									ng-model="emailSettings.credentials.mail_user"
+									ng-required="emailSettings.mode === 'smtp'"
+								/>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="password"
+									>Password</label
+								>
+								<div class="input-group">
+									<input
+										id="password"
+										ng-attr-type="{{
+											showPassword ? 'text' : 'password'
+										}}"
+										class="form-control"
+										type="password"
+										ng-model="emailSettings.credentials.mail_pass"
+										ng-required="emailSettings.credentials.mode === 'smtp'"
+										spellcheck="false"
+									/>
+									<button
+										ng-click="showPassword = !showPassword"
+										class="btn btn-outline-primary"
+										type="button"
+									>
+										<span
+											ng-class="
+												showPassword
+													? 'dashicons dashicons-visibility'
+													: 'dashicons dashicons-hidden'
+											"
+										></span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div ng-if="!saving">
+							<button
+								class="btn btn-primary"
+								type="button"
+								ng-click="UpdateSettings(emailSettings)"
+							>
+								Update
+							</button>
+						</div>
+
+						<div class="d-flex align-items-center" ng-if="saving">
+							<strong>Submitting, please wait...</strong>
+						</div>
+					</form>
+				</div>
+			</div>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>

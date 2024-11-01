@@ -1,0 +1,144 @@
+<layout-component>
+	<div class="alert alert-info" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<bs-spinner ng-if="$ctrl.isLoading && $ctrl.isSignedIn"> </bs-spinner>
+
+	<alert-list></alert-list>
+
+	<div ng-if="!$ctrl.isLoading && $ctrl.isSignedIn">
+		<bs-breadcrumb breadcrumb="$ctrl.breadcrumb"> </bs-breadcrumb>
+
+		<div ng-if="!$ctrl.items.length" class="alert alert-warning">
+			<p>
+				This saved cart is currently empty. You can add more items to it
+				from the <a ng-href="{{ $ctrl.pageUrls.cart }}">Cart</a> page,
+				return to your other
+				<a ng-href="{{ $ctrl.pageUrls.savedCarts }}">Saved Carts</a>, or
+				delete this empty saved cart.
+			</p>
+			<button
+				class="btn btn-danger"
+				ng-disabled="$ctrl.isDeleting"
+				ng-click="$ctrl.deleteCart()"
+			>
+				{{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+			</button>
+		</div>
+
+		<div ng-if="$ctrl.items.length">
+			<div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+				<!-- wp:heading {"level":1} -->
+				<h1>
+					Your Saved Cart:
+					<em>{{ $ctrl.cartTitle }}</em>
+				</h1>
+				<!-- /wp:heading -->
+
+				<button
+					class="btn btn-link btn-sm"
+					data-bs-toggle="collapse"
+					href="#collapseHelp"
+					role="button"
+					aria-expanded="false"
+					aria-controls="collapseHelp"
+					title="See help"
+				>
+					<i class="bi bi-info-circle-fill me-1"></i>Help
+				</button>
+			</div>
+
+			<div class="collapse" id="collapseHelp">
+				<ul>
+					<li>
+						To add an item to Your Cart, click or tap the
+						<em>Add To Cart</em> button.
+					</li>
+					<li>
+						To add all or multiple items to Your Cart, click or tap
+						the Select All checkbox or the checkbox for each item,
+						and then click or tap the
+						<em>Add Selected To Cart</em> button.
+					</li>
+					<li>
+						To remove an item from your Saved Cart, click or tap the
+						<em>Remove Saved Item</em> button.
+					</li>
+					<li>
+						To remove all or multiple items from the Saved Cart,
+						click or tap the Select All checkbox or the checkbox for
+						each item, and then click or tap the
+						<em>Remove Selected from Saved Cart</em> button. This
+						will remove it from your Saved Cart, but not remove any
+						items from Your Cart.
+					</li>
+					<li>
+						To add an item to Your Favorites, click the
+						<em>Add To Favorites</em> button.
+					</li>
+				</ul>
+			</div>
+
+			<div class="form-check">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					id="selectAll"
+					ng-model="$ctrl.isAllSelected"
+					ng-change="$ctrl.toggleSelectAll($ctrl.isAllSelected)"
+				/>
+				<label class="form-check-label" for="selectAll"
+					>Select All</label
+				>
+			</div>
+			<div class="list-group mb-3">
+				<saved-cart-item
+					class="list-group-item"
+					ng-repeat="item in $ctrl.items track by $index"
+					item="item"
+					on-delete="$ctrl.deleteItem(item)"
+					ng-class="{ active: item.isSelected }"
+				>
+				</saved-cart-item>
+			</div>
+			<div class="row g-0 justify-content-end mb-3">
+				<div class="col col-md-auto">
+					<button
+						class="btn btn-primary"
+						ng-click="$ctrl.addSelectedToCart()"
+						ng-disabled="$ctrl.selectedItemsForAdding() === 0"
+					>
+						<span ng-show="!$ctrl.isAddingSelectedToCart">
+							Add Selected to Cart
+							<i class="bi bi-cart-plus-fill"></i>
+						</span>
+						<span ng-show="$ctrl.isAddingSelectedToCart">
+							Adding to cart
+							<span
+								class="spinner-border spinner-border-sm"
+								role="status"
+								aria-hidden="true"
+							></span>
+						</span>
+					</button>
+				</div>
+				<div class="col col-md-auto">
+					<button
+						class="btn btn-link ms-2"
+						ng-disabled="$ctrl.selectedItems() === 0"
+						ng-click="$ctrl.deleteSelected()"
+					>
+						Remove Selected from Saved Cart
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</layout-component>

@@ -1,0 +1,22 @@
+[
+	{
+		"name": "admin",
+		"url": "/admin",
+		"abstract": true
+	},
+	{
+		"name": "admin.index",
+		"url": "",
+		"component": "adminAccountsIndex"
+	},
+	{
+		"name": "admin.edit",
+		"url": "/:id",
+		"component": "adminAccountEdit"
+	},
+	{
+		"name": "admin.create",
+		"url": "/create",
+		"component": "adminAccountEdit"
+	}
+]

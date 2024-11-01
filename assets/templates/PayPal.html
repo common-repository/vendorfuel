@@ -1,0 +1,63 @@
+<div
+	ng-controller="PaymentProcessorController"
+	ng-init="processorIndex = 'paypal';attributeIndex1 = 'client_id';attributeIndex2 = 'secret';attributeIndex3 = 'paypal_checkout_enabled';attributeCount = 3;"
+>
+	<form name="paypal">
+		<div class="form-check mb-3">
+			<input
+				id="enabled"
+				class="form-check-input"
+				type="checkbox"
+				name="att3"
+				ng-model="attribute3"
+				ng-true-value="1"
+				ng-false-value="0"
+			/>
+			<label for="enabled" class="form-check-label">
+				Enable Paypal checkout
+			</label>
+		</div>
+		<div class="mb-3">
+			<label for="att1" class="form-label">ID</label>
+			<input
+				id="att1"
+				class="form-control"
+				ng-class="{'is-invalid': paypal.att1.$invalid}"
+				name="att1"
+				type="text"
+				ng-model="attribute1"
+				required
+			/>
+			<p class="description">
+				Your Client ID and Secret can be found by logging in to
+				https://developer.paypal.com/
+			</p>
+		</div>
+		<div class="mb-3">
+			<label for="att2" class="form-label">Secret</label>
+			<input
+				id="att2"
+				class="form-control"
+				ng-class="{'is-invalid': paypal.att2.$invalid}"
+				name="att2"
+				type="text"
+				ng-model="attribute2"
+				required
+			/>
+		</div>
+		<input
+			class="btn btn-primary"
+			type="button"
+			ng-click="updateGateway()"
+			title="{{paypal.$invalid ? 'Please fill out the form completely.' : ''}}"
+			ng-disabled="paypal.$invalid"
+			value="Update"
+		/>
+		<input
+			class="btn btn-danger"
+			type="button"
+			ng-click="disableGateway()"
+			value="Disable"
+		/>
+	</form>
+</div>

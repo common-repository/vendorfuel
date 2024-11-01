@@ -1,0 +1,276 @@
+<layout-component>
+	<div class="alert alert-info" role="alert" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<div ng-if="$ctrl.isSignedIn">
+		<form
+			name="form"
+			class="needs-validation"
+			novalidate
+			ng-hide="$ctrl.isAccountCreated"
+		>
+			<div class="mb-3">
+				<label for="name" class="form-label"
+					>Name <small>(required)</small></label
+				>
+				<input
+					type="text"
+					class="form-control"
+					autocomplete="off"
+					id="name"
+					name="name"
+					autocomplete="name"
+					required
+					ng-model="$ctrl.account.name"
+					ng-minlength="2"
+					ng-pattern="$ctrl.formPatterns.name"
+					ng-class="{
+						'is-valid': form.name.$valid && form.name.$touched,
+						'is-invalid': form.name.$invalid && form.name.$touched
+					}"
+				/>
+				<p class="invalid-feedback">Please enter your name.</p>
+			</div>
+			<div class="mb-3">
+				<label for="email" class="form-label">Email</label>
+				<input
+					class="form-control"
+					disabled
+					id="email"
+					name="email"
+					ng-model="$ctrl.account.email"
+					type="email"
+				/>
+				<p class="form-text">Email addresses cannot be changed.</p>
+			</div>
+			<div class="mb-3">
+				<label for="company" class="form-label"
+					>Company/Organization</label
+				>
+				<input
+					class="form-control"
+					disabled
+					id="company"
+					name="company"
+					ng-model="$ctrl.account.company"
+					type="text"
+				/>
+				<p class="form-text">Company/Organization cannot be changed.</p>
+			</div>
+			<div class="collapse" id="collapsePassword">
+				<div class="mb-3">
+					<label for="password" class="form-label"
+						>Password <small>(required)</small></label
+					>
+					<div class="input-group">
+						<input
+							class="form-control"
+							type="password"
+							name="password"
+							id="password"
+							minlength="8"
+							required
+							autocomplete="new-password"
+							aria-describedby="passwordHelp"
+							ng-model="$ctrl.account.password"
+							ng-attr-type="{{
+								$ctrl.isShowingPassword ? 'text' : 'password'
+							}}"
+							ng-pattern="$ctrl.formPatterns.password"
+							ng-class="{
+								'is-valid': form.password.$valid,
+								'is-invalid':
+									form.password.$invalid &&
+									form.password.$touched
+							}"
+							spellcheck="false"
+						/>
+						<button
+							class="btn btn-secondary"
+							ng-class="{ active: $ctrl.isShowingPassword }"
+							ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword"
+						>
+							<i
+								class="bi"
+								ng-class="{
+									'bi-eye-fill': $ctrl.isShowingPassword,
+									'bi-eye-slash-fill':
+										!$ctrl.isShowingPassword
+								}"
+							></i>
+						</button>
+					</div>
+					<div class="progress mt-1">
+						<div
+							class="progress-bar"
+							role="progressbar"
+							aria-valuenow="25"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							ng-style="{
+								width:
+									$ctrl.getPasswordStrength(form.password) +
+									'%'
+							}"
+							ng-class="{
+								'bg-success': form.password.$valid,
+								'bg-warning': form.password.$invalid,
+								'bg-danger':
+									$ctrl.getPasswordStrength(form.password) <
+									50
+							}"
+						></div>
+					</div>
+					<p
+						id="passwordHelp"
+						ng-class="[
+							'form-text small',
+							{
+								'has-vivid-red-color':
+									form.password.$invalid &&
+									form.password.$touched
+							}
+						]"
+					>
+						{{
+							form.password.$valid
+								? 'Password valid.'
+								: 'Passwords must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, a special character (*,!,$, etc.) and a number.'
+						}}
+					</p>
+				</div>
+				<div class="mb-3">
+					<label for="passwordConfirmation" class="form-label"
+						>Reenter Password <small>(required)</small></label
+					>
+					<div class="input-group">
+						<input
+							class="form-control"
+							type="password"
+							name="passwordConfirmation"
+							id="passwordConfirmation"
+							required
+							autocomplete="new-password"
+							ng-model="$ctrl.account.passwordConfirmation"
+							ng-attr-type="{{
+								$ctrl.isShowingConfirmPassword
+									? 'text'
+									: 'password'
+							}}"
+							minlength="8"
+							ng-class="{
+								'is-valid':
+									form.passwordConfirmation.$valid &&
+									$ctrl.account.password ===
+										$ctrl.account.passwordConfirmation,
+								'is-invalid':
+									form.passwordConfirmation.$invalid &&
+									form.passwordConfirmation.$touched
+							}"
+							ng-pattern="$ctrl.formPatterns.password"
+							spellcheck="false"
+						/>
+						<button
+							class="btn btn-secondary"
+							ng-class="{
+								active: $ctrl.isShowingConfirmPassword
+							}"
+							ng-click="$ctrl.isShowingConfirmPassword = !$ctrl.isShowingConfirmPassword"
+						>
+							<i
+								class="bi"
+								ng-class="{
+									'bi-eye-fill':
+										$ctrl.isShowingConfirmPassword,
+									'bi-eye-slash-fill':
+										!$ctrl.isShowingConfirmPassword
+								}"
+							></i>
+						</button>
+					</div>
+					<div class="progress mt-1">
+						<div
+							class="progress-bar"
+							role="progressbar"
+							aria-valuenow="25"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							ng-style="{
+								width:
+									$ctrl.getPasswordStrength(
+										form.passwordConfirmation
+									) + '%'
+							}"
+							ng-class="{
+								'bg-success': form.passwordConfirmation.$valid,
+								'bg-warning':
+									form.passwordConfirmation.$invalid ||
+									$ctrl.account.password !==
+										$ctrl.account.passwordConfirmation,
+								'bg-danger':
+									$ctrl.getPasswordStrength(
+										form.passwordConfirmation
+									) < 50
+							}"
+						></div>
+					</div>
+					<p
+						id="passwordConfirmationHelp"
+						ng-class="[
+							'form-text small',
+							{
+								'has-vivid-red-color':
+									form.passwordConfirmation.$invalid &&
+									form.passwordConfirmation.$touched
+							}
+						]"
+					>
+						{{
+							form.passwordConfirmation.$valid &&
+							$ctrl.account.password ===
+								$ctrl.account.passwordConfirmation
+								? 'Your passwords match.'
+								: 'Please verify your password.'
+						}}
+					</p>
+				</div>
+			</div>
+			<div class="btn-toolbar justify-content-between">
+				<button
+					class="btn btn-primary me-2"
+					ng-click="$ctrl.onClickUpdate()"
+					ng-disabled="form.$pristine"
+				>
+					{{ $ctrl.isUpdating ? 'Updating' : 'Update' }}
+				</button>
+				<button
+					class="btn btn-secondary me-2"
+					ng-hide="$ctrl.isShowingPasswordFields"
+					ng-click="$ctrl.onClickChangePassword()"
+				>
+					Change Password
+				</button>
+				<a
+					class="btn btn-link text-decoration-none"
+					ng-href="{{ $ctrl.pageUrls.addresses }}"
+				>
+					View Saved Addresses
+				</a>
+				<button
+					class="btn btn-link text-decoration-none ms-auto"
+					ng-disabled="$ctrl.isSigningOut"
+					ng-click="$ctrl.onClickSignOut()"
+				>
+					{{ $ctrl.isSigningOut ? 'Signing' : 'Sign' }} Out
+				</button>
+			</div>
+		</form>
+	</div>
+</layout-component>

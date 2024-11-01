@@ -1,0 +1,100 @@
+<wp-button on-click="$ctrl.openModal()"
+  >Copy to New Customer
+</wp-button>
+
+<div
+  class="modal fade"
+  id="copyCustomerModal"
+  tabindex="-1"
+  aria-labelledby="copyCustomerModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+		<form name="copyCustomerForm" ng-submit="$ctrl.copyCustomer()">
+			<div class="modal-header">
+			  <h5 class="modal-title" id="copyCustomerModalLabel">
+				Copy to New Customer
+			  </h5>
+			  <button
+				type="button"
+				class="btn-close"
+				data-bs-dismiss="modal"
+				aria-label="Close"
+			  ></button>
+			</div>
+			<div class="modal-body">
+				<wp-notice-list></wp-notice-list>
+				<div class="mb-3">
+					<label for="email" class="form-label">Email address</label>
+					<input type="email" id="email" autocomplete="email" name="email" required ng-class="['form-control', {
+						'is-valid': copyCustomerForm.email.$valid
+					}]" ng-model="$ctrl.email">
+					<div class="form-text">Please email a unique email address for the copied customer. The address must not be used for an existing customer account.</div>
+				</div>
+				<div class="mb-3">
+					<label for="tempPassword" class="form-label">Temporary Password</label>
+					<div class="hstack gap-1 align-items-stretch">
+						<input name="tempPassword" id="temp-password" autocomplete="new-password" required ng-class="['form-control', {
+							'is-valid': $ctrl.passwordHas.all( $ctrl.tempPassword )
+						}]" ng-model="$ctrl.tempPassword" ng-attr-type="{{ $ctrl.isShowingPassword ? 'text' : 'password' }}">
+						<button class="button" type="button" ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword" ng-attr-aria-label="{{ $ctrl.isShowingPassword ? 'Hide password' : 'Show password' }}">
+							<i aria-hidden="true" ng-class="['bi', {
+								'bi-eye-fill': !$ctrl.isShowingPassword,
+								'bi-eye-slash-fill': $ctrl.isShowingPassword
+							}]"></i>
+							
+						</button>
+					</div>
+					<ul class="list-inline form-text">
+						<li class="list-inline-item mb-0 me-0">Your password must contain at least</li>
+						<li ng-class="['list-inline-item mb-0 me-0', {
+							'text-success': $ctrl.passwordHas.length( $ctrl.tempPassword )
+						}]">8 characters,</li>
+						<li ng-class="['list-inline-item mb-0 me-0', {
+							'text-success': $ctrl.passwordHas.symbol( $ctrl.tempPassword )
+						}]">a special character,</li>
+						<li ng-class="['list-inline-item mb-0 me-0', {
+							'text-success': $ctrl.passwordHas.number( $ctrl.tempPassword )
+						}]">a number,</li>
+						<li ng-class="['list-inline-item mb-0 me-0', {
+							'text-success': $ctrl.passwordHas.uppercase( $ctrl.tempPassword )
+						}]">a uppercase letter,</li>
+						<li ng-class="['list-inline-item mb-0 me-0', {
+							'text-success': $ctrl.passwordHas.lowercase( $ctrl.tempPassword )
+						}]">a lowercase letter.</li>
+					  </ul>
+				</div>		
+				<div class="mb-3">
+					<label for="temp-password-confirmation" class="form-label">Temporary Password Confirmation</label>
+					<div class="hstack gap-1 align-items-stretch">
+						<input name="tempPasswordConfirmation" id="tempPasswordConfirmation" autocomplete="new-password" required ng-class="['form-control', {
+							'is-valid': $ctrl.passwordHas.all( $ctrl.tempPassword ) &&
+								$ctrl.tempPassword === $ctrl.tempPasswordConfirmation
+						}]" ng-model="$ctrl.tempPasswordConfirmation" ng-attr-type="{{ $ctrl.isShowingPasswordConfirmation ? 'text' : 'password' }}">
+						<button class="button" type="button" ng-click="$ctrl.isShowingPasswordConfirmation = !$ctrl.isShowingPasswordConfirmation" ng-attr-aria-label="{{ $ctrl.isShowingPasswordConfirmation ? 'Hide password' : 'Show password' }}">
+							<i aria-hidden="true" ng-class="['bi', {
+								'bi-eye-fill': !$ctrl.isShowingPasswordConfirmation,
+								'bi-eye-slash-fill': $ctrl.isShowingPasswordConfirmation
+							}]"></i>
+							
+						</button>						
+					</div>
+					<div ng-class="['form-text', {
+						'text-success': $ctrl.passwordHas.all( $ctrl.tempPassword ) && $ctrl.tempPassword === $ctrl.tempPasswordConfirmation
+					}]">Please retype your temporary password for confirmation.</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="button me-1" data-bs-dismiss="modal">
+				Cancel
+			  </button>
+			  <button type="submit" class="button button-primary" ng-disabled="!( copyCustomerForm.$valid &&
+			  	$ctrl.passwordHas.all( $ctrl.tempPassword ) &&
+				$ctrl.tempPassword === $ctrl.tempPasswordConfirmation) || $ctrl.isCopying">
+			{{ $ctrl.isCopying ? 'Copying' : 'Copy' }}</button>
+		</form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,394 @@
+@use "settings/fonts";
+@use "settings/global";
+
+@use "elements/button";
+@use "elements/links";
+@use "elements/table";
+
+@use "components/breadcrumb";
+@use "components/card";
+@use "components/dashicons";
+@use "components/forms";
+@use "components/list-group";
+@use "components/modal";
+@use "components/pagination";
+@use "components/tabs";
+@use "components/wp-admin";
+
+@use "utilities/color-palette";
+@use "utilities/sizing";
+@use "wp-components";
+
+.row-actions span.delete {
+	button,
+	button:hover {
+		color: #b32d2e;
+	}
+}
+
+.navbar {
+	padding: 0;
+}
+.navbar-inverse {
+	border: none !important;
+	border-radius: 0 !important;
+}
+.navbar-nav > li {
+	padding: 5px;
+	margin: 0;
+}
+.navbar-nav > li > a {
+	color: white;
+}
+.notification-dropdown {
+	padding: 0;
+	margin-top: 10px;
+	border: none;
+	background-color: transparent;
+}
+.notification-list {
+	margin: 1px;
+}
+.notification-btn {
+	margin: 0;
+	cursor: pointer;
+}
+.navbar-inverse .navbar-nav > li > a {
+	color: white !important;
+}
+.min-scroll {
+	padding: 5px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	margin-bottom: 15px;
+	margin-top: 15px;
+}
+.min-scroll-table {
+	padding: 5px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	margin-bottom: 15px;
+	margin-top: 15px;
+	overflow-y: none !important;
+	overflow-x: scroll;
+}
+
+a:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+.content .nav-tabs > li.active > a,
+.content .nav-tabs > li.active > a:focus,
+.content .nav-tabs > li.active > a:hover {
+	color: var(--wp--color--accent-orange) !important;
+}
+.content a:focus {
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+.selectedRow {
+	background-color: #97a7c1;
+}
+.modal-dialog {
+	margin-top: 5%;
+}
+.editor {
+	height: 52vh;
+	min-height: 600px;
+}
+.inline-block {
+	display: inline-block;
+}
+.non-justified-width > .nav-tabs .nav-item {
+	width: 180px;
+	text-align: center;
+}
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 58px;
+	height: 38px;
+	margin-bottom: 0 !important;
+}
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: 0.4s;
+}
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 30px;
+	width: 20px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	transition: 0.4s;
+}
+input:checked + .slider {
+	background-color: #2196f3;
+}
+input:focus + .slider {
+	box-shadow: 0 0 1px #2196f3;
+}
+input:checked + .slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
+}
+input:disabled {
+	color: #666666;
+}
+.slider.round {
+	border-radius: 34px;
+}
+.slider.round:before {
+	border-radius: 50%;
+}
+
+/* Changed card outer min height from 180px to 220px */
+.vf-price-tier ul {
+	background: #fafafa;
+	padding: 0;
+	margin: 0;
+}
+.vf-price-tier ul li {
+	list-style: none;
+	padding: 15px 0;
+	font-size: 16px;
+	font-weight: 400;
+}
+.vf-price-tier ul li:nth-child(even) {
+	background: #f5f5f5;
+}
+.vf-tier-header {
+	color: white;
+	background-color: #2e2e2e;
+	min-height: 90px;
+	max-height: 120px;
+	padding: 3%;
+}
+.vf-tier-header-featured {
+	color: white;
+	background-color: var(--wp--color--accent-orange);
+	min-height: 90px;
+	max-height: 120px;
+	padding: 3%;
+}
+.vf-tier-featured-img {
+	position: absolute;
+	right: 0;
+	top: 0;
+	max-height: 70px;
+}
+.vf-item-card-outer {
+	text-align: center;
+	min-height: 220px;
+	color: black;
+	padding: 5px;
+}
+.vf-item-card-inner {
+	padding: 5px;
+	cursor: pointer;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	height: 100%;
+	background-color: white;
+}
+.vf-item-card-inner:hover {
+	box-shadow: 0 1px 5px 0 grey;
+}
+.vf-item-card-inner.remove {
+	color: black !important;
+	background-color: rgb(255, 0, 0, 0.5);
+}
+.vf-item-card-inner.add {
+	color: black !important;
+	background-color: rgb(0, 255, 0, 0.3);
+}
+.vf-item-card-inner.edited {
+	color: black !important;
+	background-color: rgb(255, 255, 0, 0.3);
+}
+.vf-item-card-inner .vf-item-card-input {
+	bottom: 10px;
+	left: 0;
+}
+.vf-item-image {
+	height: 80px;
+}
+.vf-list-text {
+	word-wrap: break-word;
+}
+.vf-list-item:hover {
+	background-color: var(--wp--color--accent-orange);
+	color: black;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.vf-dropdown-search {
+	margin-top: 0;
+	padding-top: 0;
+	right: 0;
+	width: calc(100% - 135px);
+	border-top: unset;
+}
+@media screen and (max-width: 782px) {
+	#wpcontent {
+		padding-right: 10px;
+		min-height: 100vh;
+		padding-bottom: 15px;
+	}
+	.vf-tab-body {
+		border-top: 1px solid #ddd;
+	}
+}
+
+.sortRow > div {
+	cursor: pointer;
+}
+
+.form-control.is-warning {
+	border-color: #ffcc00;
+	padding-right: 2.25rem;
+}
+
+.pcode-form {
+	margin: auto;
+}
+
+#bee-plugin-container {
+	position: relative;
+	height: 100vh;
+	width: auto;
+}
+
+#integrator-bottom-bar {
+	position: absolute;
+	height: 25px;
+	bottom: 0;
+	left: 5px;
+	right: 0;
+}
+
+.form-control::placeholder {
+	opacity: 0.8;
+}
+.form-control {
+	color: black;
+}
+
+.mce-edit-area iframe {
+	min-height: 200px;
+}
+.dropdown-menu {
+	// left: unset;
+}
+.dropdown-menu.uomCodes {
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.table-fixed thead {
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+	z-index: 999;
+	background-color: #e9ecef;
+	color: #495057;
+	border-bottom: 2px solid #ced4da;
+	border-top: 2px solid #ced4da;
+}
+.table-fixed thead th {
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+	z-index: 999;
+	background-color: #e9ecef;
+	color: #495057;
+	border-bottom: 2px solid #ced4da;
+	border-top: 2px solid #ced4da;
+}
+.slick-prev:before,
+.slick-next:before {
+	color: var(--wp--color--accent-orange) !important;
+}
+[hidden] {
+	display: none !important;
+}
+
+li.nav-item {
+	margin-bottom: 0;
+}
+
+.js .postbox .hndle:not(.ui-sortable-handle) {
+	cursor: initial;
+}
+
+.toplevel_page_vendorfuel .subsubsub {
+	float: none;
+}
+
+/**
+  * Reset Bootstrap styles to original WordPress admin styles.
+  */
+
+/* Elements */
+h2:not(.modal-title) {
+	font-size: 1.3em;
+}
+
+.col-wrap h3 {
+	margin: 12px 0;
+	font-size: 0.9rem;
+}
+
+b,
+strong,
+dt,
+.subsubsub .current {
+	font-weight: var(--wp--font-weight--bold);
+}
+
+/* Cards */
+.container .metabox-holder {
+	padding-top: 0;
+}
+
+.container .postbox-container {
+	float: none;
+}
+
+.container .postbox {
+	min-width: auto;
+}
+
+/* Forms */
+.form-field > label {
+	font-size: var(--wp--font-size--default);
+	margin: 0;
+}
+
+legend.inline-edit-legend {
+	font-size: 12px;
+}
+
+/* Welcome panel */
+.welcome-panel {
+	overflow: inherit;
+}

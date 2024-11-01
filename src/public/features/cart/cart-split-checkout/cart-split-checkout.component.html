@@ -1,0 +1,137 @@
+<button
+	class="btn btn-secondary w-100 btn-sm mb-2"
+	ng-click="$ctrl.openSplitCartModal()"
+>
+	Split Checkout
+</button>
+
+<div
+	class="modal fade"
+	id="splitCheckoutModal"
+	tabindex="-1"
+	aria-labelledby="splitCheckoutModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">Partial Checkout</h3>
+			</div>
+			<div class="modal-body">
+				<div class="btn-toolbar justify-content-end">
+					<button
+						class="btn btn-primary btn-sm"
+						ng-click="$ctrl.toggleAll()"
+					>
+						Toggle All
+					</button>
+				</div>
+				<div
+					class="row mb-3"
+					ng-repeat="item in $ctrl.items track by $index"
+				>
+					<div
+						class="col-sm-7"
+						ng-click="$ctrl.changeIncludes(item)"
+						style="cursor: pointer"
+					>
+						<div class="row">
+							<div class="col-sm-3">
+								<button
+									type="button"
+									class="btn w-100 p-0"
+									ng-model="item.included"
+									ng-class="
+										(item.included &&
+											'btn-success active') ||
+										'btn-danger'
+									"
+								>
+									<i
+										class="bi bi-check"
+										ng-show="item.included"
+										>Included</i
+									>
+									<i class="bi bi-x" ng-hide="item.included"
+										>Excluded</i
+									>
+									<div
+										ng-repeat="img in item.images"
+										ng-if="$index < 1"
+									>
+										<img
+											class="w-100"
+											ng-src="{{ img.thumb_url }}"
+										/>
+									</div>
+								</button>
+							</div>
+							<div class="col-sm-9">
+								<span>{{ item.description }}</span>
+								<div>
+									<div>Item #: {{ item.sku }}</div>
+									<div>
+										Mfg Part #: {{ item.mfg_part_num }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-3">
+						<div class="input-group">
+							<input
+								ng-disabled="!item.included"
+								limit-to="4"
+								type="number"
+								class="text-center form-control"
+								ng-change="$ctrl.handleChange( $index )"
+								ng-model-options="{ debounce: 250 }"
+								ng-model="item.qty"
+								min="0"
+							/>
+							<button
+								ng-disabled="!item.included"
+								ng-class="['btn', {
+									'btn-success': $ctrl.qtyUpdateIsHidden[$index],
+									'btn-warning': $ctrl.updatingQty[$index] && !$ctrl.updated,
+								}]"
+								type="button"
+								ng-click="$ctrl.updateQty(item, $index)"
+							>
+								<i
+									ng-if="
+										$ctrl.updatingQty[$index] &&
+										!$ctrl.updated
+									"
+									class="bi bi-arrow-repeat"
+								></i>
+								<i
+									ng-if="!$ctrl.updatingQty[$index]"
+									class="bi bi-check"
+								></i>
+							</button>
+						</div>
+					</div>
+					<div class="col-sm-2">{{ item.item_total | currency }}</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button
+					type="submit"
+					ng-click="$ctrl.splitCheckout()"
+					class="btn btn-primary"
+					ng-disabled="!$ctrl.includes || $ctrl.checkUpdating()"
+				>
+					Partial Checkout
+				</button>
+				<button
+					type="button"
+					ng-click="$ctrl.cancel()"
+					class="btn btn-secondary"
+				>
+					Cancel
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

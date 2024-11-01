@@ -1,0 +1,875 @@
+<layout-component breadcrumbs="$ctrl.breadcrumbs" heading="Edit product">
+	<spinner-component ng-if="loading"></spinner-component>
+
+	<div ng-if="!loading">
+		<form name="productForm">
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="productForm">
+						<div class="mb-3">
+							<label for="prod_name" class="form-label"
+								>Name</label
+							>
+							<input
+								id="prod_name"
+								name="prod_name"
+								class="form-control"
+								ng-class="{
+									'is-invalid': productForm.prod_name.$invalid
+								}"
+								type="text"
+								title="{{ $ctrl.product.description }}"
+								ng-model="$ctrl.product.description"
+								minlength="3"
+								required
+							/>
+						</div>
+						<div class="mb-3">
+							<label for="sku" class="form-label"
+								><abbr title="Stock Keeping Unit"
+									>SKU</abbr
+								></label
+							>
+							<input
+								id="sku"
+								name="sku"
+								class="form-control"
+								ng-class="{
+									'is-invalid': productForm.sku.$invalid
+								}"
+								type="text"
+								ng-model="$ctrl.product.sku"
+								required
+							/>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="long-description">
+								Description
+							</label>
+							<div class="border">
+								<textarea
+									class="form-control"
+									id="long-description"
+									name="long_description"
+									ui-tinymce="$ctrl.tinymceOptions"
+									ng-model="$ctrl.product.long_description"
+								></textarea>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="slug" class="form-label">Slug</label>
+							<input
+								id="slug"
+								name="slug"
+								class="form-control"
+								type="text"
+								ng-model="$ctrl.product.slug"
+							/>
+							<div class="form-text">
+								Must be kebob-case (e.g. 'my-new-product').
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="upc" class="form-label"
+								><abbr title="Universal Product Code"
+									>UPC</abbr
+								></label
+							>
+							<input
+								id="upc"
+								name="upc"
+								class="form-control"
+								type="text"
+								ng-model="$ctrl.product.upc"
+							/>
+						</div>
+						<div class="mb-3">
+							<label class="form-label"
+								>Manufacturer part #</label
+							>
+							<input
+								class="form-control"
+								type="text"
+								name="mfg_part_num"
+								ng-model="$ctrl.product.mfg_part_num"
+							/>
+						</div>
+						<div class="mb-3">
+							<label for="qty" class="form-label"
+								>Stock quantity</label
+							>
+							<input
+								id="qty"
+								name="qty"
+								class="form-control"
+								type="number"
+								min="0"
+								ng-model="$ctrl.product.qty"
+								ng-disabled="$ctrl.product.ignore_inventory"
+							/>
+						</div>
+						<div class="form-check mb-3">
+							<input
+								id="ignore_inventory"
+								class="form-check-input"
+								type="checkbox"
+								ng-model="$ctrl.product.ignore_inventory"
+							/>
+							<label
+								for="ignore_inventory"
+								class="form-check-label"
+								>Ignore inventory stock</label
+							>
+						</div>
+						<fieldset>
+							<legend>Unit of measurement</legend>
+							<div class="mb-3">
+								<label for="uom-id" class="form-label"
+									><abbr title="Unit of measurement"
+										>UOM</abbr
+									>
+									ID</label
+								>
+								<input
+									id="uom-id"
+									class="form-control"
+									type="text"
+									name="uomid"
+									ng-model="$ctrl.product.uomid"
+									list="uom-id-options"
+								/>
+								<datalist id="uom-id-options">
+									<option
+										ng-repeat="option in $ctrl.uomOptions"
+										value="{{ option.value }}"
+									></option>
+								</datalist>
+							</div>
+							<div class="mb-3">
+								<label for="uom-description" class="form-label"
+									><abbr title="Unit of measurement"
+										>UOM</abbr
+									>
+									description</label
+								>
+								<input
+									id="uom-description"
+									class="form-control"
+									type="text"
+									name="uomdesc"
+									ng-model="$ctrl.product.uomdesc"
+									list="uom-id-description"
+								/>
+								<datalist id="uom-id-description">
+									<option
+										ng-repeat="option in $ctrl.uomOptions"
+										value="{{ option.label }}"
+									></option>
+								</datalist>
+							</div>
+							<div class="mb-3">
+								<label for="uomqty" class="form-label"
+									><abbr title="Unit of measurement"
+										>UOM</abbr
+									>
+									quantity</label
+								>
+								<input
+									id="uomqty"
+									name="uomqty"
+									class="form-control"
+									type="number"
+									ng-model="$ctrl.product.uomqty"
+									min="0"
+								/>
+							</div>
+						</fieldset>
+						<div class="mb-3">
+							<label for="category" class="form-label"
+								>Category</label
+							>
+							<div class="input-group">
+								<input
+									id="category"
+									name="category"
+									class="form-control"
+									type="text"
+									placeholder="None"
+									ng-model="$ctrl.product.category.title"
+									disabled
+								/>
+								<button
+									type="button"
+									ng-click="$ctrl.openCatSearch()"
+									class="btn btn-outline-primary"
+								>
+									Select
+								</button>
+							</div>
+							<div
+								class="form-text"
+								ng-if="
+									$ctrl.product.category.title &&
+									!$ctrl.product.pricesheets.length &&
+									$ctrl.product.status !== 'inactive'
+								"
+							>
+								This product will not appear in the catalog
+								under
+								{{ $ctrl.product.category.title }} until
+								assigned a price.
+							</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="status"
+								>Status</label
+							>
+							<select
+								class="form-select"
+								type="text"
+								name="status"
+								id="status"
+								ng-options="key as val for (key, val) in productsFactory.getStatuses()"
+								ng-model="$ctrl.product.status"
+							></select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-8">
+					<uib-tabset>
+						<uib-tab heading="Pricing">
+							<h3 class="h5">Pricing</h3>
+							<fieldset>
+								<div
+									class="form-text mb-2"
+									ng-if="
+										!$ctrl.product.pricesheets.length &&
+										$ctrl.product.status !== 'inactive'
+									"
+								>
+									Add a price to make this product visible on
+									the catalog.
+								</div>
+								<div
+									class="mb-3"
+									ng-if="!ps.deleted"
+									ng-repeat="ps in $ctrl.product.pricesheets track by $index"
+								>
+									<label class="form-label">
+										{{ ps.pricesheetindex.sheet }}
+									</label>
+									<div class="input-group">
+										<input
+											ng-class="[
+												'form-control',
+												{
+													'is-invalid':
+														productForm[
+															'price' + $index
+														].$touched &&
+														(!ps.price ||
+															ps.price >
+																$ctrl.priceLimit)
+												}
+											]"
+											name="price{{ $index }}"
+											format="currency"
+											type="text"
+											maxlength="10"
+											ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+											ng-model="ps.price"
+										/>
+										<div class="input-group-text">
+											<div class="form-check">
+												<input
+													class="form-check-input"
+													type="checkbox"
+													id="punchout_only"
+													ng-model="ps.punchout_only"
+													ng-true-value="1"
+													ng-false-value="0"
+												/>
+												<label class="form-check-label"
+													>Punchout</label
+												>
+											</div>
+										</div>
+										<button
+											type="button"
+											ng-click="$ctrl.removePricesheet($index)"
+											class="btn btn-danger"
+										>
+											Remove
+										</button>
+									</div>
+									<div
+										class="form-text text-danger"
+										ng-if="
+											productForm['price' + $index]
+												.$touched &&
+											(!ps.price ||
+												ps.price > $ctrl.priceLimit)
+										"
+									>
+										Please enter a price between
+										{{ $ctrl.priceMinimum | currency }} and
+										{{ $ctrl.priceLimit | currency }}.
+									</div>
+								</div>
+								<button
+									type="button"
+									class="btn btn-outline-primary"
+									ng-click="$ctrl.openPsSearch()"
+								>
+									Add price
+								</button>
+							</fieldset>
+						</uib-tab>
+						<uib-tab heading="Images">
+							<h3 class="h5">Images</h3>
+							<product-images
+								product="$ctrl.stringify($ctrl.product)"
+								handle-change="$ctrl.handleChange"
+							></product-images>
+						</uib-tab>
+						<uib-tab heading="Details">
+							<h3 class="h5">Details</h3>
+							<product-details
+								product="$ctrl.stringify($ctrl.product)"
+								handle-change="$ctrl.handleChange"
+							></product-details>
+						</uib-tab>
+						<uib-tab>
+							<uib-tab-heading>
+								<abbr title="Attributes">Attrs</abbr>
+							</uib-tab-heading>
+							<fieldset>
+								<h3 class="h5">Attributes</h3>
+								<button
+									type="button"
+									ng-show="
+										numAttributes.length < maxAttributes
+									"
+									class="btn btn-outline-primary"
+									ng-click="$ctrl.addAttribute()"
+								>
+									Add attribute
+								</button>
+								<div class="min-scroll">
+									<div
+										ng-repeat="n in numAttributes track by $index"
+									>
+										<div class="input-group my-2">
+											<span class="input-group-text"
+												>Attr. ({{ n }})</span
+											>
+											<input
+												class="form-control"
+												type="text"
+												name="att{{ n }}n"
+												placeholder="Name"
+												ng-model="$ctrl.product['att' + n + 'n']"
+											/>
+											<input
+												class="form-control"
+												type="text"
+												name="att{{ n }}d"
+												placeholder="Data"
+												ng-model="$ctrl.product['att' + n + 'd']"
+											/>
+										</div>
+										<div class="text-end">
+											<button
+												type="button"
+												class="btn btn-danger"
+												ng-click="$ctrl.removeAttribute(n)"
+											>
+												Remove Attribute
+											</button>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+						</uib-tab>
+						<uib-tab>
+							<uib-tab-heading>
+								<abbr title="Documents">Docs</abbr>
+							</uib-tab-heading>
+							<h3 class="h5">Documents</h3>
+							<fieldset>
+								<div
+									class="row g-2 mb-3 align-items-start"
+									ng-repeat="document in $ctrl.product.documents track by $index"
+								>
+									<div class="col">
+										<label
+											ng-attr-for="doc_{{ $index }}_name"
+											class="form-label"
+											>Document
+											{{ $index + 1 }} name</label
+										>
+										<input
+											ng-attr-id="doc_{{ $index }}_name"
+											ng-attr-name="doc_{{ $index }}_name"
+											class="form-control"
+											type="text"
+											ng-model="document.name"
+										/>
+									</div>
+									<div class="col">
+										<label
+											ng-attr-for="doc_{{ $index }}_url"
+											class="form-label"
+											>Document
+											{{ $index + 1 }} URL</label
+										>
+										<input
+											ng-attr-id="doc_{{ $index }}_url"
+											ng-attr-name="doc_{{ $index }}_url"
+											ng-class="[
+												'form-control',
+												{
+													'is-invalid':
+														productForm[
+															'doc_' +
+																$index +
+																'_url'
+														].$invalid
+												}
+											]"
+											type="url"
+											ng-model="document.url"
+										/>
+										<div class="invalid-feedback">
+											Please enter a URL.
+										</div>
+									</div>
+									<div class="col-auto align-self-center">
+										<button
+											type="button"
+											class="btn btn-danger mt-4"
+											ng-click="$ctrl.deleteDocument( $index )"
+										>
+											Delete
+										</button>
+									</div>
+								</div>
+								<button
+									type="button"
+									class="btn btn-outline-primary"
+									ng-click="$ctrl.addDocument()"
+								>
+									Add new document
+								</button>
+							</fieldset>
+						</uib-tab>
+						<uib-tab heading="Parcels">
+							<h3 class="h5">Parcels</h3>
+							<fieldset class="mb-3">
+								<div class="productForm">
+									<div
+										class="productForm"
+										ng-class="{
+											'min-scroll':
+												Object.keys(
+													$ctrl.product.parcels
+												).length >= 3
+										}"
+										ng-repeat="parcel in $ctrl.product.parcels track by $index"
+									>
+										<div class="input-group my-2">
+											<span class="input-group-text"
+												>Parcel {{ $index + 1 }}</span
+											>
+											<input
+												class="form-control"
+												type="text"
+												name="parcel$index"
+												ng-model="$ctrl.product.parcels[$index].title"
+												disabled
+											/>
+										</div>
+										<div class="input-group my-2">
+											<span class="input-group-text"
+												>Weight {{ $index + 1 }}</span
+											>
+											<input
+												class="form-control"
+												type="number"
+												name="weight$index"
+												ng-model="$ctrl.product.parcels[$index].pivot.weight"
+												min="0"
+											/>
+											<select
+												class="form-select"
+												ng-options="key as val for (key, val) in parcelWeightUnits"
+												ng-model="$ctrl.product.parcels[$index].pivot.mass_unit"
+											></select>
+										</div>
+										<div class="text-end">
+											<button
+												type="button"
+												class="btn btn-danger"
+												ng-click="$ctrl.removeParcel($index)"
+											>
+												Remove
+											</button>
+										</div>
+									</div>
+									<button
+										type="button"
+										ng-click="$ctrl.openParcelSearch()"
+										class="btn btn-outline-primary"
+									>
+										Add parcels
+									</button>
+								</div>
+							</fieldset>
+							<fieldset class="mb-3">
+								<legend class="h6">Shipping</legend>
+								<div class="form-check">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										id="truck_only"
+										ng-model="$ctrl.product.truck_only"
+										ng-true-value="1"
+										ng-false-value="0"
+									/>
+									<label
+										class="form-check-label"
+										for="truck_only"
+									>
+										Truck only
+									</label>
+									<div class="form-text">
+										Product can only be delivered via
+										freight truck.
+									</div>
+								</div>
+								<div class="form-check">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										id="additional_shipping"
+										ng-model="$ctrl.product.additional_shipping"
+									/>
+									<label
+										class="form-check-label"
+										for="additional_shipping"
+									>
+										Additional shipping
+									</label>
+									<div class="form-text">
+										Checking this will make this product not
+										available for free shipping and subject
+										to additional charge.
+									</div>
+								</div>
+							</fieldset>
+						</uib-tab>
+						<uib-tab heading="Misc">
+							<h3 class="h5">Miscellaneous</h3>
+							<fieldset>
+								<div class="mb-3">
+									<label
+										class="form-label"
+										for="avatax_tax_code"
+										>Avatax tax code</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="avatax_tax_code"
+										name="avatax_tax_code"
+										ng-model="$ctrl.product.avatax_tax_code"
+									/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="alternates"
+										>Alternate SKUs</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="alternates"
+										name="alternates"
+										ng-model="$ctrl.product.alternates"
+									/>
+									<div class="form-text">
+										Add comma-separated SKUs to display
+										alternate products in a dropdown menu.
+									</div>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="related"
+										>Related SKUs</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="related"
+										name="related"
+										ng-model="$ctrl.product.related"
+									/>
+									<div class="form-text">
+										Add comma-separated SKUs to display
+										related products.
+									</div>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="model"
+										>Model</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="model"
+										name="model"
+										ng-model="$ctrl.product.model"
+									/>
+								</div>
+								<div class="mb-3">
+									<label
+										class="form-label"
+										for="ability_one_sku"
+										>AbilityOne SKU</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="ability_one_sku"
+										name="ability_one_sku"
+										ng-model="$ctrl.product.ability_one_sku"
+									/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="hazmat"
+										>Hazmat</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="hazmat"
+										name="hazmat"
+										ng-model="$ctrl.product.hazmat"
+									/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="includes"
+										>Includes</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="includes"
+										name="includes"
+										placeholder="'six packs'"
+										ng-model="$ctrl.product.includes"
+									/>
+								</div>
+								<div class="form-check mb-3">
+									<input
+										id="rebate"
+										class="form-check-input"
+										type="checkbox"
+										ng-model="$ctrl.product.rebate"
+										ng-true-value="1"
+										ng-false-value="0"
+									/>
+									<label
+										class="form-check-label"
+										for="rebate"
+									>
+										Rebate
+									</label>
+								</div>
+								<div class="mb-3">
+									<label for="country" class="form-label"
+										>Country of origin</label
+									>
+									<input
+										id="country"
+										name="country"
+										class="form-control"
+										type="text"
+										ng-model="$ctrl.product.country"
+									/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="device"
+										>Device</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="device"
+										name="device"
+										ng-model="$ctrl.product.device"
+									/>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="family"
+										>Family</label
+									>
+									<input
+										class="form-control"
+										type="text"
+										id="family"
+										name="family"
+										ng-model="$ctrl.product.family"
+									/>
+								</div>
+								<div class="form-check mb-3">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										id="edit-prop65"
+										ng-model="$ctrl.product.prop65"
+									/>
+									<label
+										class="form-check-label"
+										for="edit-prop65"
+									>
+										Enable California Proposition 65 warning
+									</label>
+								</div>
+								<div class="mb-3" ng-if="$ctrl.product.prop65">
+									<label
+										for="edit-prop65-warning"
+										class="form-label"
+									>
+										Proposition 65 warning text
+									</label>
+									<input
+										id="edit-prop65-warning"
+										class="form-control"
+										type="text"
+										name="prop65_warning"
+										ng-model="$ctrl.product.prop65_warning"
+									/>
+								</div>
+							</fieldset>
+						</uib-tab>
+						<uib-tab heading="Notes">
+							<h3 class="h5">Notes</h3>
+							<fieldset ng-disabled="savingNote">
+								<div class="mb-3">
+									<label for="note" class="form-label"
+										>Add new note</label
+									>
+									<textarea
+										class="form-control"
+										maxlength="65535"
+										type="text"
+										id="note"
+										ng-model="noteParams.note"
+									></textarea>
+								</div>
+								<button
+									class="btn btn-outline-primary"
+									ng-click="$ctrl.saveNote()"
+									ng-disabled="!noteParams.note"
+								>
+									Save note
+								</button>
+							</fieldset>
+							<div
+								ng-repeat="note in productNotes"
+								class="card mt-3"
+							>
+								<div class="card-body">
+									<p class="card-text">
+										{{ note.note }}
+									</p>
+									<p class="card-text small text-muted">
+										Created {{ note.admin.name }} at
+										{{ note.datetime | date : 'short' }}
+									</p>
+									<button
+										class="btn btn-danger btn-sm"
+										ng-click="$ctrl.deleteNote(note.note_id)"
+									>
+										Delete
+									</button>
+								</div>
+							</div>
+						</uib-tab>
+						<uib-tab heading="Meta">
+							<h3 class="h5">Meta</h3>
+							<fieldset>
+								<div class="mb-3">
+									<label class="form-label" for="meta_title"
+										>Meta title</label
+									>
+									<input
+										id="meta_title"
+										class="form-control"
+										type="text"
+										name="meta_title"
+										ng-model="$ctrl.product.meta.title"
+									/>
+								</div>
+								<div class="mb-3">
+									<label
+										class="form-label"
+										for="meta-description"
+										>Meta description</label
+									>
+									<textarea
+										id="meta-description"
+										class="form-control"
+										type="text"
+										ng-model="$ctrl.product.meta.description"
+									></textarea>
+								</div>
+							</fieldset>
+						</uib-tab>
+					</uib-tabset>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div class="btn-toolbar justify-content-between">
+						<div class="h-stack">
+							<button
+								class="btn btn-primary"
+								type="submit"
+								title="{{
+									productForm.$invalid
+										? 'Please make sure you have filled out all of the required fields.'
+										: ''
+								}}"
+								ng-disabled="productForm.$invalid"
+								ng-click="$ctrl.updateProduct()"
+							>
+								Update
+							</button>
+							<copy-to-new-product
+								product="$ctrl.product"
+							></copy-to-new-product>
+						</div>
+						<div>
+							<a
+								class="btn btn-outline-primary"
+								target="_blank"
+								ng-href="{{ window.location.hostname }}/{{
+									$ctrl.productSlug
+								}}/{{ $ctrl.product.slug }}"
+								ng-attr-title="{{
+									'View ' +
+										$ctrl.product.description +
+										' in a new tab'
+								}}"
+								ng-if="$ctrl.product.pricesheets.length"
+							>
+								View Product
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<timestamp-component model="$ctrl.product"></timestamp-component>
+</layout-component>

@@ -1,0 +1,151 @@
+<div ng-controller="PaymentProcessorController" ng-init="initPayfabric()">
+	<h2>PayFabric</h2>
+	<form name="form">
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">Payment Processor</th>
+					<td>
+						<label for="enabled">
+							<input
+								id="enabled"
+								type="checkbox"
+								ng-model="enabled"
+								ng-true-value="1"
+								ng-false-value="0"
+							/>
+							Enable PayFabric as primary payment card processor
+						</label>
+					</td>
+				</tr>
+				<tr
+					ng-class="['form-required', {'form-invalid': form.att1.$invalid}]"
+				>
+					<th scope="row">
+						<label for="att1">Device ID</label>
+					</th>
+					<td>
+						<input
+							class="code regular-text"
+							id="att1"
+							name="att1"
+							ng-model="attribute1"
+							required
+							type="text"
+						/>
+						<p class="description">
+							A unique & secure identifier to identify different
+							applications under a single PayFabric merchant
+							account.
+						</p>
+					</td>
+				</tr>
+				<tr
+					ng-class="['form-required', {'form-invalid': form.att2.$invalid}]"
+				>
+					<th scope="row">
+						<label for="att2">Password</label>
+					</th>
+					<td>
+						<div class="hstack gap-1">
+							<span class="password-input-wrapper">
+								<input
+									class="regular-text"
+									id="att2"
+									name="att2"
+									ng-attr-type="{{ $ctrl.showPassword ? 'text' : 'password'}}"
+									ng-model="attribute2"
+									spellcheck="false"
+									required
+								/>
+							</span>
+							<button
+								class="button"
+								ng-click="$event.preventDefault(); $ctrl.showPassword = !$ctrl.showPassword"
+								type="button"
+							>
+								{{ $ctrl.showPassword ? 'Hide' : 'Show' }}
+							</button>
+						</div>
+						<p class="description">
+							Assigned to a single device. Both device Id and
+							device password are required when integrating with
+							PayFabric.
+						</p>
+					</td>
+				</tr>
+				<tr
+					ng-class="['form-required', {'form-invalid': form.att3.$invalid}]"
+				>
+					<th scope="row">
+						<label for="att3">Setup ID</label>
+					</th>
+					<td>
+						<input
+							id="att3"
+							class="regular-text"
+							name="att3"
+							type="text"
+							ng-model="attribute3"
+							required
+						/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="attribute4">Transaction Type</label>
+					</th>
+					<td>
+						<select id="attribute4" ng-model="attribute4" required>
+							<option value="Sale">Sale</option>
+							<option value="Book">Book</option>
+						</select>
+					</td>
+				</tr>
+				<tr
+					ng-class="['form-required', {'form-invalid': form.att5.$invalid}]"
+				>
+					<th scope="row">
+						<label for="att5">Ship From 5-Digit Zip</label>
+					</th>
+					<td>
+						<input
+							id="att5"
+							name="att5"
+							minlength="5"
+							maxlength="5"
+							ng-model="attribute5"
+							pattern="[0-9]{5}"
+							required
+							type="text"
+						/>
+						<p class="description">
+							Ship from Zip details for a transaction, typically
+							required as Level 2 data qualification.
+						</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<p class="submit">
+			<button
+				class="components-button is-primary"
+				type="button"
+				ng-click="updateGateway()"
+				title="{{ form.$invalid ? 'Please fill out the form completely.' : ''}}"
+				ng-disabled="form.$invalid"
+				value="Update"
+			>
+				Update
+			</button>
+			<button
+				class="components-button is-tertiary is-destructive"
+				type="button"
+				ng-click="disableGateway()"
+			>
+				Disable
+			</button>
+		</p>
+	</form>
+</div>

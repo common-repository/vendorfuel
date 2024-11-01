@@ -1,0 +1,275 @@
+<h2>Order Details</h2>
+<a href="#" ng-click="$ctrl.goToIndex( $event )"> Go back to Orders </a>
+
+<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+	<div class="spinner-border" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+</div>
+
+<div ng-if="!$ctrl.isLoading">
+	<div>
+		<h3>Summary</h3>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Order ID</th>
+					<th>Date</th>
+					<th>Status</th>
+					<th class="text-end">Subtotal</th>
+					<th class="text-end">Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ $ctrl.order.order_id }}</td>
+					<td>
+						<time
+							ng-attr-datetime="{{ $ctrl.order.order_date_time }}"
+						>
+							{{ $ctrl.order.order_date_time | date:'short' }}
+						</time>
+					</td>
+					<td>
+						<strong>
+							<span
+								ng-class="{
+									'has-very-dark-gray-color': $ctrl.order.status === 'created',
+									'has-vivid-red-color': $ctrl.order.status === 'cancelled',
+									'has-luminous-vivid-orange-color': $ctrl.order.status.includes('pending'),
+									'text-success': $ctrl.order.status === 'completed',
+								}"
+							>
+								{{ $ctrl.order.status | uppercase }}
+							</span>
+						</strong>
+					</td>
+					<td class="text-end">
+						{{ $ctrl.order.subtotal | currency }}
+					</td>
+					<td class="text-end">
+						{{ $ctrl.order.total_amt | currency }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="btn-toolbar justify-content-center">
+			<button
+				class="btn btn-primary"
+				ng-click="$ctrl.sendOrderEmail( $ctrl.order.order_id )"
+				ng-disabled="$ctrl.isSendingEmail"
+			>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isSendingEmail"
+				></span>
+				{{ $ctrl.isSendingEmail ? 'Sending' : 'Send'}} Order Email
+			</button>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-if="$ctrl.order.approver"
+				ng-href="mailto:{{ $ctrl.order.approver }}"
+			>
+				Email Approver
+			</a>
+		</div>
+	</div>
+
+	<div class="card my-3">
+		<h3 class="card-header h5">Items</h3>
+		<div class="card-body">
+			To add a previously ordered item to your cart at the current price,
+			click the Add to Cart button. Price and availability are subject to
+			change from any previous order.
+		</div>
+		<ul class="list-group list-group-flush">
+			<li
+				class="list-group-item"
+				ng-repeat="item in $ctrl.order.items track by $index"
+			>
+				<order-details-list-item
+					item="item"
+					status="$ctrl.order.status"
+				>
+				</order-details-list-item>
+			</li>
+		</ul>
+	</div>
+
+	<div class="card mb-3" ng-if="$ctrl.order.shipments.length">
+		<h3 class="card-header h5">Tracking</h3>
+		<div class="card-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Carrier</th>
+						<th scope="col">Tracking #</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="shipment in $ctrl.order.shipments">
+						<td>{{shipment.carrier || 'N/A'}}</td>
+						<td>
+							<span ng-if="shipment.code">
+								<a
+									ng-if="shipment.tracking_url"
+									target="_blank"
+									href="{{shipment.tracking_url}}"
+									>{{shipment.code}}</a
+								>
+								<a
+									ng-if="!shipment.tracking_url"
+									target="_blank"
+									href="https://google.com/search?q={{shipment.code}}"
+									>{{shipment.code}}</a
+								>
+							</span>
+							<span ng-if="!shipment.code"> N/A </span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div>
+		<div class="row">
+			<div class="col">
+				<h3>Shipping</h3>
+				<h4 ng-if="$ctrl.order.shipping_name">
+					{{ $ctrl.order.shipping_name }}
+				</h4>
+				<p>
+					{{ $ctrl.order.shipping.first_name }} {{
+					$ctrl.order.shipping.last_name }}<br />
+					{{ $ctrl.order.shipping.email }}<br
+						ng-if="$ctrl.order.shipping.phone"
+					/>
+					{{ $ctrl.order.shipping.phone | tel }}<br />
+					{{ $ctrl.order.shipping.address1 }}<br
+						ng-if="$ctrl.order.shipping.address2"
+					/>
+					{{ $ctrl.order.shipping.address2 }}<br />
+					{{ $ctrl.order.shipping.city }}, {{
+					$ctrl.order.shipping.state }} {{ $ctrl.order.shipping.zip }}
+				</p>
+			</div>
+			<div class="col">
+				<h3>Billing</h3>
+				<h4 ng-if="$ctrl.order.billing_name">
+					{{ $ctrl.order.billing_name }}
+				</h4>
+				<p>
+					{{ $ctrl.order.billing.first_name }} {{
+					$ctrl.order.billing.last_name }}<br />
+					{{ $ctrl.order.billing.email }}<br
+						ng-if="$ctrl.order.billing.phone"
+					/>
+					{{ $ctrl.order.billing.phone | tel }}<br />
+					{{ $ctrl.order.billing.address1 }}<br
+						ng-if="$ctrl.order.billing.address2"
+					/>
+					{{ $ctrl.order.billing.address2 }}<br />
+					{{ $ctrl.order.billing.city }}, {{ $ctrl.order.billing.state
+					}} {{ $ctrl.order.billing.zip }}
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div ng-if="$ctrl.hasAdditionalInfo">
+		<h3>Additional Information</h3>
+		<table class="table">
+			<tbody>
+				<tr
+					ng-if="item.value || item.value === 0"
+					ng-repeat="item in $ctrl.additionalInfo track by $index"
+				>
+					<th scope="row" class="text-end">{{ item.name }}</th>
+					<td>{{ item.value }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="card mb-3">
+		<h3 class="card-header h5">Payment</h3>
+		<div class="card-body">
+			<p class="card-text" ng-if="$ctrl.order.credit_line">
+				This order was placed with a credit line.
+			</p>
+			<p class="card-text" ng-if="$ctrl.order.credit_card.length > 0">
+				This order was placed with a credit card ending in: {{
+				$ctrl.order.credit_card }}
+			</p>
+			<div
+				ng-if="$ctrl.order.promo_codes && !$ctrl.order.status.includes('pending')"
+			>
+				Promo Code(s) Applied:
+				<span ng-repeat="promo in $ctrl.order.promo_codes"
+					>{{promo.code}} ({{promo.discount | percentage: 0}})</span
+				>
+			</div>
+			<dl class="row">
+				<dt class="col-sm-3" ng-if="$ctrl.order.shipping_carrier">
+					Shipping Carrier
+				</dt>
+				<dd class="col-sm-9" ng-if="$ctrl.order.shipping_carrier">
+					{{ $ctrl.order.shipping_carrier }}
+				</dd>
+				<dt class="col-sm-3" ng-if="$ctrl.order.tracking_code">
+					Tracking Code
+				</dt>
+				<dd class="col-sm-9" ng-if="$ctrl.order.tracking_code">
+					{{ $ctrl.order.tracking_code }}
+				</dd>
+			</dl>
+
+			<table class="table">
+				<tbody>
+					<tr ng-if="$ctrl.order.subtotal">
+						<th scope="row">Subtotal</th>
+						<td class="text-end">
+							{{ $ctrl.order.subtotal | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.subtotal">
+						<th scope="row">Discount</th>
+						<td class="text-end">
+							{{ $ctrl.order.promo_discount | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.subtotal">
+						<th scope="row">Shipping</th>
+						<td class="text-end">
+							{{ $ctrl.order.shipping_total | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.subtotal">
+						<th scope="row">Tax</th>
+						<td class="text-end">
+							{{ $ctrl.order.tax | currency }}
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr ng-if="$ctrl.order.total_amt">
+						<th scope="row">Total Amount</th>
+						<td class="text-end">
+							{{ $ctrl.order.total_amt | currency }}
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+	<order-shipments shipments="$ctrl.order.shipments"></order-shipments>
+	<order-change-logs
+		ng-if="$ctrl.order.logs.length"
+		logs="$ctrl.order.logs"
+	></order-change-logs>
+</div>

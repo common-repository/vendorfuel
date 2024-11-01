@@ -1,0 +1,65 @@
+<vf-search class="d-block"></vf-search>
+
+<!-- Search component template -->
+<script type="text/ng-template" id="vfSearch.html">
+
+	<form role="search" method="get" class="wp-block-search__button-outside wp-block-search__icon-button wp-block-search ng-pristine ng-valid"
+		ng-submit="$ctrl.submit($ctrl.q)">
+		<label for="search" class="wp-block-search__label">
+			Search
+		</label>
+		<div class="wp-block-search__inside-wrapper">
+			<input type="search" id="search" class="wp-block-search__input" name="q" value="" required
+				ng-model="$ctrl.q">
+			<button type="submit" class="wp-block-search__button has-icon">
+				<svg id="search-icon" class="search-icon" viewBox="0 0 24 24" width="24" height="24">
+					<path d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z">
+					</path>
+				</svg>
+			</button>
+		</div>
+	</form>
+
+	<div class="d-flex justify-content-center py-5"
+		ng-show="$ctrl.isInProgress">
+		<div class="spinner-border" role="status">
+			<span class="sr-only">Loading...</span>
+		</div>
+	</div>
+
+	<div class="py-3"
+		ng-hide="$ctrl.isInProgress || $ctrl.numResults === 0">
+		<p>
+			Showing {{$ctrl.numResults}} result{{ $ctrl.numResults > 1 ? 's' : ''}}.
+		</p>
+
+		<table class="table" ng-hide="$ctrl.isInProgress">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Price</th>
+					<th>SKU</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="product in $ctrl.products">
+					<td>
+						<a ng-href="{{product.url}}">
+							{{product.name}}
+						</a>
+					</td>
+					<td>
+						{{ product.price | currency }}
+						<small
+							ng-if="product.uom">
+							/{{product.uom}}
+						</small>
+					</td>
+					<td>
+						{{product.sku}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</script>

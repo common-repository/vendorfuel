@@ -1,0 +1,111 @@
+<div class="dropdown">
+	<button
+		id="cartDropdown"
+		type="button"
+		role="button"
+		data-toggle="dropdown"
+		aria-expanded="false"
+		ng-class="['btn dropdown-toggle', $ctrl.btnClass]"
+	>
+		<i
+			ng-class="[
+				'bi',
+				{
+					'bi-cart': !$ctrl.cartCount,
+					'bi-cart-fill': $ctrl.cartCount
+				}
+			]"
+		></i>
+		<span
+			class="badge badge-pill badge-dark cart-number"
+			ng-if="$ctrl.cartCount"
+		>
+			{{ $ctrl.cartCount }}
+		</span>
+		<span class="d-none d-md-inline ml-1"> Cart </span>
+	</button>
+	<div
+		class="dropdown-menu dropdown-menu-right"
+		aria-labelledby="cartDropdown"
+	>
+		<div class="d-flex justify-content-center" ng-show="$ctrl.isInProgress">
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
+		<div ng-show="!$ctrl.isInProgress">
+			<a
+				class="dropdown-item dropdown-header"
+				title="Edit Cart"
+				ng-href="{{ $ctrl.cartUrl }}"
+			>
+				<ng-pluralize
+					count="$ctrl.cartCount"
+					when="{'0': 'No items in your cart.',
+						'one': 'One item in your cart.',
+						'other': '{} items in your cart.'}"
+				>
+				</ng-pluralize>
+				<span
+					class="badge badge-success ml-2"
+					ng-if="$ctrl.totalAmount > 0"
+				>
+					Total: {{ $ctrl.totalAmount | currency }}
+				</span>
+			</a>
+			<div
+				class="small text-success px-4 py-2"
+				ng-if="
+					$ctrl.showFreeShipping &&
+					$ctrl.cartCount &&
+					$ctrl.minOrderAmount &&
+					$ctrl.minOrderAmount > $ctrl.totalAmount
+				"
+			>
+				Add {{ $ctrl.minOrderAmount - $ctrl.totalAmount | currency }} to
+				your cart to qualify for free shipping.
+			</div>
+			<div class="dropdown-divider" ng-if="$ctrl.cartCount"></div>
+			<div class="list-group list-group-flush">
+				<a
+					class="list-group-item list-group-item-action"
+					ng-attr-title="View {{ item.description }}"
+					ng-repeat="item in $ctrl.cartItems track by $index"
+					ng-href="/{{ $ctrl.productSlug }}/{{ item.slug }}"
+				>
+					<div
+						class="d-flex w-100 justify-content-between align-items-center"
+					>
+						<span ng-if="item.description.length <= 30">
+							{{ item.description }}
+						</span>
+						<span ng-if="item.description.length > 30">
+							{{ item.description | limitTo: 30 }}&hellip;
+						</span>
+						<span class="badge badge-secondary badge-pill ml-2">
+							{{ item.qty }}
+						</span>
+					</div>
+					<p class="has-small-font-size mb-0">
+						<strong>SKU: </strong>{{ item.sku }}
+					</p>
+					<small
+						>{{ item.price | currency
+						}}{{ item.uom ? "/" + item.uom : "" }}</small
+					>
+				</a>
+			</div>
+		</div>
+		<div ng-if="$ctrl.cartCount">
+			<div class="dropdown-divider"></div>
+			<a
+				class="dropdown-item"
+				title="Edit Cart"
+				ng-href="{{ $ctrl.cartUrl }}"
+			>
+				<i class="bi bi-cart-fill mr-2"></i>
+				Go to Cart
+			</a>
+		</div>
+	</div>
+</div>

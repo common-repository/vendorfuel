@@ -1,0 +1,6 @@
+a {
+	color: var(--wp--color--blue-50);
+	&:hover {
+		color: var(--wp--color--blue-60);
+	}
+}

@@ -1,0 +1,110 @@
+<p class="text-center lead pt-5">Sign in to your VendorFuel account</p>
+<div class="col-12 col-md-6 col-lg-4 mx-auto">
+	<div class="alert alert-danger" ng-if="!$ctrl.isSSL">
+		<strong>Website not secure:</strong> VendorFuel requires a SSL
+		certificate to ensure PCI compliance. Please ensure your site is secure
+		before continuing.
+	</div>
+	<form name="loginForm">
+		<fieldset ng-disabled="$ctrl.isSignedIn">
+			<div class="mb-3">
+				<label for="inputEmail" class="form-label">Email Address</label>
+				<input
+					autofocus
+					id="inputEmail"
+					name="inputEmail"
+					ng-class="[
+						'form-control',
+						{
+							'is-invalid':
+								loginForm.inputEmail.$invalid &&
+								loginForm.inputEmail.$touched
+						}
+					]"
+					ng-model="user.loginEmail"
+					required
+					type="email"
+				/>
+				<div class="invalid-feedback">
+					Please enter your email address.
+				</div>
+			</div>
+			<div class="mb-3">
+				<label for="inputPassword" class="form-label">Password</label>
+				<div class="input-group has-validation">
+					<input
+						id="inputPassword"
+						name="inputPassword"
+						ng-class="[
+							'form-control',
+							{
+								'is-invalid':
+									loginForm.inputPassword.$invalid &&
+									loginForm.inputPassword.$touched
+							}
+						]"
+						ng-model="user.loginPassword"
+						ng-attr-type="{{
+							$ctrl.showPassword ? 'text' : 'password'
+						}}"
+						required
+						type="password"
+						spellcheck="false"
+					/>
+					<button
+						ng-click="$ctrl.showPassword = !$ctrl.showPassword"
+						class="btn btn-outline-primary"
+						type="button"
+					>
+						<i
+							ng-class="[
+								'bi',
+								{
+									'bi-eye-fill': $ctrl.showPassword,
+									'bi-eye-slash-fill': !$ctrl.showPassword
+								}
+							]"
+						></i>
+					</button>
+				</div>
+				<p
+					class="description text-danger"
+					ng-if="
+						loginForm.inputPassword.$invalid &&
+						loginForm.inputPassword.$touched
+					"
+				>
+					Please enter your password.
+				</p>
+			</div>
+			<div class="hstack justify-content-between mb-3">
+				<div class="form-check">
+					<input
+						class="form-check-input"
+						id="remember_me"
+						type="checkbox"
+						name="remember_me"
+						ng-model="remember_me"
+					/>
+					<label for="remember_me" class="form-check-label">
+						Remember for 7 days
+					</label>
+				</div>
+				<a
+					class="text-decoration-none"
+					href="?page=vendorfuel#!/reset-password"
+					>Forgot Password?</a
+				>
+			</div>
+			<div class="d-grid mb-3">
+				<button
+					class="btn btn-primary btn-lg"
+					ng-disabled="loginForm.$invalid || loggingIn"
+					ng-click="Login()"
+				>
+					{{ loggingIn ? 'Signing' : 'Sign' }} in
+				</button>
+			</div>
+		</fieldset>
+	</form>
+</div>

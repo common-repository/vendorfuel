@@ -1,0 +1,29 @@
+<table class="table">
+	<tbody>
+		<tr ng-repeat="item in $ctrl.specs" ng-if="item.label">
+			<th scope="row" ng-attr-title="{{ item.title }}">
+				{{ item.label }}:
+			</th>
+			<td>
+				<span ng-repeat="value in item.values">
+					<a
+						ng-href="{{ value.url }}"
+						ng-if="value.url"
+						ng-attr-title="{{ value.title }}"
+					>
+						{{ value.name }}
+					</a>
+					<span ng-if="!value.url">
+						{{ value.name }}
+					</span>
+				</span>
+			</td>
+		</tr>
+	</tbody>
+	<caption>
+		Specifications for
+		{{
+			$ctrl.product.description
+		}}
+	</caption>
+</table>

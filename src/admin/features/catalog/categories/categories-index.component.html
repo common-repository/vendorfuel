@@ -1,0 +1,515 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Categories</h2>
+<vf-check-auth></vf-check-auth>
+
+<uib-tabset
+	active="$ctrl.activeTab">
+	<uib-tab index="0" select="$ctrl.tabChanged(0)" heading="Categories">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.loading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.loading">
+
+			<bs-search-box-legacy
+				q="$ctrl.searchParams.q"
+				on-submit="$ctrl.setQuery(query)"
+				is-loading="$ctrl.loadingMore">
+			</bs-search-box-legacy>
+
+			<table class="wp-list-table widefat fixed striped table-view-list">
+				<thead>
+					<tr>
+						<th class="col-1">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeSortBy('cat_id', $event)">
+								ID
+								<i ng-class="['bi', {
+									'bi-sort-numeric-down': $ctrl.sortAscending,
+									'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.sortBy === 'cat_id'">
+								</i>
+							</a>
+						</th>
+						<th class="col">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeSortBy('title', $event)">
+								Name
+								<i ng-class="['bi', {
+									'bi-sort-alpha-down': $ctrl.sortAscending,
+									'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.sortBy === 'title'">
+								</i>
+							</a>
+						</th>
+						<th class="col">
+							Description
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="!$ctrl.categories.data.length && !$ctrl.loadingMore">
+						<td colspan="2">
+							No categories found<span ng-if="$ctrl.searchTerm.length >= 1"> matching '{{$ctrl.searchTerm}}'</span>.
+						</td>
+					</tr>
+					<tr ng-if="!$ctrl.loadingMore"
+						ng-repeat="category in $ctrl.categories.data track by $index">
+						<td>{{category.cat_id}}</td>
+						<td>
+							<strong>
+								<a href="#" class="text-decoration-none"
+									ng-click="$ctrl.editCategory( $index, $event )">
+									{{ category.title }}
+								</a>
+							</strong>
+						</td>
+						<td>{{ category.description }}</td>
+					</tr>
+				</tbody>
+			</table>
+			<wp-spinner
+				type="2x"
+				ng-show="$ctrl.loadingMore">
+			</wp-spinner>
+
+			<div class="row  mb-3">
+				<div class="col-sm-4">
+					<span>Showing {{$ctrl.categories.from || 0}} to {{$ctrl.categories.to || 0}} of
+						{{$ctrl.categories.total || 0}} entries<span>
+				</div>
+				<div class="col-sm-4 text-center mt-2">
+					<button class="button" ng-if="$ctrl.categories.prev_page_url"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page - 1)">&lsaquo; Prev</button>
+					<button class="button" ng-if="$ctrl.categories.current_page - 2 > 0"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page - 2)">{{$ctrl.categories.current_page -
+						2}}</button>
+					<button class="button" ng-if="$ctrl.categories.current_page - 1 > 0"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page - 1)">{{$ctrl.categories.current_page -
+						1}}</button>
+					<button class="button"
+						ng-disabled="true">{{$ctrl.categories.current_page}}</button>
+					<button class="button"
+						ng-if="$ctrl.categories.current_page + 1 <= $ctrl.categories.last_page"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page + 1)">{{$ctrl.categories.current_page +
+						1}}</button>
+					<button class="button"
+						ng-if="$ctrl.categories.current_page + 2 <= $ctrl.categories.last_page"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page + 2)">{{$ctrl.categories.current_page +
+						2}}</button>
+					<button class="button" ng-if="$ctrl.categories.next_page_url"
+						ng-click="$ctrl.setPage($ctrl.categories.current_page + 1)">Next &rsaquo;</button>
+				</div>
+				<div class="col-sm-4  justify-content-end">
+					<label for="rpp" class="form-label">Per Page: </label>
+					<select class="form-select" id="rpp"
+						ng-model="$ctrl.searchParams.rpp" ng-change="$ctrl.setRpp( $ctrl.searchParams.rpp )"
+						ng-options="value for value in $ctrl.rppValues">
+					</select>
+				</div>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab index="1" select="$ctrl.tabChanged(1)" heading="Add new">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.loading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.loading">
+			<div class="col-container">
+				<div class="col-left">
+					<div class="mb-3">
+						<label for="create-title" class="form-label">Name</label>
+						<input id="create-title" class="form-control" type="text" id="newCategory"
+							ng-model="$ctrl.addParams.title">
+					</div>
+					<div class="mb-3">
+						<label for="create-description" class="form-label">Description</label>
+						<textarea id="create-description" class="form-control"
+							ng-model="$ctrl.addParams.description"></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="parentCategory" class="form-label">Parent</label>
+						<div class="input-group">
+							<input class="form-control" type="text" id="parentCategory" disabled
+								ng-model="$ctrl.addParams.parentCategoryTitle">
+							<button class="button button-primary"
+								ng-click="$ctrl.openParentCatSearchModal()">Edit</button>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="slug" class="form-label">Slug</label>
+						<input class="form-control" type="text"
+							ng-model="$ctrl.addParams.slug">
+						<div class="form-text">Must be kebob-case (e.g. 'my-new-category'). Leave empty to generate automatically when saved.</div>
+					</div>
+					<div class="mb-3">
+						<label for="avatax" class="form-label">Avatax code</label>
+						<input class="form-control" type="text" id="avatax" ng-model="$ctrl.addParams.avatax_tax_code">
+					</div>
+					<div class="mb-3">
+						<label for="unspsc" class="form-label"><abbr title="United Nations Standard Products and Services Code">UNSPSC</abbr></label>
+						<input class="form-control" type="text" id="unspsc"
+							ng-model="$ctrl.addParams.unspsc">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Image/Icon</label>
+						<div class="input-group">
+							<input class="form-control" type="url" placeholder="None"
+								ng-model="$ctrl.addParams.img_url">
+							<button class="button" ng-click="$ctrl.openMediaFrame('add_img')">
+								Browse
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-right">
+					<button class="button"
+					ng-click="$ctrl.openSearchModalAdd()">Add/Remove Products</button>
+					<div class="row min-scroll m-0">
+						<div class="col text-center p-20"
+							ng-click="$ctrl.openSearchModalAdd()"
+							ng-if="!$ctrl.addParams.products.length">
+							<h3>Click Here or 'Add/Remove Products' to get started.</h3>
+						</div>
+						<div class="col-6 col-md-4 col-lg-3 vf-item-card-outer"
+							ng-repeat="product in $ctrl.addParams.products track by $index">
+							<div class="vf-item-card-inner">
+								<div class="row">
+									<p class="col-12"><b>{{product.value.sku}}</b></p>
+									<div class="col-12" ng-if="!product.value.image">
+										<img class="img-fluid"
+											ng-src="{{ $ctrl.brandImg }}">
+									</div>
+									<div class="col-12" ng-if="product.value.image">
+										<img class="img-fluid vf-item-image"
+											ng-src="{{product.value.image.thumb_url}}">
+									</div>
+									<div class="col-12">
+										<p>{{product.value.description | limitTo:
+											30}}{{product.value.description.length >= 30 ? '...' : ''}}
+										</p>
+									</div>
+									<div class="col-12">
+										<p>Sku: {{product.value.sku}}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<button class="button button-primary"
+			ng-click="$ctrl.addCategory()">
+			Save
+		</button>
+		</div>
+	</uib-tab>
+	<uib-tab index="2" select="$ctrl.tabChanged(2)"
+		heading="Edit category"
+		ng-show="$ctrl.selectedCategory">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.loading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.loading">
+			<div class="col-container">
+				<div class="col-left">
+					<div class="mb-3">
+						<label for="edit-title" class="form-label">Name</label>
+						<input id="edit-title" class="form-control" ng-model="$ctrl.selectedCategory.title" />
+					</div>
+					<div class="mb-3">
+						<label for="edit-description" class="form-label">Description</label>
+						<textarea id="edit-description" class="form-control"
+							ng-model="$ctrl.selectedCategory.description"></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="parentSelectedCategory" class="form-label">Parent</label>
+						<div class="input-group">
+							<input class="form-control" type="text" id="parentSelectedCategory"
+								ng-model="$ctrl.selectedCategory.parentCategoryTitle" disabled>
+							<button class="button"
+								ng-click="$ctrl.openParentCatSearchModal()">Select</button>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="view_slug" class="form-label">Slug</label>
+						<input class="form-control" id="view_slug" type="text"
+							ng-model="$ctrl.selectedCategory.slug">
+						<div class="form-text">Must be kebob-case (e.g. 'my-new-category').</div>
+					</div>
+					<div class="mb-3">
+						<label for="view_avatax_tax_code" class="form-label">Avatax Code</label>
+						<input class="form-control" id="view_avatax_tax_code" type="text"
+							ng-model="$ctrl.selectedCategory.avatax_tax_code">
+					</div>
+					<div class="mb-3">
+						<label for="view_unspsc" class="form-label"><abbr title="United Nations Standard Products and Services Code">UNSPSC</abbr></label>
+						<input class="form-control" id="view_unspsc" ng-model="$ctrl.selectedCategory.unspsc">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Image/Icon</label>
+						<div class="input-group">
+							<input class="form-control" type="url" ng-model="$ctrl.selectedCategory.img_url"
+								placeholder="None">
+							<button class="button" ng-click="$ctrl.openMediaFrame('update_img')">
+								Browse
+							</button>
+						</div>
+					</div>
+					<div class="mb-2">
+						<button class="button" ng-click="$ctrl.viewParent()"
+							ng-if="$ctrl.selectedCategory.parent_id && $ctrl.selectedCategory.parent_id != 0">Go to parent category</button>
+						<button class="button" ng-click="$ctrl.changeView()"
+							ng-disabled="($ctrl.viewProducts && $ctrl.selectedCategory.subcategories.length <= 0) || (!$ctrl.viewProducts && $ctrl.selectedCategory.products.data.length <= 0)">
+							<span ng-if="!$ctrl.viewProducts">Show products
+								({{$ctrl.selectedCategory.products.data.length}})</span>
+							<span ng-if="$ctrl.viewProducts">Show subcategories
+								({{$ctrl.selectedCategory.subcategories.length}})</span>
+						</button>
+					</div>
+					<div id="buttons" ng-hide="$ctrl.productsLoading">
+						<div class="mb-2">
+							<button class="button"
+								type="button"
+								ng-if="$ctrl.editedProducts.length >= 1" ng-click="$ctrl.ShowChanges()"
+								ng-if="$ctrl.viewProducts">
+								<span ng-if="!$ctrl.showChanges">Show Changes ({{$ctrl.editedProducts.length}})</span>
+								<span ng-if="$ctrl.showChanges">Show Current</span>
+							</button>
+							<button class="button"
+								ng-click="$ctrl.openSearchModalUpdate()"><span
+									ng-if="$ctrl.selectedCategory.products.data.length">Add/Remove
+									Products</span><span ng-if="!$ctrl.selectedCategory.products.data.length">Add
+									Products</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-right"
+					style="display: inline-grid; position: relative;">
+					<div class="col-12" ng-if="$ctrl.viewProducts">
+						<div ng-if="!$ctrl.showChanges">
+							<div class="row " ng-hide="$ctrl.productsLoading">
+								<div class="input-group col-8 p-0">
+									<input class="form-control" type="text" id="searchProduct"
+										ng-model="$ctrl.searchParams.q" placeholder="Search Products">
+									<button class="button" type="submit"
+										ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, 1)">Search</button>
+								</div>
+								<div class="col-4  justify-content-end">
+									<label for="rpp" class="form-label">Per Page: </label>
+									<select class="form-select" id="rpp"
+										ng-model="$ctrl.searchParams.rpp" ng-change="$ctrl.searchCategory( $ctrl.searchParams.rpp, 1 )"
+										ng-options="value for value in $ctrl.rppValues">
+									</select>
+								</div>
+							</div>
+							<wp-spinner
+								type="2x"
+								ng-show="$ctrl.productsLoading">
+							</wp-spinner>
+							<div ng-if="!$ctrl.productsLoading">
+								<div class="text-center p-5"
+									ng-if="!$ctrl.selectedCategory.products.data.length">
+									<h3>Click 'Add Products' to get started.</h3>
+								</div>
+								<div class="row py-2 row-cols-2 row-cols-md-3 g-2">
+									<div class="col" ng-repeat="product in $ctrl.selectedCategory.products.data track by $index">
+										<div class="card h-100">
+											<div class="ratio ratio-1x1">
+												<img
+													class="card-img-top"
+													loading="lazy"
+													style="object-fit: contain"
+													alt=""
+													ng-src="{{ product.image.thumb_url }}"
+													ng-if="product.image.thumb_url"
+												/>
+												<div
+													class="card-img-top bg-light"
+													ng-if="!product.image.thumb_url"
+												>
+													<div class="d-flex h-100 align-items-center justify-content-center">
+														<i
+															class="dashicons dashicons-format-image medium-gray-placeholder"
+															style="font-size: 2.5rem; width: auto; height: auto;"
+														></i>
+													</div>
+												</div>
+											</div>
+											<div class="card-body">
+												<h5 class="h6 card-title">{{ product.description }}</h5>
+												<h6 class="card-subtitle text-muted small">{{ product.sku }}</h6>
+												<p class="card-text">
+													<span class="d-block" ng-if="product.pricesheets[0]">
+														{{ product.pricesheets[0].price | currency }}
+													</span>
+													<span ng-if="!product.pricesheets.length" class="badge bg-warning text-uppercase">
+														Missing Price
+													</span>
+													<span ng-class="['badge text-uppercase', {
+														'bg-primary': product.status === 'active',
+														'bg-secondary': product.status !== 'active'
+													}]">{{ product.status }}
+													</span>
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col text-center mb-3" ng-hide="$ctrl.productsLoading">
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.prev_page_url"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page - 1)">&lsaquo; Prev</button>
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.current_page - 2 > 0"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page - 2)">{{$ctrl.selectedCategory.products.current_page
+									- 2}}</button>
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.current_page - 1 > 0"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page - 1)">{{$ctrl.selectedCategory.products.current_page
+									- 1}}</button>
+								<button class="button"
+									ng-disabled="true"><b>{{$ctrl.selectedCategory.products.current_page}}</b></button>
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.current_page + 1 <= $ctrl.selectedCategory.products.last_page"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page + 1)">{{$ctrl.selectedCategory.products.current_page
+									+ 1}}</button>
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.current_page + 2 <= $ctrl.selectedCategory.products.last_page"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page + 2)">{{$ctrl.selectedCategory.products.current_page
+									+ 2}}</button>
+								<button class="button"
+									ng-if="$ctrl.selectedCategory.products.next_page_url"
+									ng-click="$ctrl.searchCategory($ctrl.searchParams.rpp, $ctrl.selectedCategory.products.current_page + 1)">Next
+									&rsaquo;</button>
+							</div>
+						</div>
+						<div ng-if="$ctrl.showChanges">
+							<div class="row " ng-hide="$ctrl.productsLoading">
+								<div class="input-group col-12 p-0">
+									<input class="form-control" type="text" id="filterChanges"
+										ng-model="filterEdited" placeholder="Filter Changes">
+								</div>
+							</div>
+							<wp-spinner
+								type="2x"
+								ng-show="$ctrl.productsLoading">
+							</wp-spinner>
+							<div ng-if="!$ctrl.productsLoading">
+								<div class="text-center p-20" ng-if="results.length <= 0">
+									<h3>No results matching '{{$ctrl.filterBy}}'.</h3>
+								</div>
+								<div class="row py-2 row-cols-2 row-cols-md-3 g-2">
+									<div class="col" ng-repeat="product in $ctrl.editedProducts | filter: filterEdited as results track by $index">
+										<div ng-class="['card h-100', {
+											'border-success': product.action === 'add',
+											'border-danger': product.action !== 'add',
+										}]">
+											<div ng-class="['card-header text-white',{
+												'bg-success': product.action === 'add',
+												'bg-danger': product.action !== 'add',
+											}]">
+												{{ product.action === 'add' ? 'Adding' : 'Removing' }}
+											</div>
+											<div class="ratio ratio-1x1">
+												<img
+													class="card-img-top"
+													loading="lazy"
+													style="object-fit: contain"
+													alt=""
+													ng-src="{{ product.value.image.thumb_url }}"
+													ng-if="product.value.image.thumb_url"
+												/>
+												<div
+													class="card-img-top bg-light"
+													ng-if="!product.value.image.thumb_url"
+												>
+													<div class="d-flex h-100 align-items-center justify-content-center">
+														<i
+														class="dashicons dashicons-format-image medium-gray-placeholder"
+														style="font-size: 2.5rem; width: auto; height: auto;"
+													></i>
+													</div>
+												</div>
+											</div>
+											<div class="card-body">
+												<h5 class="h6 card-title">{{ product.value.description }}</h5>
+												<h6 class="card-subtitle text-muted small">{{ product.value.sku }}</h6>
+												<p class="card-text">
+													<span ng-class="['badge text-uppercase', {
+														'bg-primary': product.value.status === 'active',
+														'bg-secondary': product.value.status !== 'active'
+													}]">{{ product.value.status }}
+													</span>
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div ng-if="!$ctrl.viewProducts">
+						<div class="row">
+							<div class="input-group mb-3">
+								<input type="text" class="form-control"
+								placeholder="Filter Subcategories"
+									ng-model="$ctrl.filterBy" >
+							</div>
+							<div class="col p-3 min-scroll">
+								<div class="col p-3 vf-list-item cursor-pointer"
+									ng-click="$ctrl.searchSubCategory(category.cat_id)"
+									ng-repeat="category in $ctrl.selectedCategory.subcategories | orderBy: category.title | filter: $ctrl.filterBy as filtered track by $index">
+									<span>{{category.title}}</span>
+								</div>
+								<div class="col text-center p-20" ng-if="filtered.length <= 0">
+									<h3>No categories <span ng-if="$ctrl.filterBy.length >= 1">matching
+											'{{$ctrl.filterBy}}'</span> found.</h3>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-toolbar justify-content-between">
+				<span>
+					<button class="button button-primary" type="button"
+						ng-click="$ctrl.updateCategory()">
+						Update
+					</button>
+					<button class="button button-delete"
+						ng-click="$ctrl.deleteCategory($ctrl.selectedCategory.cat_id)">
+						Delete
+					</button>
+				</span>
+				<a class="button" target="_blank"
+					ng-href="/{{ $ctrl.catSlug }}/{{ $ctrl.selectedCategory.slug }}"
+					ng-attr-title="{{ 'View ' + $ctrl.selectedCategory.title + ' category in a new tab'}}">
+					View Category
+				</a>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab index="3" select="$ctrl.tabChanged(3)" heading="Utilities">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.loading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.loading">
+			<button class="button" type="submit"
+				ng-click="$ctrl.syncCategoryPosts()">
+				Sync Categories to WP Posts
+			</button>
+			<button class="button" type="submit"
+				ng-click="$ctrl.generateSlugs()">
+				Generate missing Slugs for Active Categories
+			</button>
+		</div>
+	</uib-tab>
+</uib-tabset>

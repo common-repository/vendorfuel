@@ -1,0 +1,118 @@
+[
+	{
+		"name": "customers",
+		"url": "/customers",
+		"abstract": true
+	},
+	{
+		"name": "customers.page",
+		"url": "",
+		"component": "vfCustomers"
+	},
+	{
+		"name": "customers.accounts",
+		"url": "/accounts",
+		"abstract": true
+	},
+	{
+		"name": "customers.accounts.index",
+		"url": "",
+		"component": "accountsIndex"
+	},
+	{
+		"name": "customers.accounts.settings",
+		"url": "/settings",
+		"component": "accountsSettings"
+	},
+	{
+		"name": "customers.accounts.edit",
+		"url": "/:id",
+		"component": "accountEdit"
+	},
+	{
+		"name": "customers.accounts.create",
+		"url": "/create",
+		"component": "accountEdit"
+	},
+	{
+		"name": "customers.accounts.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "customers.accounts.uploads.index",
+		"url": "",
+		"component": "customerUploadsIndex"
+	},
+	{
+		"name": "customers.accounts.uploads.show",
+		"url": "/:id",
+		"component": "customerUploadShow"
+	},
+	{
+		"name": "customers.accounts.uploads.create",
+		"url": "/create",
+		"component": "customerUploadCreate"
+	},
+	{
+		"name": "customers.groups",
+		"url": "/groups",
+		"abstract": true
+	},
+	{
+		"name": "customers.groups.index",
+		"url": "",
+		"component": "groupsIndex"
+	},
+	{
+		"name": "customers.groups.edit",
+		"url": "/:id",
+		"component": "groupEdit"
+	},
+	{
+		"name": "customers.groups.create",
+		"url": "/create",
+		"component": "groupCreate"
+	},
+	{
+		"name": "customers.groups.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "customers.groups.uploads.index",
+		"url": "",
+		"component": "groupUploadsIndex"
+	},
+	{
+		"name": "customers.groups.uploads.show",
+		"url": "/:id",
+		"component": "groupUploadShow"
+	},
+	{
+		"name": "customers.groups.uploads.create",
+		"url": "/create",
+		"component": "groupUploadCreate"
+	},
+	{
+		"name": "customers.roles",
+		"url": "/roles",
+		"abstract": true,
+		"template": "<ui-view/>"
+	},
+	{
+		"name": "customers.roles.index",
+		"url": "",
+		"component": "rolesPage"
+	},
+	{
+		"name": "customers.roles.create",
+		"url": "/create",
+		"component": "rolePage"
+	},
+	{
+		"name": "customers.roles.edit",
+		"url": "/:id",
+		"component": "rolePage"
+	}
+]

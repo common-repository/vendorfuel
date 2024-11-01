@@ -1,0 +1,25 @@
+<div class="row my-3 align-items-center" ng-if="$ctrl.refinements.length > 0">
+	<div class="col">
+		<div class="d-flex justify-content-end align-items-center flex-wrap">
+			<button
+				class="btn badge text-bg-secondary ms-1"
+				ng-repeat="refinement in $ctrl.refinements"
+				ng-click="$ctrl.onClickRemove(refinement)"
+				ng-disabled="$ctrl.isLoading"
+				ng-attr-title="{{
+					'Clear ' + refinement.name + refinement.value + ' filter'
+				}}"
+			>
+				<em ng-bind="refinement.name"></em>{{ refinement.value }}
+				<i class="bi bi-x" aria-hidden="true"></i>
+			</button>
+			<button
+				class="btn btn-sm btn-link"
+				ng-click="$ctrl.onClickRemoveAll()"
+				ng-disabled="$ctrl.isLoading"
+			>
+				Clear Filters
+			</button>
+		</div>
+	</div>
+</div>

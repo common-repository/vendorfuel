@@ -1,0 +1,9 @@
+<h1>Taxes</h1>
+<nav-tab-wrapper
+	active="$ctrl.active"
+	tabs="$ctrl.tabs"
+	handle-change="$ctrl.setActive(id)"
+></nav-tab-wrapper>
+
+<taxes-options ng-if="$ctrl.active === 'options'"></taxes-options>
+<taxes-avalara ng-if="$ctrl.active === 'avalara'"> </taxes-avalara>

@@ -1,0 +1,332 @@
+<layout-component>
+	<form
+		name="loginForm"
+		autocomplete="on"
+		novalidate
+		ng-if="!$ctrl.isForcingPasswordUpdate"
+	>
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input
+				autocomplete="email"
+				type="text"
+				id="email"
+				name="email"
+				ng-model="$ctrl.customer.email"
+				ng-required="true"
+				ng-class="[
+					'form-control',
+					{
+						'is-invalid':
+							loginForm.email.$invalid && loginForm.email.$touched
+					}
+				]"
+			/>
+			<small
+				class="has-vivid-red-color"
+				ng-if="loginForm.email.$touched && loginForm.email.$invalid"
+			>
+				Please enter your account email address.
+			</small>
+		</div>
+		<div class="mb-3">
+			<label for="password" class="form-label">Password</label>
+			<div class="input-group">
+				<input
+					autocomplete="current-password"
+					class="form-control"
+					type="password"
+					name="password"
+					id="password"
+					ng-model="$ctrl.customer.password"
+					ng-attr-type="{{
+						$ctrl.showPassword ? 'text' : 'password'
+					}}"
+					ng-required="true"
+					ng-minlength="8"
+					ng-class="[
+						'form-control',
+						{
+							'is-invalid':
+								loginForm.password.$invalid &&
+								loginForm.password.$touched
+						}
+					]"
+					spellcheck="false"
+				/>
+				<button
+					ng-click="$ctrl.toggleShowPassword()"
+					class="btn btn-secondary"
+					type="button"
+				>
+					<i
+						ng-class="
+							$ctrl.showPassword
+								? 'bi bi-eye-fill'
+								: 'bi bi-eye-slash-fill'
+						"
+					></i>
+				</button>
+			</div>
+			<small
+				class="has-vivid-red-color"
+				ng-if="
+					loginForm.password.$touched && loginForm.password.$invalid
+				"
+			>
+				Please enter your account password.
+			</small>
+		</div>
+		<div class="mb-3">
+			<div class="form-check">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					value=""
+					id="remember-me"
+					ng-model="$ctrl.customer.remember"
+				/>
+				<label class="form-check-label" for="remember-me"
+					>Remember me</label
+				>
+			</div>
+		</div>
+		<div class="btn-toolbar justify-content-between">
+			<button
+				class="btn btn-primary"
+				type="submit"
+				ng-disabled="loginForm.$invalid || $ctrl.isSigningIn"
+				ng-click="$ctrl.login()"
+			>
+				<i
+					class="bi bi-box-arrow-in-right"
+					ng-hide="$ctrl.isSigningIn"
+				></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isSigningIn"
+				></span>
+				{{ $ctrl.isSigningIn ? 'Signing In' : 'Sign In' }}
+			</button>
+			<div class="btn-group">
+				<a
+					class="btn btn-link"
+					ng-href="{{ $ctrl.pageUrls.forgotPassword }}"
+				>
+					Forgot Password?
+				</a>
+				<a class="btn btn-link" ng-href="{{ $ctrl.pageUrls.register }}">
+					Create an account
+				</a>
+			</div>
+		</div>
+	</form>
+
+	<div ng-if="$ctrl.isForcingPasswordUpdate">
+		<form
+			class="form"
+			name="form"
+			ng-submit="$ctrl.submitResetPassword( $ctrl.password )"
+		>
+			<fieldset>
+				<legend>Reset Password</legend>
+				<div class="mb-3">
+					<label for="newPassword" class="form-label">Password</label>
+					<div class="input-group">
+						<input
+							class="form-control"
+							id="newPassword"
+							name="newPassword"
+							aria-describedby="passwordHelp"
+							pattern="(?=.*[0-9])(?=.*[!@#$%^&*-])[a-zA-Z0-9!@#$%^&*]{8,}"
+							minlength="8"
+							required
+							autocomplete="new-password"
+							ng-attr-type="{{
+								$ctrl.isShowingPassword ? 'text' : 'password'
+							}}"
+							ng-model="$ctrl.password"
+							ng-class="{
+								'is-valid': form.newPassword.$valid,
+								'is-invalid':
+									form.newPassword.$invalid &&
+									form.newPassword.$touched
+							}"
+							spellcheck="false"
+						/>
+						<button
+							class="btn btn-secondary"
+							type="button"
+							ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword"
+						>
+							<i
+								ng-class="
+									$ctrl.isShowingPassword
+										? 'bi bi-eye-fill'
+										: 'bi bi-eye-slash-fill'
+								"
+							></i>
+						</button>
+					</div>
+					<div class="progress mt-1">
+						<div
+							class="progress-bar"
+							role="progressbar"
+							aria-valuenow="25"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							ng-style="{
+								width:
+									$ctrl.getPasswordStrength(
+										form.newPassword
+									) + '%'
+							}"
+							ng-class="{
+								'bg-success': form.newPassword.$valid,
+								'bg-warning': form.newPassword.$invalid,
+								'bg-danger':
+									$ctrl.getPasswordStrength(
+										form.newPassword
+									) < 50
+							}"
+						></div>
+					</div>
+					<small
+						id="passwordHelp"
+						ng-class="[
+							'form-text',
+							{
+								'has-vivid-red-color':
+									form.newPassword.$invalid &&
+									form.newPassword.$touched
+							}
+						]"
+					>
+						{{
+							form.newPassword.$valid
+								? 'Password valid.'
+								: 'Passwords must be at least 8 characters and
+							contain
+							at least one uppercase letter, one lowercase letter, a special character (*,!,$, etc.) and a
+							number.'
+						}}
+					</small>
+				</div>
+
+				<div class="mb-3">
+					<label for="passwordConfirmation" class="form-label"
+						>Reenter Password</label
+					>
+					<div class="input-group">
+						<input
+							class="form-control"
+							id="passwordConfirmation"
+							aria-describedby="passwordConfirmationHelp"
+							name="passwordConfirmation"
+							pattern="(?=.*[0-9])(?=.*[!@#$%^&*-])[a-zA-Z0-9!@#$%^&*]{8,}"
+							minlength="8"
+							required
+							autocomplete="new-password"
+							ng-attr-type="{{
+								$ctrl.isShowingPasswordCheck
+									? 'text'
+									: 'password'
+							}}"
+							ng-model="$ctrl.passwordConfirmation"
+							ng-class="{
+								'is-valid':
+									form.passwordConfirmation.$valid &&
+									$ctrl.password ===
+										$ctrl.passwordConfirmation,
+								'is-invalid':
+									form.passwordConfirmation.$invalid &&
+									form.passwordConfirmation.$touched
+							}"
+							spellcheck="false"
+						/>
+						<button
+							class="btn btn-secondary"
+							type="button"
+							ng-click="$ctrl.isShowingPasswordCheck = !$ctrl.isShowingPasswordCheck"
+						>
+							<i
+								ng-class="
+									$ctrl.isShowingPasswordCheck
+										? 'bi bi-eye-fill'
+										: 'bi bi-eye-slash-fill'
+								"
+							></i>
+						</button>
+					</div>
+					<div class="progress mt-1">
+						<div
+							class="progress-bar"
+							role="progressbar"
+							aria-valuenow="25"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							ng-style="{
+								width:
+									$ctrl.getPasswordStrength(
+										form.passwordConfirmation
+									) + '%'
+							}"
+							ng-class="{
+								'bg-success': form.passwordConfirmation.$valid,
+								'bg-warning':
+									form.passwordConfirmation.$invalid ||
+									$ctrl.password !==
+										$ctrl.passwordConfirmation,
+								'bg-danger':
+									$ctrl.getPasswordStrength(
+										form.passwordConfirmation
+									) < 50
+							}"
+						></div>
+					</div>
+					<small
+						id="passwordConfirmationHelp"
+						ng-class="[
+							'form-text',
+							{
+								'has-vivid-red-color':
+									form.passwordConfirmation.$invalid &&
+									form.passwordConfirmation.$touched
+							}
+						]"
+					>
+						{{
+							form.passwordConfirmation.$valid &&
+							$ctrl.password === $ctrl.passwordConfirmation
+								? 'Your
+							passwords match.'
+								: 'Please verify your password.'
+						}}
+					</small>
+				</div>
+
+				<button
+					class="btn btn-primary"
+					ng-disabled="form.$invalid ||
+						$ctrl.password !== $ctrl.passwordConfirmation ||
+						$ctrl.isInProgress"
+					type="submit"
+				>
+					{{
+						$ctrl.isInProgress
+							? 'Resetting Password'
+							: 'Reset Password'
+					}}
+					<span
+						class="spinner-border spinner-border-sm"
+						role="status"
+						aria-hidden="true"
+						ng-show="$ctrl.isInProgress"
+					></span>
+				</button>
+			</fieldset>
+		</form>
+	</div>
+</layout-component>

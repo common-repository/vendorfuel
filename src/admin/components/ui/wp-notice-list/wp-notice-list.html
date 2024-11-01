@@ -1,0 +1,9 @@
+<div
+  ng-class="'notice inline is-dismissible notice-'+notice.type"
+  ng-repeat="notice in $ctrl.noticeList track by $index"
+>
+  <p>{{ notice.message }}</p>
+  <button type="button" class="notice-dismiss" ng-click="$ctrl.dismiss($index)">
+    <span class="screen-reader-text">Dismiss this notice.</span>
+  </button>
+</div>

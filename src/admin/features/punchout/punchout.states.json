@@ -1,0 +1,30 @@
+[
+	{
+		"name": "punchout",
+		"url": "/punchout",
+		"abstract": true
+	},
+	{
+		"name": "punchout.page",
+		"url": "",
+		"component": "punchoutPage"
+	},
+	{
+		"name": "punchout.suppliers",
+		"url": "/suppliers",
+		"abstract": true
+	},
+	{
+		"name": "punchout.suppliers.index",
+		"url": "/:activeTab",
+		"component": "punchoutIndex",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			},
+			"product": {
+				"dynamic": true
+			}
+		}
+	}
+]

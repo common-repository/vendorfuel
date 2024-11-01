@@ -1,0 +1,12 @@
+<button
+	class="btn btn-outline-danger border-0"
+	ng-click="$ctrl.toggleFavorite()"
+	ng-attr-title="{{ $ctrl.isFavorite ? 'Remove from' : 'Add to' }} favorites"
+>
+	<i
+		ng-class="{
+			'bi bi-heart-fill': $ctrl.isFavorite,
+			'bi bi-heart': !$ctrl.isFavorite
+		}"
+	></i>
+</button>

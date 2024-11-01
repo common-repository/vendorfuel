@@ -1,0 +1,80 @@
+[
+  {
+    "header": "Accounting",
+    "icon": "bank",
+    "body": "Link store data to QuickBooks.",
+    "href": "/wp-admin/admin.php?page=vf-accounting"
+  },
+  {
+    "header": "Admin accounts",
+    "icon": "groups",
+    "body": "Manage administrator accounts.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/admin"
+  },
+  {
+    "header": "Catalog",
+    "icon": "book-alt",
+    "body": "Manage banners, products, categories, collections, manufacturers, price sheets, promo codes and reviews.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/catalog"
+  },
+  {
+    "header": "Customers",
+    "icon": "admin-users",
+    "body": "Manage customer accounts, groups and roles.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/customers"
+  },
+  {
+    "header": "Email",
+    "icon": "email",
+    "body": "Manage email templates and SMTP settings.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/email"
+  },
+  {
+    "header": "Orders",
+    "icon": "text-page",
+    "body": "Manage orders and order tracking.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/orders"
+  },
+  {
+    "header": "Payments",
+    "icon": "money-alt",
+    "body": "Manage payments via PayPal, Stripe, Square, Qualpay, AuthorizeNet and PayFabric.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/payments"
+  },
+  {
+    "header": "Punchout",
+    "icon": "cart",
+    "body": "Manage punchout suppliers.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/punchout"
+  },
+  {
+    "header": "Purchasing",
+    "icon": "admin-generic",
+    "body": "Manage vendors, cost sheets and document profiles.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/purchasing"
+  },
+  {
+    "header": "Reports",
+    "icon": "analytics",
+    "body": "Manage, download and schedule reports.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/reports"
+  },
+  {
+    "header": "Settings",
+    "icon": "admin-settings",
+    "body": "Manage store, plugin and analytics settings.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/settings"
+  },
+  {
+    "header": "Shipping",
+    "icon": "admin-site",
+    "body": "Manage shipping modes, flat rates and parcels.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/shipping"
+  },
+  {
+    "header": "Taxes",
+    "icon": "admin-generic",
+    "body": "Manage state taxes and connect with Avalara account.",
+    "href": "/wp-admin/admin.php?page=vendorfuel#!/taxes"
+  }
+]

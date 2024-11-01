@@ -1,0 +1,173 @@
+<h2 class="h4 mt-4 pt-4 border-top">Your Order</h2>
+
+<!-- wp:table {"hasFixedLayout":true,"className":"is-style-stripes"} -->
+<figure class="wp-block-table is-style-stripes">
+	<table class="has-fixed-layout">
+		<tbody>
+			<tr>
+				<th scope="row">Subtotal</th>
+				<td class="has-text-align-right" data-align="right">{{ $ctrl.subtotal | currency }}</td>
+			</tr>
+			<tr ng-show="$ctrl.promoDiscount > 0">
+				<th scope="row">Discounts</th>
+				<td class="has-text-align-right" data-align="right">
+					{{ $ctrl.promoDiscount | currency }}
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th scope="row">Estimated Total</th>
+				<td class="has-text-align-right" data-align="right">{{ $ctrl.totalAmount | currency }}</td>
+			</tr>
+		</tfoot>
+	</table>
+</figure>
+<!-- /wp:table -->
+
+<p>Please proceed to checkout for final total.</p>
+
+<div ng-if="!$ctrl.isSignedIn">
+	<p>Log in or create an account now and enjoy an easier and faster checkout process.</p>
+	<wp-buttons justification="center">
+		<wp-button link="$ctrl.pageUrls.checkout" class="w-100" custom-width="100">
+			Checkout as Guest
+		</wp-button>
+	</wp-buttons>
+	<p class="has-text-align-center">
+		<a class="btn btn-link" ng-href="{{ $ctrl.pageUrls.register }}?referrer=cart">Register</a> |
+		<a class="btn btn-link" ng-href="{{ $ctrl.pageUrls.login }}">Login</a>
+	</p>
+</div>
+
+<div ng-if="$ctrl.isSignedIn">
+	<form
+		ng-if="$ctrl.cart.punchout"
+		method="POST"
+		style="display: inline"
+		action="{{$ctrl.cart.punchout.return_url}}"
+	>
+		<input
+			type="hidden"
+			name="cxml-urlencoded"
+			id="cxml-urlencoded"
+			value="{{$ctrl.cart.punchout.cxml}}"
+		/><input
+			type="submit"
+			value="Checkout"
+			id="btnCheckoutPO"
+			class="btn btn-primary btn-block btn-lg my-2"
+		/>
+	</form>
+	<wp-buttons is-vertical="true" justification="center" ng-if="!$ctrl.cart.punchout">
+		<wp-button link="$ctrl.pageUrls.checkout" class="w-100" custom-width="100">
+			Checkout
+		</wp-button>
+	</wp-buttons>
+</div>
+
+<wp-buttons justification="center">
+	<wp-button
+		class="w-100 mr-1"
+		custom-font-size="small"
+		custom-width="100"
+		is-disabled="$ctrl.promptSaveCart"
+		is-style-outline="true"
+		ng-if="$ctrl.isSignedIn"
+		on-click="$ctrl.promptSaveCart = true"
+	>
+		Save Cart
+	</wp-button>
+	<wp-button
+		class="w-100 ml-1"
+		custom-font-size="small"
+		custom-width="100"
+		is-disabled="$ctrl.promptClearCart"
+		is-style-outline="true"
+		on-click="$ctrl.promptClearCart = true"
+	>
+		Clear Cart
+	</wp-button>
+</wp-buttons>
+
+<div class="card mb-3" ng-if="$ctrl.promptSaveCart">
+	<form name="saveCartForm" class="card-body" ng-submit="$ctrl.saveCart($ctrl.cartName)">
+		<fieldset>
+			<legend>Save Cart</legend>
+			<div class="form-group">
+				<label for="cart-name">Cart Name <small>(required)</small></label>
+				<input
+					type="text"
+					class="form-control"
+					id="cart-name"
+					aria-describedby="cart-name-help"
+					ng-model="$ctrl.cartName"
+					minlength="1"
+					ng-minlength="1"
+					required
+				/>
+				<small id="cart-name-help" class="form-text"
+					>Please enter a name for your saved cart.</small
+				>
+			</div>
+			<wp-button
+				custom-font-size="small"
+				is-disabled="saveCartForm.$invalid"
+				is-loading="$ctrl.isSavingCart"
+				on-click="$ctrl.saveCart($ctrl.cartName)"
+			>
+				{{ $ctrl.isSavingCart ? 'Saving' : 'Save '}} Cart
+			</wp-button>
+			<div ng-if="$ctrl.savedCarts">
+				<p class="has-small-font-size">
+					You can also add your current cart items to a previously saved cart by clicking the cart
+					name below.
+				</p>
+				<figure class="wp-block-table is-style-stripes">
+					<figcaption><a ng-href="{{ $ctrl.pageUrls.savedCarts }}">Saved Carts</a></figcaption>
+					<table>
+						<thead>
+							<tr>
+								<th class="has-text-align-left">Name</th>
+								<th class="has-text-align-right">Items</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in $ctrl.savedCarts">
+								<td class="has-text-align-left">
+									<a href="#" ng-click="$ctrl.appendToSavedCart( item.cart_title, $event )">
+										{{ item.cart_title }}
+									</a>
+								</td>
+								<td class="has-text-align-right">{{ item.num_items | number }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</figure>
+			</div>
+
+			<wp-button
+				custom-font-size="small"
+				is-style-outline="true"
+				on-click="$ctrl.promptSaveCart = false"
+			>
+				{{ $ctrl.isCartSaved ? 'Close' : 'Cancel' }}
+			</wp-button>
+		</fieldset>
+	</form>
+</div>
+
+<div ng-show="$ctrl.promptClearCart" class="alert alert-warning">
+	<p>Are you sure you want to clear all items from your shopping cart?</p>
+	<p class="mb-0">
+		<button type="button" class="btn btn-primary" ng-click="$ctrl.clearCart()">Yes</button>
+		<button type="button" class="btn btn-secondary" ng-click="$ctrl.promptClearCart = false">
+			Cancel
+		</button>
+	</p>
+</div>
+
+<wp-spacer height-in-pixels="25"></wp-spacer>
+<cart-split-checkout></cart-split-checkout>
+<cart-request-quote></cart-request-quote>
+<cart-download-csv></cart-download-csv>

@@ -1,0 +1,111 @@
+<div class="modal-header">
+    <h4><strong ng-bind="modalTitle"></strong></h4>
+    <button type="button" class="btn-close" ng-click="Cancel()" aria-label="close"></button>
+</div>
+<div class="modal-body p-3" style="overflow-y:auto;">
+	<div class="">
+    	<div class="input-group">
+			<button class="button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{filterBy[tab]}}</button>
+			<div class="dropdown-menu">
+			  <a class="dropdown-item" ng-click="filterBy[tab] = 'Search For'" ng-show="filterBy[tab] === 'Filter Results'">Search For</a>
+			  <a class="dropdown-item" ng-click="filterBy[tab] = 'Filter Results'" ng-show="filterBy[tab] === 'Search For'">Filter Results</a>
+			</div>
+    		<input class="form-control" type="text" ng-keypress="$event.keyCode === 13 && Search(pageConfig.tabs[tab].http.params.rpp, 1)" ng-model="pageConfig.tabs[tab].http.params.q" placeholder="Search..." />
+			<button class="button" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, 1)">Search</button>
+    	</div>
+    </div>
+    <div class="row  mb-3">
+    	<div class="col-sm-7">
+			<span>Showing {{pagination[tab].from || 0}} to {{pagination[tab].to || 0}} of {{pagination[tab].total || 0}} entries<span>
+		</div>
+		<div class="col-sm-5  justify-content-end">
+			<label class="form-label" for="rpp">Per Page: </label>
+			<select class="form-control" style="display: inline-block;" id="rpp" ng-model="per_page[tab]" ng-change="Search(per_page[tab], 1)" ng-options="value for value in rppValues">
+			</select>
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-center py-5"
+		ng-if="loading">
+		<div class="spinner is-active" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+    <uib-tabset ng-show="!loading" active="activeTab" class="non-justified-width" resize>
+    <!-- <div class="row"> -->
+	    <!-- <div class="col-md-6"> -->
+	    <uib-tab active="tab" index="0" select="TabChanged(0)" heading="Add">
+			<div class="row p-3" style="border-bottom: 1px solid #ddd; max-height: calc(100vh - 500px); overflow-y: scroll;">
+				<div class="col-12 text-center" ng-if="results[0].length <= 0">
+					<span class="col m-auto">
+						<h3>No results available.</h3>
+					</span>
+				</div>
+	    		<div class="col-12 col-sm-6 col-lg-4 vf-item-card-outer" ng-repeat="result in results[0] | filter:  (filterBy[tab] === 'Filter Results' ? pageConfig.tabs[tab].http.params.q : '') track by $index" ng-if="results[0].length >= 1">
+					<div class="vf-item-card-inner" ng-class="{'add': addedIds.includes(rawResults[0][$index][pageConfig.tabs[0].id])}" ng-click="selectItem($index, tab)">
+	    				<p class="col" title="{{result[pageConfig.tabs[0].fields[0]]}}"><b>{{result[pageConfig.tabs[0].fields[0]] | limitTo: 20}}{{result[pageConfig.tabs[0].fields[0]].length >= 20 ? '...' : ''}}</b></p>
+	    				<div class="row" ng-if="pageConfig.tabs[0].fields[1] == 'image'">
+	    					<div class="col-4 col-sm-12" ng-if="!result[pageConfig.tabs[0].fields[1]]">
+                                <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                            </div>
+	    					<div class="col-4 col-sm-12" ng-if="result[pageConfig.tabs[0].fields[1]]">
+		    					<img class="img-fluid vf-item-image" ng-src="{{result[pageConfig.tabs[0].fields[1]]}}">
+		    				</div>
+	    				</div>
+	    				<div class="row" ng-if="pageConfig.tabs[0].fields[1] != 'image'">
+	    					<p class="col" title="{{result[pageConfig.tabs[0].fields[1]]}}">{{result[pageConfig.tabs[0].fields[1]] | limitTo: 20}}{{result[pageConfig.tabs[0].fields[1]].length >= 20 ? '...' : ''}}</p>
+	    				</div>
+	    				<p class="col-12" title="{{result[pageConfig.tabs[0].fields[2]]}}">{{result[pageConfig.tabs[0].fields[2]] | limitTo: 20}}{{result[pageConfig.tabs[0].fields[2]].length >= 20 ? '...' : ''}}</p>
+		    			<p class="col-12" title="{{result[pageConfig.tabs[0].fields[3]]}}">{{result[pageConfig.tabs[0].fields[3]] | limitTo: 20}}{{result[pageConfig.tabs[0].fields[3]].length >= 20 ? '...' : ''}}</p>
+	    			</div>
+	    		</div>
+	    	</div>
+		</uib-tab>
+	    <!-- </div> -->
+	    <!-- <div class="col-md-6"> -->
+	    <uib-tab index="1" select="TabChanged(1)" heading="Remove"
+			ng-if="!hasOneTab">	
+			<div class="row p-3" style="border-bottom: 1px solid #ddd; max-height: calc(100vh - 500px); overflow-y: scroll;">
+				<div class="col-12 text-center" ng-if="results[1].length <= 0">
+					<span class="col m-auto">
+						<h3>No results available.</h3>
+					</span>
+				</div>
+	    		<div class="col-12 col-sm-6 col-lg-4 vf-item-card-outer" ng-repeat="result in results[1] | filter:  (filterBy[tab] === 'Filter Results' ? pageConfig.tabs[tab].http.params.q : '') track by $index" ng-if="results[1].length >= 1">
+		    		<div class="vf-item-card-inner" ng-class="{'remove': removedIds.includes(rawResults[1][$index][pageConfig.tabs[1].id])}" ng-click="selectItem($index, tab)">
+		    			<p class="col" title="{{result[pageConfig.tabs[1].fields[0]]}}"><b>{{result[pageConfig.tabs[1].fields[0]] | limitTo: 20}}{{result[pageConfig.tabs[1].fields[0]].length >= 20 ? '...' : ''}}</b></p>
+		    			<div class="row" ng-if="pageConfig.tabs[1].fields[1] == 'image'">
+		    				<div class="col-4 col-sm-12" ng-if="!result[pageConfig.tabs[1].fields[1]]">
+                                <img class="img-fluid" src="{{rootUrl}}/assets/img/brand.png">
+                            </div>
+	    					<div class="col-4 col-sm-12" ng-if="result[pageConfig.tabs[1].fields[1]]">
+		    					<img class="img-fluid vf-item-image" ng-src="{{result[pageConfig.tabs[0].fields[1]]}}">
+		    				</div>
+		    			</div>
+		    			<div class="row" ng-if="pageConfig.tabs[1].fields[1] != 'image'">
+	    					<p class="col" title="{{result[pageConfig.tabs[1].fields[1]]}}">{{result[pageConfig.tabs[1].fields[1]]}}{{result[pageConfig.tabs[1].fields[1]].length >= 20 ? '...' : ''}}</p>
+	    				</div>
+		    			<p class="col-12" title="{{result[pageConfig.tabs[1].fields[2]]}}">{{result[pageConfig.tabs[1].fields[2]]}}{{result[pageConfig.tabs[1].fields[2]].length >= 20 ? '...' : ''}}</p>
+		    			<p class="col-12" title="{{result[pageConfig.tabs[1].fields[3]]}}">{{result[pageConfig.tabs[1].fields[3]]}}{{result[pageConfig.tabs[1].fields[3]].length >= 20 ? '...' : ''}}</p>
+		    		</div>
+		    	</div>
+	    	</div>
+	    <!-- </div> -->
+    	</uib-tab>
+	<!-- </div> -->
+	</uib-tabset>
+	<div class="col text-center mt-2">
+		<button class="button " ng-if="pagination[tab].prev_page_url" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page - 1)">&lsaquo; Prev</button>
+		<button class="button " ng-if="pagination[tab].current_page - 2 > 0" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page - 2)">{{pagination[tab].current_page - 2}}</button>
+		<button class="button " ng-if="pagination[tab].current_page - 1 > 0" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page - 1)">{{pagination[tab].current_page - 1}}</button>
+		<button class="button " ng-disabled="true">{{pagination[tab].current_page}}</button>
+		<button class="button " ng-if="pagination[tab].current_page + 1 <= pagination[tab].last_page" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page + 1)">{{pagination[tab].current_page + 1}}</button>
+		<button class="button " ng-if="pagination[tab].current_page + 2 <= pagination[tab].last_page" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page + 2)">{{pagination[tab].current_page + 2}}</button>
+		<button class="button " ng-if="pagination[tab].next_page_url" ng-click="Search(pageConfig.tabs[tab].http.params.rpp, pagination[tab].current_page + 1)">Next &rsaquo;</button>
+	</div>
+</div>
+<div class="modal-footer">
+    <button class="button me-1" ng-click="Cancel()">{{optionCancel}}</button>
+    <button class="button button-primary" ng-click="Confirm()">{{optionConfirm}}</button>
+</div>

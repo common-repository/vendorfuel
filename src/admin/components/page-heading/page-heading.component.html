@@ -1,0 +1,15 @@
+<div class="mb-3 hstack align-items-baseline gap-2">
+	<h1>{{ $ctrl.heading }}</h1>
+	<a
+		ng-if="$ctrl.action"
+		class="btn btn-outline-primary btn-sm"
+		ng-href="{{ $ctrl.action.href }}"
+	>
+		{{ $ctrl.action.label )}
+	</a>
+	<ul class="nav ms-auto" ng-if="$ctrl.nav">
+		<li class="nav-item" ng-repeat="item in $ctrl.nav track by $index">
+			<a class="nav-link" ng-href="{{ item.href }}">{{ item.label }}</a>
+		</li>
+	</ul>
+</div>

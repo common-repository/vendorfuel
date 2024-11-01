@@ -1,0 +1,85 @@
+<layout-component heading="View review" breadcrumbs="$ctrl.breadcrumbs">
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<form name="form" ng-if="!$ctrl.isLoading">
+		<fieldset class="mb-3">
+			<legend>Review</legend>
+			<div class="row mb-3">
+				<div class="col-sm-2 col-form-label">
+					<strong> Status </strong>
+				</div>
+				<div class="col-sm-10">
+					<bs-badge label="$ctrl.review.status"> </bs-badge>
+				</div>
+			</div>
+			<div class="row mb-3">
+				<div class="col-sm-2 col-form-label">
+					<strong> Rating </strong>
+				</div>
+				<div class="col-sm-10">
+					<i
+						ng-class="['dashicons me-1', {
+						'dashicons-star-fill': value <= $ctrl.review.rating,
+						'dashicons-star-empty': value > $ctrl.review.rating,
+					}]"
+						ng-repeat="value in [1,2,3,4,5] track by $index"
+					>
+					</i>
+				</div>
+			</div>
+			<wp-form-field
+				label="Title"
+				field="$ctrl.review.title"
+				is-readonly="true"
+			>
+			</wp-form-field>
+			<wp-form-field
+				label="Content"
+				field="$ctrl.review.content"
+				input-type="textarea"
+				is-readonly="true"
+			>
+			</wp-form-field>
+			<small class="text-muted"
+				>Created {{ $ctrl.review.created_at | date : 'medium' }}.
+				Updated {{ $ctrl.review.updated_at | date : 'medium' }}.</small
+			>
+		</fieldset>
+		<fieldset class="mb-3">
+			<legend>Product</legend>
+			{{ $ctrl.review.product.description }}
+			<a
+				class="btn btn-outline-primary"
+				target="_blank"
+				ng-href="{{ $ctrl.productSlug }}/{{
+					$ctrl.review.product.slug
+				}}"
+			>
+				View on site
+			</a>
+		</fieldset>
+		<fieldset class="mb-3">
+			<legend>Reviewer</legend>
+			<wp-form-field
+				label="Name"
+				field="$ctrl.review.display_name"
+				is-readonly="true"
+			>
+			</wp-form-field>
+			<wp-form-field
+				label="Email"
+				field="$ctrl.review.email"
+				is-readonly="true"
+			>
+			</wp-form-field>
+		</fieldset>
+		<wp-button
+			on-click="$ctrl.approve()"
+			is-primary="true"
+			ng-if="$ctrl.review.status !== 'approved'"
+		>
+			Approve
+		</wp-button>
+		<wp-button on-delete="$ctrl.remove()">Delete</wp-button>
+	</form>
+</layout-component>

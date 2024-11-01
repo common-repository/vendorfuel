@@ -1,0 +1,322 @@
+<div class="modal-header justify-content-start align-items-center">
+  <h3 class="h5 modal-title text-capitalize me-2" id="modal-title">
+    {{ $ctrl.key }} Addresses
+  </h3>
+  <button class="button" ng-click="$ctrl.add()" ng-disabled="$ctrl.isAdding">
+    Add New
+  </button>
+</div>
+<div class="modal-body" id="modal-body">
+  <wp-spinner type="2x" ng-show="$ctrl.isLoading"> </wp-spinner>
+  <form ng-hide="$ctrl.isLoading || $ctrl.isAdding || $ctrl.isEditing">
+    <p class="search-box">
+      <label class="screen-reader-text" for="address-filter-input"
+        >Filter Addresses:</label
+      >
+      <input type="search" id="address-filter-input" ng-model="$ctrl.q" />
+      <input
+        type="submit"
+        id="search-submit"
+        class="button"
+        value="Filter Addresses"
+      />
+    </p>
+    <div class="tablenav top">
+      <div class="tablenav-pages">
+        <span class="displaying-num"> {{ $ctrl.addresses.length }} items </span>
+      </div>
+    </div>
+    <table class="wp-list-table widefat striped table-view-list">
+      <thead>
+        <tr>
+          <th scope="col">Profile Name</th>
+          <th scope="col">Recipient</th>
+          <th scope="col">Email</th>
+          <th scope="col">Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          ng-repeat="item in $ctrl.addresses | filter:$ctrl.q track by $index"
+        >
+          <td>
+            {{ item.billing_name ? item.billing_name : item.shipping_name ?
+            item.shipping_name : '&mdash;' }}
+          </td>
+          <td class="has-row-actions column-primary">
+            <strong ng-if="item.first_name || item.last_name">
+              {{ item.first_name }} {{ item.last_name }}<br />
+            </strong>
+            {{ item.address1 }}<br ng-if="item.address2" />
+            {{ item.address2 }}<br />
+            {{ item.city }}, {{ item.state }} {{ item.zip }}
+            <div class="row-actions">
+              <span class="edit">
+                <a href="#" ng-click="$ctrl.edit($event, item)"> Edit </a>
+              </span>
+              |
+              <span class="trash">
+                <a
+                  href="#"
+                  ng-click="$event.preventDefault(); $ctrl.isConfirmingDeletion[ $index ] = true"
+                  ng-hide="$ctrl.isConfirmingDeletion[ $index ]"
+                >
+                  Delete
+                </a>
+                <span ng-if="$ctrl.isConfirmingDeletion[ $index ]">
+                  <span class="text-muted">Delete this?</span>
+                  <a
+                    href="#"
+                    class="text-dark"
+                    ng-click="$event.preventDefault(); $ctrl.isConfirmingDeletion[ $index ] = false"
+                  >
+                    Cancel
+                  </a>
+                  |
+                  <a href="#" ng-click="$ctrl.trash($event, item)">
+                    <strong>
+                      {{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+                    </strong>
+                  </a>
+                </span>
+              </span>
+            </div>
+          </td>
+          <td>
+            <a ng-href="{{ 'mailto:' + item.email }}" ng-if="item.email">
+              {{ item.email }}
+            </a>
+            <span ng-if="!item.email"> &mdash; </span>
+          </td>
+          <td>
+            <span ng-if="item.phone"> {{ item.phone | tel }} </span>
+            <span ng-if="!item.phone"> &mdash; </span>
+          </td>
+        </tr>
+        <tr ng-if="!$ctrl.addresses.length">
+          <td colspan="4">No {{ $ctrl.key }} profiles created yet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+  <form
+    name="form"
+    ng-if="$ctrl.isAdding || $ctrl.isEditing"
+    ng-hide="$ctrl.isLoading"
+  >
+    <h4 class="h6 text-capitalize">
+      {{ $ctrl.isAdding ? 'Add' : 'Edit' }} {{ $ctrl.key }} Address
+    </h4>
+    <table class="form-table" role="presentation">
+      <tbody>
+        <tr>
+          <th>
+            <label class="form-label" for="profile"> Profile Name </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="profile"
+              name="profile"
+              type="text"
+              maxlength="250"
+              ng-model="$ctrl.address[ $ctrl.key + '_name' ]"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="first_name"> First Name </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="first_name"
+              name="first_name"
+              type="text"
+              autocomplete="given-name"
+              maxlength="250"
+              ng-model="$ctrl.address.first_name"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="last_name"> Last Name </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="last_name"
+              name="last_name"
+              type="text"
+              autocomplete="family-name"
+              ng-model="$ctrl.address.last_name"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="email"> Email </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              maxlength="250"
+              ng-model="$ctrl.address.email"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="phone">Phone</label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="phone"
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+              ng-model="$ctrl.address.phone"
+              ui-mask="(299) 999-9999"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="address1">
+              Street Address
+              <span class="description">(required)</span>
+            </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="address1"
+              name="address1"
+              type="text"
+              required
+              autocomplete="street-address"
+              maxlength="250"
+              ng-model="$ctrl.address.address1"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="address2"> Apt., Suite, etc. </label>
+          </th>
+          <td>
+            <input
+              class="regular-text"
+              id="address2"
+              name="address2"
+              type="text"
+              ng-model="$ctrl.address.address2"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="city">
+              City <span class="description">(required)</span>
+            </label>
+          </th>
+          <td>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              autocomplete="address-level2"
+              required
+              ng-model="$ctrl.address.city"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="state">
+              State <span class="description">(required)</span>
+            </label>
+          </th>
+          <td>
+            <select
+              name="state"
+              id="state"
+              required
+              ng-model="$ctrl.address.state"
+              ng-options="state.val as state.name for state in $ctrl.usStates"
+            >
+              <option value="" hidden disabled>Select a State</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label class="form-label" for="zip">
+              Zip <span class="description">(required)</span>
+            </label>
+          </th>
+          <td>
+            <input
+              id="zip"
+              name="zip"
+              type="text"
+              autocomplete="postal-code"
+              required
+              maxlength="10"
+              ng-model="$ctrl.address.zip"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+      <button
+        class="button button-primary"
+        ng-show="$ctrl.isAdding"
+        ng-click="$ctrl.create()"
+        ng-disabled="$ctrl.isCreating || form.$pristine || form.$invalid"
+      >
+        <wp-spinner type="loading" ng-show="$ctrl.isCreating"> </wp-spinner>
+        {{ $ctrl.isCreating ? 'Adding' : 'Add' }} New Address
+      </button>
+      <button
+        class="button button-primary"
+        ng-show="$ctrl.isEditing"
+        ng-click="$ctrl.update()"
+        ng-disabled="$ctrl.isUpdating || form.$pristine || form.$invalid"
+      >
+        <wp-spinner type="loading" ng-show="$ctrl.isUpdating"> </wp-spinner>
+        {{ $ctrl.isUpdating ? 'Updating' : 'Update' }} Address
+      </button>
+      <button
+        class="button button-delete ml-1"
+        ng-show="$ctrl.isEditing"
+        ng-click="$ctrl.trash($event, $ctrl.address)"
+        ng-disabled="$ctrl.isUpdating || $ctrl.isDeleting"
+      >
+        <wp-spinner type="loading" ng-show="$ctrl.isDeleting"> </wp-spinner>
+        {{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+      </button>
+      <button
+        class="button ml-1"
+        ng-show="$ctrl.isAdding || $ctrl.isEditing"
+        ng-click="$ctrl.cancel()"
+        ng-disabled="$ctrl.isCreating || $ctrl.isUpdating || $ctrl.isDeleting"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+<div class="modal-footer" ng-hide="$ctrl.isAdding || $ctrl.isEditing">
+  <button class="button button-primary" type="button" ng-click="$ctrl.ok()">
+    Close
+  </button>
+</div>

@@ -1,0 +1,189 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Parcels</h2>
+<vf-check-auth></vf-check-auth>
+
+<div class="container-fluid p-0" resize>
+	<div ng-if="isAuthed" class="col p-0">
+		<uib-tabset active="activeTab" resize>
+			<uib-tab index="0" select="TabChanged(0)" heading="Search">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div>
+
+                        <bs-search-box-legacy
+                            q="searchParams.q"
+                            on-submit="SearchParcels(1, query)"
+                            is-loading="loadingMore">
+                        </bs-search-box-legacy> 
+
+                        <hr class="col p-0" ng-if="isXS">
+                        <div class="row px-3">
+                            <div class="col-2" ng-click="SortIndex('id')">ID</div>
+                            <div class="col-2" ng-click="SortIndex('title')">Title</div>
+                            <div class="col-2" ng-click="SortIndex('length')">Length</div>
+                            <div class="col-2" ng-click="SortIndex('width')">Width</div>
+                            <div class="col-2" ng-click="SortIndex('height')">Height</div>
+                            <div class="col-2" ng-click="SortIndex('distance_unit')">Distance Unit</div>
+                        </div>
+                        <div class="p-3" ng-class="{'min-scroll':!isXS}">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="col p-3 vf-list-item cursor-pointer" ng-if="!loadingMore" ng-click="ChangeTab(2, $index)" ng-repeat="parcel in shippingParcels.data track by $index">
+                                <div class="row">
+                                    <div class="col-2">{{parcel.id}}</div>
+                                    <div class="col-2">{{parcel.title}}</div>
+                                    <div class="col-2">{{parcel.length}}</div>
+                                    <div class="col-2">{{parcel.width}}</div>
+                                    <div class="col-2">{{parcel.height}}</div>
+                                    <div class="col-2">{{parcel.distance_unit}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row  mb-3">
+                            <div class="col-sm-4">
+                                <span>Showing {{shippingParcels.from || 0}} to {{shippingParcels.to || 0}} of {{shippingParcels.total || 0}} entries<span>
+                            </div>
+                            <div class="col-sm-4 text-center mt-2">
+                                <button class="button" ng-if="shippingParcels.prev_page_url" ng-click="SearchParcels(shippingParcels.current_page - 1)">&lsaquo; Prev</button>
+                                <button class="button" ng-if="shippingParcels.current_page - 2 > 0" ng-click="SearchParcels(shippingParcels.current_page - 2)">{{shippingParcels.current_page - 2}}</button>
+                                <button class="button" ng-if="shippingParcels.current_page - 1 > 0" ng-click="SearchParcels(shippingParcels.current_page - 1)">{{shippingParcels.current_page - 1}}</button>
+                                <button class="button" ng-disabled="true">{{shippingParcels.current_page}}</button>
+                                <button class="button" ng-if="shippingParcels.current_page + 1 <= shippingParcels.last_page" ng-click="SearchParcels(shippingParcels.current_page + 1)">{{shippingParcels.current_page + 1}}</button>
+                                <button class="button" ng-if="shippingParcels.current_page + 2 <= shippingParcels.last_page" ng-click="SearchParcels(shippingParcels.current_page + 2)">{{shippingParcels.current_page + 2}}</button>
+                                <button class="button" ng-if="shippingParcels.next_page_url" ng-click="SearchParcels(shippingParcels.current_page + 1)">Next &rsaquo;</button>
+                            </div>
+                            <div class="col-sm-4  justify-content-end">
+                                <label for="rpp">Per Page: </label>
+                                <select class="form-control" style="display: inline-block;" id="rpp" ng-model="searchParams.rpp" ng-change="SearchParcels(1)" ng-options="value for value in rppValues">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Add">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>            
+                <div ng-if="!loading">
+                    <div class="row">
+                        <form class="m-auto" name="addParcelForm">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Title</span>
+                                <input class="form-control" type="text" name="name" placeholder="Title" ng-model="createParcel.title" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Length</span>
+                                <input class="form-control" type="text" name="length" placeholder="Length" ng-model="createParcel.length" 
+                                ng-class="{'is-invalid': updateParcelForm.length.$invalid}" pattern="[0-9]+" required />
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Width</span>
+                                <input class="form-control" type="text" name="width" placeholder="Width" ng-model="createParcel.width" 
+                                placeholder="Width" ng-model="selectedParcel.width" pattern="[0-9]+"
+                                required />
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Height</span>
+                                <input class="form-control" type="text" name="height" placeholder="Height" ng-model="createParcel.height"
+                                ng-class="{'is-invalid': updateParcelForm.width.$invalid}" pattern="[0-9]+" required />
+                            </div>
+                            <select class="form-control" name="distance_unit" ng-model="createParcel.distance_unit" ng-selected="createParcel.distance_unit" ng-options="key as value for (key, value) in distanceUnits" required></select>
+                            <button class="button button-primary" ng-click="CreateParcel()" ng-disabled="addParcelForm.$invalid">Create Parcel</button>
+                        </form>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="TabChanged(2)" ng-show="selectedParcel" heading="View">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div class="row">
+                        <form class="m-auto" name="updateParcelForm">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Title</span>
+                                <input class="form-control" type="text" name="name" placeholder="Title" ng-model="selectedParcel.title" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Length</span>
+                                <input class="form-control" type="text" name="length" placeholder="Length" ng-model="selectedParcel.length" 
+                                ng-class="{'is-invalid': updateParcelForm.length.$invalid}" pattern="[0-9]+" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text  w-130">Width</span>
+                                <input class="form-control" type="text"  ng-class="{'is-invalid': updateParcelForm.width.$invalid}" name="width" placeholder="Width" ng-model="selectedParcel.width" pattern="[0-9]+" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Height</span>
+                                <input class="form-control" type="text" name="height" placeholder="Height" ng-model="selectedParcel.height" ng-class="{'is-invalid': updateParcelForm.width.$invalid}" pattern="[0-9]+" required>
+                            </div>
+                            <select class="form-control" name="distance_unit" ng-model="selectedParcel.distance_unit" ng-selected="selectedParcel.distance_unit" ng-options="key as value for (key, value) in distanceUnits" required></select>
+                            <button class="button button-primary mt-3" ng-click="UpdateParcel()" ng-disabled="updateParcelForm.$invalid">Update Parcel</button>
+                            <wp-notice-list></wp-notice-list>
+                        </form>
+                    </div>                  
+                </div>
+            </uib-tab>
+            <uib-tab index="3" select="TabChanged(3)" heading="Gateways">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>            
+                    <div ng-if="!loading">
+                        <div class="row">
+                            <form class="m-auto" name="updateGateways">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text w-130">Shippo</span>
+                                    <input class="form-control" type="text" name="key" placeholder="Key" ng-model="gateways.shippo" required>
+                                </div>
+                                <button class="button button-primary" ng-click="UpdateGateways()" ng-disabled="updateGateways.$invalid">Update Gateway</button>
+                                <wp-notice-list></wp-notice-list>
+                            </form>
+                        </div>
+                    </div>
+            </uib-tab>
+            <uib-tab index="4" select="TabChanged(4)" heading="Warehouse">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+	                <div class="row">
+                        <form class="m-auto" name="updateWarehouseForm">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Street 1</span>
+                                <input class="form-control" type="text" name="s1" placeholder="Street 1" ng-model="warehouse.street1" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Street 2</span>
+                                <input class="form-control" type="text" name="s2" placeholder="Street 2" ng-model="warehouse.street2">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">City</span>
+                                <input class="form-control" type="text" name="city" placeholder="City" ng-model="warehouse.city" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">State</span>
+                                <input class="form-control" type="text" name="state" placeholder="State" ng-model="warehouse.state" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Zip</span>
+                                <input class="form-control" type="text" name="zip" placeholder="Zip" ng-model="warehouse.zip" required>
+                            </div>
+                            <button class="button button-primary" ng-click="UpdateWarehouse()" ng-disabled="updateWarehouseForm.$invalid">Update Warehouse</button>
+                            <wp-notice-list></wp-notice-list>
+                        </form>
+	                </div>
+	            </div>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

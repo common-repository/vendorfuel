@@ -1,0 +1,22 @@
+<div class="btn-group me-1" role="group" aria-label="View by">
+	<button
+		type="button"
+		class="btn btn-secondary"
+		title="View as grid"
+		ng-click="$ctrl.toggle($ctrl.viewAs)"
+		ng-class="{ active: $ctrl.viewAs === 'grid' }"
+	>
+		<i class="bi bi-grid-fill" aria-hidden="true"></i
+		><span class="d-none d-md-inline ms-1">Grid</span>
+	</button>
+	<button
+		type="button"
+		class="btn btn-secondary"
+		title="View as list"
+		ng-click="$ctrl.toggle($ctrl.viewAs)"
+		ng-class="{ active: $ctrl.viewAs === 'list' }"
+	>
+		<i class="bi bi-list-ul" aria-hidden="true"></i
+		><span class="d-none d-md-inline ms-1">List</span>
+	</button>
+</div>

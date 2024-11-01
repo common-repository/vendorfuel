@@ -1,0 +1,110 @@
+<div class="modal-header">
+  <h4><strong ng-bind="modalTitle"></strong></h4>
+  <button
+    class="button"
+    ng-click="editable = !editable"
+    title="Changes made here will be published globally for your site."
+  >
+    Edit
+  </button>
+</div>
+<div class="modal-body">
+  <p ng-bind="modalMessage"></p>
+
+  <div class="d-flex justify-content-center py-5" ng-show="loading">
+    <div class="spinner is-active" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="row p-3" ng-show="!loading">
+    <div class="col-sm-5">
+      <slick
+        dots="true"
+        slides-to-show="1"
+        infinite="true"
+        init-onload="true"
+        data="result"
+      >
+        <div class="text-center" ng-repeat="img in result.images">
+          <img
+            class="img-fluid"
+            style="display: inline-block !important"
+            ng-src="{{img.small_url}}"
+          />
+        </div>
+      </slick>
+    </div>
+    <div class="col-sm-7" ng-form name="form1">
+      <div class="col p-0">
+        <label class="form-label" for="desc">Name:</label>
+        <input
+          class="form-control"
+          id="desc"
+          name="desc"
+          ng-model="result.description"
+          ng-disabled="!editable"
+        />
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <label class="form-label" for="price-sheet">Price Sheet: </label>
+          <select
+            class="form-control"
+            id="price-sheet"
+            name="pricesheets"
+            ng-change="changePricesheet()"
+            ng-model="priceSheet"
+            ng-options="ps.pricesheetindex.price_sheet_id as ps.pricesheetindex.sheet for ps in result.pricesheets"
+            ng-disabled="!editable"
+          ></select>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="price">Price: </label>
+          <input
+            class="form-control"
+            id="price"
+            name="price"
+            ng-model="result.pricesheets[priceIndex].price"
+            ng-disabled="!editable"
+          />
+        </div>
+      </div>
+      <div class="col-12 p-0">
+        <div class="">
+          <label class="form-label" for="status">Status: </label>
+          <select
+            class="form-control"
+            id="status"
+            name="status"
+            ng-model="result.status"
+            ng-disabled="!editable"
+          >
+            <option value="active" ng-selected="result.status === 'active'">
+              Active
+            </option>
+            <option value="inactive" ng-selected="result.status === 'inactive'">
+              Inactive
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="col mt-3" ng-form name="form2">
+      <label class="form-label">Long Description</label>
+      <textarea
+        maxlength="65535"
+        class="form-control"
+        name="longd"
+        ng-model="result.long_description"
+        ng-disabled="!editable"
+      ></textarea>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="button me-1" ng-click="Cancel()">{{optionCancel}}</button>
+  <button class="button button-primary" ng-click="Confirm()">
+    {{optionConfirm}}
+  </button>
+</div>

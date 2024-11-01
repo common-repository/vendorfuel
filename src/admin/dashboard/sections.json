@@ -1,0 +1,67 @@
+[
+	{
+		"title": "Accounting",
+		"body": "Link store data to QuickBooks.",
+		"link": "?page=vf-accounting"
+	},
+	{
+		"title": "Admin Users",
+		"body": "Manage administrator user accounts.",
+		"link": "?page=vf-users"
+	},
+	{
+		"title": "Catalog",
+		"body": "Manage banners, products, categories, collections, manufacturers, price sheets, promo codes and reviews.",
+		"link": "?page=vf-catalog"
+	},
+	{
+		"title": "Customers",
+		"body": "Manage customer accounts, groups and roles.",
+		"link": "?page=vf-customers"
+	},
+	{
+		"title": "Email",
+		"body": "Manage email templates and SMTP settings.",
+		"link": "?page=vendorfuel#!/email"
+	},
+	{
+		"title": "Orders",
+		"body": "Manage orders and order tracking.",
+		"link": "?page=vendorfuel#!/orders"
+	},
+	{
+		"title": "Payments",
+		"body": "Manage payments via PayPal, Stripe, Square, Qualpay, AuthorizeNet and PayFabric.",
+		"link": "?page=vendorfuel#!/payments"
+	},
+	{
+		"title": "Punchout",
+		"body": "Manage punchout suppliers.",
+		"link": "?page=vf-punchout"
+	},
+	{
+		"title": "Purchasing",
+		"body": "Manage vendors, cost sheets and document profiles.",
+		"link": "?page=vf-purchasing"
+	},
+	{
+		"title": "Reports",
+		"body": "Manage, download and schedule reports.",
+		"link": "?page=vendorfuel#!/reports"
+	},
+	{
+		"title": "Settings",
+		"body": "Manage store, plugin and analytics settings.",
+		"link": "?page=vendorfuel#!/settings"
+	},
+	{
+		"title": "Shipping",
+		"body": "Manage shipping modes, rates and parcels.",
+		"link": "?page=vf-shipping"
+	},
+	{
+		"title": "Taxes",
+		"body": "Manage state taxes and connect with Avalara account.",
+		"link": "?page=vendorfuel#!/taxes"
+	}
+]

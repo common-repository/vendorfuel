@@ -1,0 +1,136 @@
+<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+<form name="settingsMappingform" ng-hide="$ctrl.isLoading">
+	<fieldset ng-disabled="$ctrl.isUpdating">
+		<legend>Page Link Mapping</legend>
+		<p>
+			VendorFuel uses special keys (e.g. account, cart) that are
+			dynamically mapped to pages in WordPress in order to handle various
+			e-commerce functions. If you want to have a key point to another
+			page, you can select a different page to be mapped to that
+			particular key and then click the Update button below.
+		</p>
+		<p>
+			Note: Updating these mapped pages will not affect your permalinks
+			settings. Also, you can update a mapped page's title and slug
+			without affecting the map.
+		</p>
+		<div
+			class="row g-2"
+			ng-repeat="(key, value) in $ctrl.map track by $index"
+		>
+			<div class="col mb-3">
+				<input
+					type="text"
+					class="form-control"
+					aria-label="Key"
+					ng-attr-id="{{ key }}"
+					ng-attr-name="{{ 'key' + $index }}"
+					ng-model="value.template"
+					ng-pattern="$ctrl.pattern"
+					required
+				/>
+				<div
+					class="form-text"
+					ng-if="settingsMappingform[ 'key' + $index ].$invalid"
+				>
+					Please enter a key name, using lowercase letters and no
+					spaces or special characters.
+				</div>
+			</div>
+			<div class="col">
+				<select
+					class="form-select"
+					aria-label="Default select example"
+					ng-model="value.url"
+					ng-attr-name="{{ 'template' + $index }}"
+					required
+				>
+					<option
+						ng-repeat="item in $ctrl.pages"
+						ng-value="item.url"
+						ng-if="item.title"
+					>
+						{{ item.title }}
+					</option>
+				</select>
+				<div
+					class="form-text"
+					ng-if="settingsMappingform[ 'template' + $index ].$invalid"
+				>
+					Please select a template to map to this key.
+				</div>
+			</div>
+		</div>
+	</fieldset>
+
+	<wp-button
+		is-disabled="settingsMappingform.$invalid"
+		is-primary="true"
+		on-click="$ctrl.update($ctrl.map)"
+		is-loading="$ctrl.isUpdating"
+	>
+		{{ $ctrl.isUpdating ? 'Updating' : 'Update' }}
+	</wp-button>
+	<button
+		type="button"
+		class="btn btn-outline-primary"
+		ng-click="$ctrl.isAddingKey = true"
+		ng-hide="$ctrl.isAddingKey"
+	>
+		Add New Key
+	</button>
+</form>
+
+<form class="mt-3" name="newKeyForm" ng-if="$ctrl.isAddingKey">
+	<fieldset>
+		<legend>New Template Key</legend>
+		<div class="row g-2">
+			<div class="col mb-3">
+				<input
+					type="text"
+					class="form-control"
+					aria-label="Key"
+					id="key"
+					name="key"
+					ng-model="$ctrl.newKey.key"
+					ng-pattern="$ctrl.pattern"
+					required
+				/>
+				<div class="form-text" ng-if="newKeyForm.key.$invalid">
+					Please enter a key name, using lowercase letters and no
+					spaces or special characters.
+				</div>
+			</div>
+			<div class="col">
+				<select
+					class="form-select"
+					aria-label="Page"
+					ng-model="$ctrl.newKey.value"
+					name="value"
+					required
+				>
+					<option
+						ng-repeat="item in $ctrl.pages"
+						ng-value="item"
+						ng-if="item.title"
+					>
+						{{ item.title }}
+					</option>
+				</select>
+				<div class="form-text" ng-if="newKeyForm.value.$invalid">
+					Please select a template to map to this key.
+				</div>
+			</div>
+			<div class="col-auto">
+				<button
+					class="btn btn-primary"
+					ng-disabled="newKeyForm.$invalid"
+					ng-click="$ctrl.addKey( $ctrl.newKey.key, $ctrl.newKey.value )"
+				>
+					Save
+				</button>
+			</div>
+		</div>
+	</fieldset>
+</form>

@@ -1,0 +1,69 @@
+<div class="col-12 col-md-5 col-lg-4 mx-auto">
+  <h3 class="mt-0 mb-3">Billing Sign In</h3>
+  <div class="my-0">
+    <form class="form-signin">
+      <label for="inputEmail" class="visually-hidden">Email address</label>
+      <input
+        type="email"
+        id="inputEmail"
+        ng-model="user.loginEmail"
+        class="form-control mb-3"
+        placeholder="Email address"
+        ng-pattern='/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'
+        required
+        autofocus
+      />
+      <label for="inputPassword" class="visually-hidden">Password</label>
+      <div class="input-group mb-3">
+        <input
+          class="form-control"
+          type="password"
+          id="inputPassword"
+          ng-model="user.loginPassword"
+          ng-attr-type="{{ showPassword ? 'text':'password'}}"
+          placeholder="Password"
+          required
+        />
+        <button
+          ng-click="ToggleShowPassword('password')"
+          class="button"
+          type="button"
+        >
+          <span
+            ng-class="showPassword ? 'dashicons dashicons-visibility' : 'dashicons dashicons-hidden'"
+          ></span>
+        </button>
+      </div>
+      <button
+        class="col-12 button button-primary mb-3"
+        ng-if="!loggingIn"
+        ng-click="Login()"
+      >
+        Submit
+      </button>
+      <div class="mt-2">
+        <a
+          style="color: #323232; text-transform: underline"
+          ui-sref="billing-reset-password"
+          ng-if="!loggingIn"
+          >Forgot Password? <b>Click Here</b></a
+        >
+      </div>
+
+      <div class="d-flex align-items-center" ng-if="loggingIn">
+        <strong>Submitting, please wait...</strong>
+        <div
+          class="spinner is-active ml-auto"
+          role="status"
+          aria-hidden="true"
+        ></div>
+      </div>
+    </form>
+    <div
+      class="col mb-3 alert alert-danger"
+      ng-repeat="error in tenant.LoginErrors()"
+    >
+      <strong>Error:</strong> {{error}}
+    </div>
+  </div>
+</div>

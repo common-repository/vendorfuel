@@ -1,0 +1,243 @@
+<div class="modal-header">
+	<h4><strong>Shipments</strong></h4>
+</div>
+<div class="modal-body">
+	<spinner-component ng-if="loading"></spinner-component>
+
+	<div class="ordersForm" ng-form name="shipmentForm" ng-if="!loading">
+		<div class="mb-3">
+			<label class="form-label">Order ID</label>
+			<input
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.id.$invalid}"
+				name="id"
+				type="text"
+				ng-model="shipment.order_id"
+				disabled
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="ship_date" class="form-label">Ship Date</label>
+			<input
+				id="ship_date"
+				name="ship_date"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.ship_date.$invalid}"
+				type="text"
+				placeholder="yyyy/mm/dd"
+				ng-model="shipment.shipment_date"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="del_date" class="form-label">Delivery Date</label>
+			<input
+				id="del_date"
+				name="del_date"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.del_date.$invalid}"
+				type="text"
+				placeholder="yyyy/mm/dd"
+				ng-model="shipment.delivery_date"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="ship_id" class="form-label">Shipment ID</label>
+			<input
+				id="ship_id"
+				name="ship_id"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.ship_id.$invalid}"
+				type="text"
+				ng-model="shipment.supplier_shipment_id"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="carrier" class="form-label">Carrier</label>
+			<input
+				id="carrier"
+				name="carrier"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.carrier.$invalid}"
+				type="text"
+				ng-model="shipment.carrier"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="scac" class="form-label"
+				><abbr title="Standard Carrier Alpha Code">SCAC</abbr></label
+			>
+			<input
+				id="scac"
+				name="scac"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.scac.$invalid}"
+				type="text"
+				ng-model="shipment.carrier_scac"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="method" class="form-label">Method</label>
+			<input
+				id="method"
+				name="method"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.method.$invalid}"
+				type="text"
+				ng-model="shipment.method"
+				disabled
+			/>
+			<button class="btn btn-outline-primary">Edit</button>
+		</div>
+		<div class="mb-3">
+			<label for="name" class="form-label">Name</label>
+			<input
+				id="name"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.name.$invalid}"
+				name="name"
+				type="text"
+				ng-model="shipment.name"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="street" class="form-label">Street</label>
+			<input
+				id="street"
+				name="street"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.street.$invalid}"
+				type="text"
+				ng-model="shipment.street"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="city" class="form-label">City</label>
+			<input
+				id="city"
+				name="city"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.city.$invalid}"
+				type="text"
+				ng-model="shipment.city"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label class="form-label" for="state">State</label>
+			<select
+				class="form-select"
+				ng-class="{'is-invalid':shipmentForm.state.$invalid}"
+				name="state"
+				id="state"
+				ng-options="state.val as state.name for state in states"
+				ng-model="shipment.state"
+				required
+			>
+				<option value="" hidden disabled>Select a State</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label class="form-label" for="country">Country</label>
+			<select
+				class="form-select"
+				ng-class="{'is-invalid':shipmentForm.country.$invalid}"
+				name="country"
+				id="country"
+				ng-options="country.val as country.name for country in countries"
+				ng-model="shipment.country"
+				required
+			>
+				<option value="" disabled hidden>Select a Country</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label for="phoneCode" class="form-label">Country Phone</label>
+			<input
+				id="phoneCode"
+				name="phoneCode"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.phoneCode.$invalid}"
+				type="text"
+				ng-model="shipment.country_phone_code"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="area" class="form-label">Area Code</label>
+			<input
+				id="area"
+				name="area"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.area.$invalid}"
+				type="text"
+				ng-model="shipment.area_code"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="postal" class="form-label">Postal Code</label>
+			<input
+				id="postal"
+				name="postal"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.postal.$invalid}"
+				type="text"
+				ng-model="shipment.postal_code"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="comments" class="form-label">Comments</label>
+			<input
+				id="comments"
+				name="comments"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.comments.$invalid}"
+				type="text"
+				ng-model="shipment.comments"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="phone" class="form-label">Phone</label>
+			<input
+				id="phone"
+				name="phone"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.phone.$invalid}"
+				type="text"
+				ng-model="shipment.phone"
+				required
+			/>
+		</div>
+		<div class="mb-3">
+			<label for="code" class="form-label">Code</label>
+			<input
+				id="code"
+				name="code"
+				class="form-control"
+				ng-class="{'is-invalid':shipmentForm.code.$invalid}"
+				type="text"
+				ng-model="shipment.code"
+				required
+			/>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-outline-primary" ng-click="Cancel()">Cancel</button>
+	<button
+		class="btn btn-primary"
+		ng-click="Confirm()"
+		ng-disabled="shipmentForm.$invalid"
+	>
+		Save Shipment
+	</button>
+</div>

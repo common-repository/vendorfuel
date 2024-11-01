@@ -1,0 +1,155 @@
+<h4>Punchout</h4>
+<form name="punchoutForm">
+  <fieldset ng-disabled="$ctrl.isUpdating">
+    <div class="form-check mb-3">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="punchout_only"
+        ng-model="$ctrl.customer.punchout_only"
+        ng-change="$ctrl.onChange({ key: 'punchout_only', value: $ctrl.customer.punchout_only })"
+      />
+      <label for="punchout_only" class="form-check-label">
+        Enable punchout
+      </label>
+      <div class="form-text">
+        Allows the customer to punchout to a partner or supplier.
+      </div>
+    </div>
+    <div ng-if="$ctrl.customer.punchout_only">
+      <div class="notice notice-info" ng-if="!$ctrl.customer.id">
+        <p>Please save your customer to attach any punchout suppliers.</p>
+      </div>
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="mixed_punchout"
+          ng-model="$ctrl.customer.mixed_punchout"
+          ng-change="$ctrl.onChange({ key: 'mixed_punchout', value: $ctrl.customer.mixed_punchout })"
+        />
+        <label class="form-check-label" for="mixed_punchout">
+          Enable mixed punchout
+        </label>
+        <div class="form-text">
+          Allow user to see both Punchout and non-Punchout catalogs.
+        </div>
+      </div>
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="price_availability"
+          ng-model="$ctrl.customer.price_availability"
+          ng-change="$ctrl.onChange({ key: 'price_availability', value: $ctrl.customer.price_availability })"
+        />
+        <label class="form-check-label" for="price_availability">
+          Enable price availability check
+        </label>
+        <div class="form-text">
+          Performs a price and availability check on Punchout items during
+          Checkout process.
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="punchin_identity">Punchin identity</label>
+      <input
+        class="form-control"
+        type="text"
+        id="punchin_identity"
+        ng-model="$ctrl.customer.punchin_identity"
+        ng-change="$ctrl.onChange({ key: 'punchin_identity', value: $ctrl.customer.punchin_identity })"
+      />
+      <div class="form-text">
+        Define an identity for this customer to punch in to your catalog.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="punchin_secret">Punchin secret</label>
+      <input
+        class="form-control"
+        type="text"
+        id="punchin_secret"
+        ng-model="$ctrl.customer.punchin_secret"
+        ng-change="$ctrl.onChange({ key: 'punchin_secret', value: $ctrl.customer.punchin_secret })"
+      />
+      <div class="form-text">
+        Define an identity secret for this customer to punch in to your catalog.
+      </div>
+    </div>
+  </fieldset>
+</form>
+
+<div
+  class="mt-3"
+  ng-if="$ctrl.availableSuppliers.length || $ctrl.customer.punchout_suppliers.length"
+>
+  <h5>Punchout Suppliers</h5>
+  <table
+    class="table caption-top"
+    ng-if="$ctrl.customer.punchout_suppliers.length"
+  >
+    <caption>
+      Attached Suppliers
+    </caption>
+    <tbody>
+      <tr
+        class="align-center"
+        ng-repeat="supplier in $ctrl.customer.punchout_suppliers track by $index"
+      >
+        <td class="col-sm-3">
+          <img
+            class="img-fluid"
+            ng-attr-alt="{{ supplier.name }}"
+            ng-if="supplier.logo"
+            ng-src="{{ supplier.logo }}"
+          />
+        </td>
+        <td class="col-sm-4 align-bottom">
+          <span>{{ supplier.name }}</span>
+        </td>
+        <td class="col-sm-4 text-end">
+          <wp-button
+            on-click="$ctrl.detachSupplier(supplier.id)"
+            is-loading="$ctrl.isDetaching[supplier.id]"
+            >{{ $ctrl.isDetaching[supplier.id] ? 'Detaching' : 'Detach'
+            }}</wp-button
+          >
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table caption-top" ng-if="$ctrl.availableSuppliers.length">
+    <caption>
+      Available Suppliers
+    </caption>
+    <tbody>
+      <tr
+        class="align-center"
+        ng-repeat="supplier in $ctrl.availableSuppliers track by $index"
+      >
+        <td class="col-sm-3">
+          <img
+            class="img-fluid"
+            ng-attr-alt="{{ supplier.name }}"
+            ng-if="supplier.logo"
+            ng-src="{{ supplier.logo }}"
+          />
+        </td>
+        <td class="col align-bottom">
+          <span>{{ supplier.name }}</span>
+        </td>
+        <td class="col-auto text-end">
+          <wp-button
+            on-click="$ctrl.attachSupplier( supplier.id )"
+            is-loading="$ctrl.isAttaching[ supplier.id ]"
+            >{{ $ctrl.isAttaching[ supplier.id ] ? 'Attaching' : 'Attach'
+            }}</wp-button
+          >
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,303 @@
+<h2 class="wp-heading-inline">Reports</h2>
+<vf-check-auth></vf-check-auth>
+
+<div class="col-xs-12 p-0">
+    <div ng-if="isAuthed" class="col-xs-12 p-0">
+        <uib-tabset active="activeTab" resize>
+            <uib-tab index="0" select="TabChanged(0)" heading="Reports">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-show="!loading">
+                    <form name="newReport" class="row">
+                        <div class="col-12 col-lg-6">
+                            <div class="input-group w-100  mb-3">
+                                <span class="input-group-text w-130">Saved Reports</span>
+                                <select class="form-control" id="savedReports" ng-model="selectedReport"
+                                    ng-options="x.name for x in savedReports" ng-change="AssignReport(selectedReport)"
+                                    ng-disabled="savedReports.length <= 0">
+                                    <option value="" hidden disabled ng-selected="clear">{{savedReports.length >= 1 ?
+                                        'Select Report' : 'No Saved Reports'}}</option>
+                                </select>
+                                <button class="button button-primary" id="updateBtn"
+                                    ng-click="UpdateReport(selectedReport)"
+                                    ng-disabled="!selectedReport">Update</button>
+                            </div>
+                            <div class="input-group w-100  mb-3">
+                                <span class="input-group-text w-130">Table</span>
+                                <select class="form-control" name="tables"
+                                    ng-class="{'is-invalid':newReport.tables.$invalid}"
+                                    ng-model="selectedParams['tables'][0]" ng-options="x as x for (x, y) in storeTables"
+                                    ng-change="UpdateColumns(selectedParams['tables'][0], '{{selectedParams['tables'][0]}}')"
+                                    required>
+                                    <option value="" hidden disabled>Select Table</option>
+                                </select>
+                            </div>
+                            <div class="input-group w-100 mb-3" ng-if="selectedParams['tables'][0].length">
+                                <span class="input-group-text w-130">Headers</span>
+                                <select multiple class="form-control"
+                                    ng-class="{'is-invalid':newReport.headers.$invalid , 'h-100': isSM || isXS}"
+                                    name="headers" ng-model="selectedParams['headers']"
+                                    ng-options="x.value as x.name group by x.table for x in allColumns" required>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3" ng-show="selectedParams['headers'].length >= 1">
+                                <span class="input-group-text w-130">Sort By Header</span>
+                                <select class="form-control"
+                                    ng-class="{'is-invalid':newReport.selectedHeader.$invalid}" name="selectedHeader"
+                                    ng-model="selectedParams.order"
+                                    ng-options="x.value as x.name group by x.table for x in allColumns"
+                                    ng-required="selectedParams['headers'].length >= 1">
+                                    <option value="" hidden disabled>Select Table</option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Asc/Desc</span>
+                                <select class="form-control" ng-model="selectedParams.direction">
+                                    <option value="asc">Ascending</option>
+                                    <option value="desc">Descending</option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-130">Report Name</span>
+                                <input class="form-control" name="reportName" id="report-name"
+                                    placeholder="'New User Report 1-1-19'" ng-model="selectedParams.name" />
+                                <button class="button button-primary" id="saveBtn"
+                                    title="{{!selectedParams.name.length ? 'Please add a name for the report.' : 'Save the report in order to run it at a later date/time.'}}"
+                                    ng-disabled="!selectedParams.name.length" ng-click="SaveReport()">Save</button>
+                                <button class="button" id="downloadBtn"
+                                    title="{{!selectedParams.name.length ? 'Please add a name for the report.' : 'Download the report to the downloads tab.'}}"
+                                    ng-disabled="!selectedParams.name.length"
+                                    ng-click="DownloadReport()">Download</button>
+                            </div>
+                            <button class="button button-primary"
+                                id="runBtn" ng-click="RunReport(per_page, 1)" ng-disabled="newReport.$invalid">
+                                Run Report
+                            </button>
+                            <button class="button"
+                                ng-click="ClearReport()">
+                                Reset
+                            </button>
+                            <button class="button button-delete" id="deleteBtn" 
+                                ng-if="selectedReport"
+                                ng-click="DeleteReport(selectedReport)">
+                                Delete Report
+                            </button>
+                        </div>
+                        <div class="col-12 col-lg-6" ng-class="{'mb-3':isSM}">
+                            <div class=" mb-3">
+                                <button class="button"
+                                    ng-click="AddJoinRow()"
+                                    ng-disabled="newReport.tables.$invalid || newReport.headers.$invalid">
+                                    Add Join
+                                </button>
+                                <button class="button"
+                                    ng-click="AddFilterRow()"
+                                    ng-disabled="newReport.tables.$invalid || newReport.headers.$invalid">
+                                    Add Filter
+                                </button>
+                            </div>
+                            <div style="max-height:150px; overflow:auto">
+                                <div class="input-group mb-3"
+                                    ng-repeat="row in selectedParams['joinTable'] track by $index">
+                                    <select class="form-control" ng-model="selectedParams['joinTable'][$index]"
+                                        ng-options="x as x for (x, y) in allTables"
+                                        ng-change="UpdateColumns(selectedParams['joinTable'][$index], '{{selectedParams['joinTable'][$index]}}')">
+                                    </select>
+                                    <select class="form-control" ng-model="selectedParams['joinSelect'][$index]"
+                                        ng-options="y.value as y.name for (x, y) in allTables[selectedParams['joinTable'][$index]]">
+                                    </select>
+                                    <span class="input-group-text"
+                                        ng-model="selectedParams['joinTerm'][$index]">Equals (=)
+                                    </span>
+                                    <select class="form-control" ng-model="selectedParams['joinValue'][$index]"
+                                        ng-options="x.value as x.value group by x.table for x in allColumns"></select>
+                                    <select class="form-control" ng-model="selectedParams['joinType'][$index]"
+                                        ng-options="x as y for (x, y) in joinTypes"></select>
+                                    <button class="button button-delete"
+                                        ng-click="RemoveJoin($index)">Remove</button>
+                                </div>
+                            </div>
+                            <div style="max-height:200px; overflow:auto">
+                                <div class="input-group py-3 "
+                                    ng-repeat="row in selectedParams['filterSelect'] track by $index">
+                                    <div class="row">
+                                        <div class="col-12 input-group">
+                                            <select class="form-control" ng-class="{'h-100':isXS || isSM}"
+                                                ng-if="$index != 0"
+                                                ng-model="selectedParams['filterOperator'][$index]"
+                                                ng-options="x for x in filterOperators">
+                                            </select>
+                                            <select class="form-control" ng-class="{'h-100':isXS || isSM}"
+                                                ng-model="selectedParams['filterSelect'][$index]"
+                                                ng-options="x.value as x.value group by x.table for x in allColumns"
+                                                required>
+                                            </select>
+                                            <select class="form-control" ng-class="{'h-100':isXS || isSM}"
+                                                ng-model="selectedParams['filterTerm'][$index]"
+                                                ng-options="x for x in comparators" required></select>
+                                        </div>
+                                        <div class="col-12 input-group">
+                                            <input class="form-control" type="text" placeholder="Filter Terms"
+                                                ng-model="selectedParams['filterValue'][$index]" required>
+                                            <button class="button button-delete"
+                                                ng-click="RemoveFilter($index)">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <wp-spinner
+                        type="2x"
+                        ng-show="reportLoading">
+                    </wp-spinner>                    
+                    <div class="col-12 my-3" ng-if="reportData.data.length <= 0 && reportRan">
+                        <div class="text-center" ng-if="!reportLoading">
+                            <span class="col m-auto">
+                                <h3>No Results found.</h3>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12 my-3" ng-if="reportData.data.length >= 1 && reportRan">
+                        <div style="overflow: auto;">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="reportLoading">
+                            </wp-spinner>                    
+                            <table ng-if="!reportLoading" class="table table-striped table-fixed">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="padding: 10px;" ng-repeat="th in reportHeaders">{{th}}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="data in reportData.data">
+                                        <td scope="row" class="padding: 10px;" ng-repeat="(x, y) in data">
+                                            {{y ? y : '----'}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-if="reportData.data">
+                            <div class="row  mb-3">
+                                <div class="col-sm-4">
+                                    <span>Showing {{reportData.from || 0}} to {{reportData.to || 0}} of
+                                        {{reportData.total || 0}} entries<span>
+                                </div>
+                                <div class="col-sm-4 text-center mt-2">
+                                    <button class="button" ng-if="reportData.prev_page_url"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page - 1)">&lsaquo;> Prev</button>
+                                    <button class="button" ng-if="reportData.current_page - 2 > 0"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page - 2)">{{reportData.current_page
+                                        - 2}}</button>
+                                    <button class="button" ng-if="reportData.current_page - 1 > 0"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page - 1)">{{reportData.current_page
+                                        - 1}}</button>
+                                    <button class="button"
+                                        ng-disabled="true">{{reportData.current_page}}</button>
+                                    <button class="button"
+                                        ng-if="reportData.current_page + 1 <= reportData.last_page"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page + 1)">{{reportData.current_page
+                                        + 1}}</button>
+                                    <button class="button"
+                                        ng-if="reportData.current_page + 2 <= reportData.last_page"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page + 2)">{{reportData.current_page
+                                        + 2}}</button>
+                                    <button class="button" ng-if="reportData.next_page_url"
+                                        ng-click="RunReport(reportData.per_page, reportData.current_page + 1)">Next
+                                        &rsaquo;</button>
+                                </div>
+                                <div class="col-sm-4  justify-content-end">
+                                    <label for="rpp">Per Page: </label>
+                                    <select class="form-control" style="display: inline-block;" id="rpp"
+                                        ng-model="per_page" ng-change="RunReport(per_page, 1)"
+                                        ng-options="value for value in rppValues">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Report Downloads">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>                    
+                <div ng-if="!loading">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">File name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="min-scroll" ng-repeat="x in downloads" ng-click="Download(x.id)">
+                                <td scope="row">{{x.id}}</td>
+                                <td scope="row">{{x.filename}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="TabChanged(2)" heading="Schedule">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>                    
+                <div ng-if="!loading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Report</th>
+                                        <th>Scheduled</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-model="scheduleReports.id[$index]"
+                                        ng-class="{ 'selectedRow': x.id == selectedId }"
+                                        ng-repeat="x in savedReports track by $index"
+                                        ng-click="UpdateScheduleModel($index)">
+                                        <td>{{x.id}}</td>
+                                        <td>{{x.name}}</td>
+                                        <td>{{x.frequency ? frequencies[x.frequency] : '---------'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="radio" ng-repeat="(key, value) in frequencies">
+                                <label>
+                                    <input ng-model="scheduleReports.frequency[scheduleReports.selectedIndex]"
+                                        type="radio" value={{key}}>{{value}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-2">
+                            <button class="button button-primary" ng-click="UpdateSchedules()">
+                                Update
+                            </button>
+                            <button class="button" ng-click="TabChanged(2)">Reset</button>
+                            <div ng-if="scheduleSaveSuccessful" class="alert alert-success">
+                                <strong>Report(s) Saved!</strong>
+                            </div>
+                            <div ng-if="scheduleSaveError" class="alert alert-danger">
+                                <strong>An error occured.</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

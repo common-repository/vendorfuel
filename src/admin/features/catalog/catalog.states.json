@@ -1,0 +1,248 @@
+[
+	{
+		"name": "catalog",
+		"url": "/catalog",
+		"abstract": true
+	},
+	{
+		"name": "catalog.page",
+		"url": "",
+		"component": "catalogPage"
+	},
+	{
+		"name": "catalog.banners",
+		"url": "/banners",
+		"abstract": true
+	},
+	{
+		"name": "catalog.banners.index",
+		"url": "/:activeTab",
+		"component": "bannersIndex",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	},
+	{
+		"name": "catalog.categories",
+		"url": "/categories",
+		"abstract": true
+	},
+	{
+		"name": "catalog.categories.index",
+		"url": "",
+		"component": "categoriesIndex"
+	},
+	{
+		"name": "catalog.categories.create",
+		"url": "/create",
+		"component": "categoryCreate"
+	},
+	{
+		"name": "catalog.categories.edit",
+		"url": "/:id",
+		"component": "categoryEdit"
+	},
+	{
+		"name": "catalog.categories.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "catalog.categories.uploads.index",
+		"url": "",
+		"component": "categoryUploadsIndex"
+	},
+	{
+		"name": "catalog.categories.uploads.show",
+		"url": "/:id",
+		"component": "categoryUploadShow"
+	},
+	{
+		"name": "catalog.categories.uploads.create",
+		"url": "/create",
+		"component": "categoryUploadCreate"
+	},
+	{
+		"name": "catalog.categories.tree",
+		"url": "/tree",
+		"abstract": true
+	},
+	{
+		"name": "catalog.categories.tree.index",
+		"url": "",
+		"component": "categoryTreeIndex"
+	},
+	{
+		"name": "catalog.categories.tree.create",
+		"url": "/create",
+		"component": "categoryTreeCreate"
+	},
+	{
+		"name": "catalog.categories.tree.show",
+		"url": "/:id",
+		"component": "categoryTreeShow"
+	},
+	{
+		"name": "catalog.categories.utilities",
+		"url": "/utilities",
+		"component": "categoriesUtilities"
+	},
+	{
+		"name": "catalog.products",
+		"url": "/products",
+		"abstract": true
+	},
+	{
+		"name": "catalog.products.index",
+		"url": "",
+		"component": "productsIndex"
+	},
+	{
+		"name": "catalog.products.edit",
+		"url": "/:id",
+		"component": "productEdit"
+	},
+	{
+		"name": "catalog.products.create",
+		"url": "/create",
+		"component": "productCreate"
+	},
+	{
+		"name": "catalog.products.utilities",
+		"url": "/utilities",
+		"component": "productUtilities"
+	},
+	{
+		"name": "catalog.products.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "catalog.products.uploads.index",
+		"url": "",
+		"component": "productUploadsIndex"
+	},
+	{
+		"name": "catalog.products.uploads.show",
+		"url": "/:id",
+		"component": "productUploadShow"
+	},
+	{
+		"name": "catalog.products.uploads.create",
+		"url": "/create",
+		"component": "productUploadCreate"
+	},
+	{
+		"name": "catalog.products.reviews",
+		"url": "/reviews",
+		"abstract": true,
+		"template": "<ui-view/>"
+	},
+	{
+		"name": "catalog.products.reviews.index",
+		"url": "",
+		"component": "reviewsIndex"
+	},
+	{
+		"name": "catalog.products.reviews.show",
+		"url": "/:id",
+		"component": "reviewsEdit"
+	},
+	{
+		"name": "catalog.collections",
+		"url": "/collections",
+		"abstract": true
+	},
+	{
+		"name": "catalog.collections.index",
+		"url": "",
+		"component": "collectionsIndex"
+	},
+	{
+		"name": "catalog.collections.create",
+		"url": "/create",
+		"component": "collectionCreate"
+	},
+	{
+		"name": "catalog.collections.edit",
+		"url": "/:id",
+		"component": "collectionEdit"
+	},
+	{
+		"name": "catalog.manufacturers",
+		"url": "/manufacturers",
+		"abstract": true
+	},
+	{
+		"name": "catalog.manufacturers.index",
+		"url": "",
+		"component": "manufacturersIndex"
+	},
+	{
+		"name": "catalog.manufacturers.create",
+		"url": "/create",
+		"component": "manufacturerEdit"
+	},
+	{
+		"name": "catalog.manufacturers.show",
+		"url": "/:id",
+		"component": "manufacturerEdit"
+	},
+	{
+		"name": "catalog.pricesheets",
+		"url": "/pricesheets",
+		"abstract": true
+	},
+	{
+		"name": "catalog.pricesheets.index",
+		"url": "",
+		"component": "pricesheetsIndex"
+	},
+	{
+		"name": "catalog.pricesheets.edit",
+		"url": "/:id",
+		"component": "pricesheetEdit"
+	},
+	{
+		"name": "catalog.pricesheets.create",
+		"url": "/create",
+		"component": "pricesheetCreate"
+	},
+	{
+		"name": "catalog.pricesheets.uploads",
+		"url": "/uploads",
+		"abstract": true
+	},
+	{
+		"name": "catalog.pricesheets.uploads.index",
+		"url": "",
+		"component": "pricesheetUploadsIndex"
+	},
+	{
+		"name": "catalog.pricesheets.uploads.show",
+		"url": "/:id",
+		"component": "pricesheetUploadShow"
+	},
+	{
+		"name": "catalog.pricesheets.uploads.create",
+		"url": "/create",
+		"component": "pricesheetUploadCreate"
+	},
+	{
+		"name": "catalog.promo-codes",
+		"url": "/promo-codes",
+		"abstract": true
+	},
+	{
+		"name": "catalog.promo-codes.index",
+		"url": "/:activeTab",
+		"component": "promoCodesIndex",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	}
+]

@@ -1,0 +1,44 @@
+<vf-spinner text="{{ $ctrl.loadingText }}" ng-show="$ctrl.isLoading">
+</vf-spinner>
+
+<welcome-shipping-address
+	ng-if="$ctrl.hasNoShippingProfiles"
+	on-change="$ctrl.getSuppliers()"
+>
+</welcome-shipping-address>
+
+<p
+	class="has-text-align-center has-medium-font-size"
+	ng-if="$ctrl.suppliers.length"
+>
+	Our valued available trading partners:
+</p>
+
+<div
+	class="d-flex flex-column"
+	ng-repeat="supplier in $ctrl.suppliers"
+	ng-hide="$ctrl.isLoading"
+>
+	<button
+		class="btn btn-lg p-3 border shadow-sm"
+		ng-attr-title="{{supplier.name}}"
+		ng-click="$ctrl.punchoutToPartner(supplier.id)"
+	>
+		<span
+			class="spinner-border spinner-border-sm"
+			role="status"
+			aria-hidden="true"
+			ng-if="$ctrl.isLoadingPunchout"
+		>
+		</span>
+		{{ !supplier.logo ? supplier.name : '' }}
+		<img
+			class="img-fluid center-block lazy"
+			loading="lazy"
+			ng-if="supplier.logo"
+			ng-src="{{ supplier.logo }}"
+		/>
+		<br />
+		<span class="small">Shop business supplies here</span>
+	</button>
+</div>

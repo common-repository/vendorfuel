@@ -1,0 +1,647 @@
+<layout-component heading="Promo codes" breadcrumbs="$ctrl.breadcrumbs">
+	<uib-tabset active="activeTab">
+		<uib-tab index="0" select="TabChanged(0)" heading="Promo codes">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-if="!loading">
+
+				<bs-search-box-legacy
+					q="$ctrl.searchParams.q"
+					on-submit="$ctrl.setQuery(query)"
+					is-loading="loadingMore">
+				</bs-search-box-legacy>
+
+				<table class="table">
+					<thead>
+						<tr>
+							<th class="col-1">
+								<a href="#" class="text-decoration-none" title="Sort by ID"
+									ng-click="$ctrl.changeSortBy('id', $event)">
+									ID
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.searchParams.orderBy === 'id'">
+									</i>
+								</a>
+							</th>
+							<th class="col-3">
+								<a href="#" class="text-decoration-none" title="Sort by code"
+									ng-click="$ctrl.changeSortBy('code', $event)">
+									Promo code
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.searchParams.orderBy === 'code'">
+									</i>
+								</a>
+							</th>
+							<th class="col-5">
+								<a href="#" class="text-decoration-none" title="Sort by email"
+									ng-click="$ctrl.changeSortBy('email', $event)">
+									Email
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.searchParams.orderBy === 'email'">
+									</i>
+								</a>
+							</th>
+							<th class="col-3">
+								<a href="#" class="text-decoration-none" title="Sort by date"
+									ng-click="$ctrl.changeSortBy('date_expires', $event)">
+									Date
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.searchParams.orderBy === 'date_expires'">
+									</i>
+								</a>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-if="!promoCodes.data.length && !loadingMore">
+							<td colspan="5">
+								No promo codes found<span ng-if="searchTerm.length >= 1"> matching '{{searchTerm}}'</span>.
+								</td>
+						</tr>
+						<tr class="cursor-pointer"
+							ng-repeat="code in promoCodes.data track by $index"
+							ng-if="!loadingMore">
+							<td>{{code.id}}</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="ChangeTab( 2, $index, $event )">
+										{{code.code}}
+									</a>
+								</strong>
+							</td>
+							<td>{{code.email}}</td>
+							<td>{{code.date_expires}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<spinner-component ng-if="loadingMore"></spinner-component>
+
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{promoCodes.from || 0}} to {{promoCodes.to || 0}} of
+							{{promoCodes.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.prev_page_url"
+							ng-click="$ctrl.setPage(promoCodes.current_page - 1)">&lsaquo; Prev</button>
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.current_page - 2 > 0"
+							ng-click="$ctrl.setPage(promoCodes.current_page - 2)">{{promoCodes.current_page -
+							2}}</button>
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.current_page - 1 > 0"
+							ng-click="$ctrl.setPage(promoCodes.current_page - 1)">{{promoCodes.current_page -
+							1}}</button>
+						<button type="button" class="btn btn-outline-primary" ng-disabled="true">{{promoCodes.current_page}}</button>
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.current_page + 1 <= promoCodes.last_page"
+							ng-click="$ctrl.setPage(promoCodes.current_page + 1)">{{promoCodes.current_page +
+							1}}</button>
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.current_page + 2 <= promoCodes.last_page"
+							ng-click="$ctrl.setPage(promoCodes.current_page + 2)">{{promoCodes.current_page +
+							2}}</button>
+						<button type="button" class="btn btn-outline-primary" ng-if="promoCodes.next_page_url"
+							ng-click="$ctrl.setPage(promoCodes.current_page + 1)">Next &rsaquo;</button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label class="form-label" for="rpp">Number of items per page:</label>
+						<select class="form-select" id="rpp" ng-model="$ctrl.searchParams.rpp"
+							ng-change="$ctrl.setRpp( $ctrl.searchParams.rpp )" ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add new">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-if="!loading">
+				<form name="addPromocodeForm" id="addPromocodeForm">
+					<div class="row">
+						<div class="col-lg-4">
+
+							<div class="mb-3">
+								<label class="form-label" for="add_code">
+									Promo Code
+								</label>
+								<input class="form-control" ng-class="{'is-invalid':addPromocodeForm.code.$invalid}"
+									name="code" type="text" id="add_code" ng-model="addParams.code"
+									maxlength="12" required>
+									<p class="description">Promo codes can only be used by signed in customers, not guest customers.</p>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_cid">
+									Customer
+								</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_cid" placeholder="None" readonly
+										ng-model="addParams.customerName">
+									<button type="button" class="btn btn-outline-primary" ng-click="OpenAddSearchModal('customer')">
+										Select
+									</button>
+								</div>
+								<p class="description">Specify a customer you would like this promo code to apply to.</p>
+							</div>
+
+							<div class="mb-3">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="add_auto_add"
+										ng-model="addParams.auto_add">
+									<label class="form-check-label" for="add_auto_add">
+										Auto Add
+									</label>
+									<p class="description">Automatically add all the selected products to the customer's cart whenever this promo code is applied.</p>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="add_require_all"
+										ng-model="addParams.require_all_items">
+									<label class="form-check-label" for="add_require_all">Require All Items</label>
+									<p class="description">Require the customer's cart to have all the selected products in order for this promo code to be applied.</p>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_email">
+									Email
+								</label>
+								<input class="form-control" name="code" type="email" id="add_email"
+									ng-class="{'is-invalid':addPromocodeForm.email.$invalid}"
+									ng-model="addParams.email">
+									<p class="description">Specify the email of the individual you would like this promo code to apply to.</p>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_date_eff">
+											Start Date
+										</label>
+										<input class="form-control" name="dateEff" type="date" id="add_date_eff"
+											required
+											ng-class="{'is-invalid':addPromocodeForm.dateEff.$invalid}"
+											ng-model="addParams.date_effective">
+											<p class="description">Set the date that the promo code will become active.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_date_exp">
+											Expiration Date
+										</label>
+										<input class="form-control" name="dateExp" type="date" id="add_date_exp"
+											required
+											ng-class="{'is-invalid':addPromocodeForm.dateExp.$invalid}"
+											ng-model="addParams.date_expires">
+											<p class="description">Set the date that the promo code will become inactive.</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_lpc">
+											Usage Limit Per Customer
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_lpc"
+											ng-class="{'is-invalid':addPromocodeForm.limit.$invalid}"
+											ng-model="addParams.limit_per_customer"  min="0">
+											<p class="description">Specify the maximum number of times a customer can apply this promo code to their cart.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_limit_total">
+											Usage Limit Per Promo Code
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_limit_total"
+											ng-class="{'is-invalid':addPromocodeForm.limitTotal.$invalid}"
+											ng-model="addParams.limit_total" min="0">
+											<p class="description">Specify the maximum number of times this promo code can be applied overall.</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_discount">
+									Discount Amount
+								</label>
+								<div class="input-group">
+									<input class="form-control" ng-class="{'is-invalid':addPromocodeForm.discAm.$invalid}"
+										name="discAm" type="number" id="add_discount"
+										ng-model="addParams.discount" min="0"
+										required>
+									<button class="button dropdown-toggle" type="button"
+										data-bs-toggle="dropdown" aria-haspopup="true"
+										aria-expanded="false">{{addParams.discount_type}}</button>
+									<div class="dropdown-menu">
+										<span class="dropdown-item" ng-click="addParams.discount_type = type"
+											ng-repeat="type in discountTypes" id="add_discount_type">{{type}}</span>
+									</div>
+								</div>
+								<p class="description">Set the discount amount/percentage here. Use the button to the right to change what kind of discount this promo code will be.</p>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_max_discount">
+											Max Discount
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_max_discount"
+											ng-class="{'is-invalid':addPromocodeForm.maxDisc.$invalid}"
+											ng-model="addParams.max_discount" min="0">
+											<p class="description">Specify the maximum dollar amount that this promo code will discount from an order.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_min_purchase">
+											Minimum Spend
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_min_purchase"
+											ng-class="{'is-invalid':addPromocodeForm.minPur.$invalid}"
+											ng-model="addParams.min_purchase" min="0">
+											<p class="description">Specify the minimum dollar amount required to apply this promo code.</p>
+									</div>
+								</div>
+							</div>
+							<button class="btn btn-primary" ng-disabled="addPromocodeForm.$invalid"
+								ng-click="AddPromoCode()">
+								Save
+							</button>
+						</div>
+						<div class="col-lg-8">
+							<h3 class="h6">Products</h3>
+							<spinner-component ng-if="loadingMore"></spinner-component>
+
+							<div ng-if="!loadingMore">
+								<div ng-if="!showChanges">
+									<div class="row mb-3" ng-hide="productsLoading">
+										<div class="col-8">
+											<div class="input-group">
+												<input class="form-control" type="text" id="searchProduct"
+													ng-model="$ctrl.searchParams.q" placeholder="Search Products">
+												<button class="btn btn-outline-primary" type="submit"
+													ng-click="SearchProducts($ctrl.searchParams.rpp, 1)">Search</button>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="input-group">
+												<select class="form-select" id="rpp"
+													ng-model="per_page" ng-change="SearchProducts(per_page, 1)"
+													ng-options="value for value in rppValues">
+												</select>
+												<label class="input-group-text" for="rpp">Number of items per page:</label>
+											</div>
+										</div>
+									</div>
+									<spinner-component ng-if="productsLoading"></spinner-component>
+
+									<div ng-if="!productsLoading">
+										<div class="text-center p-5 border rounded mb-3"
+											ng-if="!addedProducts.length">
+											Click 'Add Products' to get started.
+										</div>
+										<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+											<div class="col"
+												ng-repeat="product in addedProducts track by $index">
+												<div class="card shadow-sm h-100">
+													<img class="card-img-top" ng-if="product.image"
+														ng-src="{{product.image.thumb_url}}">
+													<div class="card-body">
+														<h5 class="card-title text-truncate" ng-attr-title="product.description">{{ product.description }}</h5>
+														<h6 class="card-subtitle mb-2 text-muted">{{ product.sku }}</h6>
+														<p class="card-text">
+															<span class="badge bg-secondary text-capitalize">
+																{{ product.status }}
+															</span>
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<button type="button" class="btn btn-outline-primary" ng-click="OpenAddSearchModal('product')">
+										Add Products
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="TabChanged(2)" ng-show="selectedPromocode" heading="Edit promo code">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<form name="selectedPromoForm" class="row" id="selectedPromoForm">
+					<div class="row">
+						<div class="col-lg-4">
+
+							<div class="mb-3">
+								<label class="form-label" for="add_code">
+									Promo Code
+								</label>
+								<input class="form-control" ng-class="{'is-invalid':selectedPromoForm.code.$invalid}"
+									name="code" type="text" id="add_code" 								ng-model="selectedPromocode.code" maxlength="12" required>
+									<p class="description">Promo codes can only be used by signed in customers, not guest customers.</p>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_cid">
+									Customer
+								</label>
+								<div class="input-group">
+									<input class="form-control" type="text" id="add_cid" placeholder="None" readonly
+										ng-model="selectedPromocode.customerName">
+									<button class="btn btn-outline-primary" type="button" ng-click="OpenUpdateSearchModal('customer')">
+										Select
+									</button>
+								</div>
+								<p class="description">Specify a customer you would like this promo code to apply to.</p>
+							</div>
+
+							<div class="mb-3">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="add_auto_add"
+										ng-model="selectedPromocode.auto_add">
+									<label class="form-check-label" for="add_auto_add">
+										Auto Add
+									</label>
+									<p class="description">Automatically add all the selected products to the customer's cart whenever this promo code is applied.</p>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="add_require_all"
+										ng-model="selectedPromocode.require_all_items">
+									<label class="form-check-label" for="add_require_all">Require All Items</label>
+									<p class="description">Require the customer's cart to have all the selected products in order for this promo code to be applied.</p>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_email">
+									Email
+								</label>
+								<input class="form-control" name="code" type="email" id="add_email"
+									ng-class="{'is-invalid':selectedPromoForm.email.$invalid}"
+									ng-model="selectedPromocode.email">
+									<p class="description">Specify the email of the individual you would like this promo code to apply to.</p>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_date_eff">
+											Start Date
+										</label>
+										<input class="form-control" name="dateEff" type="date" id="add_date_eff"
+											required
+											ng-class="{'is-invalid':selectedPromoForm.dateEff.$invalid}"
+											ng-model="selectedPromocode.date_effective">
+											<p class="description">Set the date that the promo code will become active.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_date_exp">
+											Expiration Date
+										</label>
+										<input class="form-control" name="dateExp" type="date" id="add_date_exp"
+											required
+											ng-class="{'is-invalid':selectedPromoForm.dateExp.$invalid}"
+											ng-model="selectedPromocode.date_expires">
+											<p class="description">Set the date that the promo code will become inactive.</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_lpc">
+											Usage Limit Per Customer
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_lpc"
+											ng-class="{'is-invalid':selectedPromoForm.limit.$invalid}"
+											ng-model="selectedPromocode.limit_per_customer" min="0">
+											<p class="description">Specify the maximum number of times a customer can apply this promo code to their cart.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_limit_total">
+											Usage Limit Per Promo Code
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_limit_total"
+											ng-class="{'is-invalid':selectedPromoForm.limitTotal.$invalid}"
+											ng-model="selectedPromocode.limit_total" min="0">
+											<p class="description">Specify the maximum number of times this promo code can be applied overall.</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label" for="add_discount">
+									Discount Amount
+								</label>
+								<div class="input-group">
+									<input class="form-control" ng-class="{'is-invalid':selectedPromoForm.discAm.$invalid}"
+										name="discAm" type="number" id="add_discount"
+										ng-model="selectedPromocode.discount" required min="0">
+									<button class="button dropdown-toggle" type="button"
+										data-bs-toggle="dropdown" aria-haspopup="true"
+										aria-expanded="false">{{selectedPromocode.discount_type}}</button>
+									<div class="dropdown-menu">
+										<span class="dropdown-item" ng-click="selectedPromocode.discount_type = type"
+											ng-repeat="type in discountTypes" id="add_discount_type">{{type}}</span>
+									</div>
+								</div>
+								<p class="description">Set the discount amount/percentage here. Use the button to the right to change what kind of discount this promo code will be.</p>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_max_discount">
+											Max Discount
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_max_discount"
+											ng-class="{'is-invalid':selectedPromoForm.maxDisc.$invalid}"
+											ng-model="selectedPromocode.max_discount" min="0">
+											<p class="description">Specify the maximum dollar amount that this promo code will discount from an order.</p>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label" for="add_min_purchase">
+											Minimum Spend
+										</label>
+										<input class="form-control" name="limit" type="number" id="add_min_purchase"
+											ng-class="{'is-invalid':selectedPromoForm.minPur.$invalid}"
+											ng-model="selectedPromocode.min_purchase" min="0">
+											<p class="description">Specify the minimum dollar amount required to apply this promo code.</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="btn-toolbar" role="toolbar"
+								aria-label="Toolbar for updating and deleting promo codes.">
+								<wp-button is-primary="true" on-click="UpdatePromoCode()">
+									Update
+								</wp-button>
+								<wp-button
+									is-loading="$ctrl.isDeleting"
+									on-delete="$ctrl.deletePromoCode()">
+									Delete
+								</wp-button>
+							</div>
+						</div>
+						<div class="col-lg-8">
+							<h3 class="h6">Products</h3>
+							<spinner-component ng-if="loadingMore"></spinner-component>
+
+							<div ng-if="!loadingMore">
+								<div ng-if="!showChanges">
+									<div class="row mb-3" ng-hide="productsLoading">
+										<div class="col-8">
+											<div class="input-group">
+												<input class="form-control" type="text" id="searchProduct"
+													ng-model="$ctrl.searchParams.q" placeholder="Search Products">
+												<button class="btn btn-outline-primary" type="submit"
+													ng-click="SearchProducts($ctrl.searchParams.rpp, 1)">Search</button>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="input-group">
+												<select class="form-select" id="rpp"
+													ng-model="per_page" ng-change="SearchProducts(per_page, 1)"
+													ng-options="value for value in rppValues">
+												</select>
+												<label class="input-group-text" for="rpp">Number of items per page:</label>
+											</div>
+										</div>
+									</div>
+									<spinner-component ng-if="productsLoading"></spinner-component>
+
+									<div ng-if="!productsLoading">
+										<div class="text-center p-5 border rounded mb-3"
+											ng-if="!selectedPromocode.products.data.length">
+											Click 'Add Products' to get started.
+										</div>
+										<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+											<div class="col"
+												ng-repeat="product in selectedPromocode.products.data track by $index">
+												<div class="card h-100 shadow-sm">
+													<img class="card-img-top" ng-if="product.image"
+														ng-src="{{product.image.thumb_url}}">
+													<div class="card-body">
+														<h5 class="card-title text-truncate" ng-attr-title="product.description">{{ product.description }}</h5>
+														<h6 class="card-subtitle mb-2 text-muted">{{ product.sku }}</h6>
+														<p class="card-text">
+															<span class="badge bg-secondary text-capitalize">
+																{{ product.status }}
+															</span>
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col text-center mb-3" ng-hide="productsLoading">
+										<button class="btn btn-outline-primary" ng-if="selectedPromocode.products.prev_page_url"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page - 1)">&lsaquo;>
+											Prev</button>
+										<button class="btn btn-outline-primary" ng-if="selectedPromocode.products.current_page - 2 > 0"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page - 2)">{{selectedPromocode.products.current_page
+											- 2}}</button>
+										<button class="btn btn-outline-primary" ng-if="selectedPromocode.products.current_page - 1 > 0"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page - 1)">{{selectedPromocode.products.current_page
+											- 1}}</button>
+										<button class="btn btn-outline-primary"
+											ng-disabled="true"><b>{{selectedPromocode.products.current_page}}</b></button>
+										<button class="btn btn-outline-primary"
+											ng-if="selectedPromocode.products.current_page + 1 <= selectedPromocode.products.last_page"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page + 1)">{{selectedPromocode.products.current_page
+											+ 1}}</button>
+										<button class="btn btn-outline-primary"
+											ng-if="selectedPromocode.products.current_page + 2 <= selectedPromocode.products.last_page"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page + 2)">{{selectedPromocode.products.current_page
+											+ 2}}</button>
+										<button class="btn btn-outline-primary" ng-if="selectedPromocode.products.next_page_url"
+											ng-click="SearchProducts($ctrl.searchParams.rpp, selectedPromocode.products.current_page + 1)">Next
+											&rsaquo;</button>
+									</div>
+
+
+
+								</div>
+								<div ng-if="showChanges">
+									<input class="form-control mb-3" type="text" id="filterChanges" ng-disabled="productsLoading"
+										ng-model="filterEdited" placeholder="Filter Changes">
+									<spinner-component ng-if="productsLoading"></spinner-component>
+
+									<div ng-if="!productsLoading">
+										<div class="text-center p-5 rounded border" ng-if="results.length <= 0">
+											<h3>No results matching '{{filterEdited}}'.</h3>
+										</div>
+										<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+											<div class="col"
+												ng-repeat="product in updatedProducts | filter: filterEdited as results track by $index">
+												<div ng-class="['card h-100 shadow-sm', {
+													'border-success': product.action === 'add',
+													'border-danger': product.action === 'remove',
+												}]" >
+													<img
+														ng-if="product.value.image"
+														ng-src="{{
+															product.value.image.thumb_url
+														}}"
+														class="card-img-top"
+													/>
+													<div class="card-body">
+														<h5 class="card-title text-truncate" title="product.value.description">
+															{{ product.value.description }}
+														</h5>
+														<h6
+															class="card-subtitle mb-2 text-muted"
+														>
+															{{ product.value.sku }}
+														</h6>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<button class="btn btn-outline-primary" ng-click="OpenAddSearchModal('product')">
+									{{ selectedPromocode.products.data.length ? 'Edit' : 'Add' }} Products
+								</button>
+								<button class="btn btn-outline-primary position-relative" type="button" ng-if="updatedProducts.length >= 1"
+									ng-click="ShowChanges()">
+									Show {{ showChanges ? 'Current' : 'Changes' }}
+									<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" ng-if="!showChanges">
+										{{ updatedProducts.length }}
+										<span class="visually-hidden">changes</span>
+									  </span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>
+

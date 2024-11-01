@@ -1,0 +1,668 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Customer Groups</h2>
+<vf-check-auth></vf-check-auth>
+<wp-notice-list></wp-notice-list>
+
+<div ng-if="isAuthed">
+	<uib-tabset 
+		active="$ctrl.activeTab" 
+		resize>
+		<uib-tab index="0" select="TabChanged(0)" heading="Customer Groups">
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading">
+				<div>
+
+					<bs-search-box-legacy
+						q="$ctrl.searchParams.q"
+						on-submit="$ctrl.setQuery(query, searchBy)"
+						is-loading="loadingMore"
+						search-options="$ctrl.searchOptions">
+					</bs-search-box-legacy>   
+
+					<table class="wp-list-table widefat fixed striped table-view-list">
+						<thead>
+							<tr>
+								<th class="col-1">
+									<a href="#" class="text-decoration-none"
+										ng-click="$ctrl.changeSortBy('group_id', $event)">
+										ID
+										<i ng-class="['bi', {
+											'bi-sort-numeric-down': $ctrl.sortAscending,
+											'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+										}]"
+											ng-if="$ctrl.searchParams.sortBy === 'group_id'">
+										</i>							
+									</a>
+								</th>
+								<th class="col-4">
+									<a href="#" class="text-decoration-none"
+										ng-click="$ctrl.changeSortBy('name', $event)">
+										Name
+										<i ng-class="['bi', {
+											'bi-sort-alpha-down': $ctrl.sortAscending,
+											'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+										}]"
+											ng-if="$ctrl.searchParams.sortBy === 'name'">
+										</i>																			
+									</a>
+								</th>
+								<th class="col-4">
+									<a href="#" class="text-decoration-none"
+										ng-click="$ctrl.changeSortBy('parent_group_id', $event)">
+										Parent ID
+										<i ng-class="['bi', {
+											'bi-sort-numeric-down': $ctrl.sortAscending,
+											'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+										}]"
+											ng-if="$ctrl.searchParams.sortBy === 'parent_group_id'">
+										</i>																	
+									</a>
+								</th>
+								<th class="col-3">
+									<a href="#" class="text-decoration-none"
+										ng-click="$ctrl.changeSortBy('default_price_sheet', $event)">
+										Default Price Sheet
+										<i ng-class="['bi', {
+											'bi-sort-down': $ctrl.sortAscending,
+											'bi-sort-down-alt': !$ctrl.sortAscending,
+										}]"
+											ng-if="$ctrl.searchParams.sortBy === 'default_price_sheet'">
+										</i>																	
+									</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-if="!customerGroups.data.length && !loadingMore">
+								<td colspan="4">
+									No Group(s) <span ng-if="searchTerm.length >= 1 && searchedBy.length <= 0">with
+										the Name of '{{searchTerm}}'</span><span
+										ng-if="searchTerm.length >= 1 && searchedBy.length >= 1">with the
+										{{searchedBy === 'group_id' ? 'Group ID' : searchedBy === 'parent_group_id'
+										? 'Parent ID' : searchedBy === 'default_price_sheet' ? 'Price Sheet' :
+										searchedBy}} of '{{searchTerm}}'</span> found.
+								</td>
+							</tr>
+	
+							<tr class="cursor-pointer"
+								ng-if="!loadingMore" 
+								ng-click="ChangeTab(2, $index)"
+								ng-repeat="group in customerGroups.data track by $index">
+								<td>{{group.group_id}}</td>
+								<td>{{group.name}}</td>
+								<td>{{group.parent_group_id}}</td>
+								<td>{{group.default_price_sheet}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<wp-spinner
+						type="2x"
+						ng-show="loadingMore">
+					</wp-spinner>	
+					<div class="row  mb-3">
+						<div class="col-sm-4">
+							<span>Showing {{customerGroups.from || 0}} to {{customerGroups.to || 0}} of
+								{{customerGroups.total || 0}} entries<span>
+						</div>
+						<div class="col-sm-4 text-center mt-2">
+							<button class="button" ng-if="customerGroups.prev_page_url"
+								ng-click="$ctrl.setPage(customerGroups.current_page - 1)">&lsaquo; Prev</button>
+							<button class="button" ng-if="customerGroups.current_page - 2 > 0"
+								ng-click="$ctrl.setPage(customerGroups.current_page - 2)">{{customerGroups.current_page
+								- 2}}</button>
+							<button class="button" ng-if="customerGroups.current_page - 1 > 0"
+								ng-click="$ctrl.setPage(customerGroups.current_page - 1)">{{customerGroups.current_page
+								- 1}}</button>
+							<button class="button"
+								ng-disabled="true">{{customerGroups.current_page}}</button>
+							<button class="button"
+								ng-if="customerGroups.current_page + 1 <= customerGroups.last_page"
+								ng-click="$ctrl.setPage(customerGroups.current_page + 1)">{{customerGroups.current_page
+								+ 1}}</button>
+							<button class="button"
+								ng-if="customerGroups.current_page + 2 <= customerGroups.last_page"
+								ng-click="$ctrl.setPage(customerGroups.current_page + 2)">{{customerGroups.current_page
+								+ 2}}</button>
+							<button class="button" ng-if="customerGroups.next_page_url"
+								ng-click="$ctrl.setPage(customerGroups.current_page + 1)">Next &rsaquo;</button>
+						</div>
+						<div class="col-sm-4  justify-content-end">
+							<label class="form-label" for="rpp">Per Page: </label>
+							<select class="form-control" style="display: inline-block;" id="rpp"
+								ng-model="$ctrl.searchParams.rpp" ng-change="$ctrl.setRpp( $ctrl.searchParams.rpp )"
+								ng-options="value for value in rppValues">
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add Group">
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading" >
+				<div>
+					<form class="groupForm mx-auto col-md-6" name="groupAddForm">
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group Name</span>
+							<input class="form-control" ng-class="{'is-invalid':groupAddForm.group_name.$invalid}"
+								type="text" name="group_name" placeholder="'Group Name'" ng-model="newGroup.name"
+								required />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Parent Group</span>
+							<input class="form-control"
+								ng-class="{'is-invalid':groupAddForm.parent_group_id.$invalid}" type="text"
+								name="parent_group_id" placeholder="N/A" ng-model="newGroup.parent_group.name"
+								disabled />
+							<div ng-class="!isXS && !isSM ? '' : 'col-12 p-0 mt-2'">
+								<button class="button" ng-class="{'col':isXS || isSM}"
+									ng-click="OpenGroupSearchModal()">Change Group</button>
+							</div>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Terms</span>
+							<input class="form-control" type="text" name="terms" placeholder="'Net 30'"
+								ng-model="newGroup.terms" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Authorized Emails</span>
+							<input class="form-control" type="text" name="auth_email"
+								placeholder="'test.com, vendorfuel.com'" ng-model="newGroup.authorized_emails" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group Invite Code</span>
+							<input class="form-control" type="text" name="inv_code" placeholder="N/A"
+								ng-model="newGroup.group_invite_code" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Order Prefix</span>
+							<input class="form-control" type="text" name="prefix" placeholder="N/A"
+								ng-model="newGroup.order_prefix" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group Registration</span>
+							<select class="form-control" name="grp_reg"
+								ng-options="item.key as item.value for item in regValues"
+								ng-model="newGroup.group_registration_available">
+							</select>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Price Sheet</span>
+							<select class="form-control" type="text" name="price_sheet"
+								placeholder="'Price Sheet ID'" ng-model="newGroup.default_price_sheet"
+								ng-options="priceSheet.price_sheet_id as priceSheet.sheet for priceSheet in priceSheets">
+							</select>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Shipping Mode</span>
+							<select class="form-control" type="text" name="shipping_mode"
+								placeholder="'Shipping Mode'" ng-model="newGroup.shipping_mode"
+								ng-options="key as value for (key, value) in shippingModes">
+							</select>
+						</div>
+						<button class="button button-primary"
+							ng-click="AddGroup()">
+							Add New Group
+						</button>
+					</form>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="TabChanged(2)" ng-show="$ctrl.selectedGroup" heading="View Group">
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading">
+				<div class="row">
+					<form class="groupForm col-md-5" name="groupViewForm">
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group Name</span>
+							<input class="form-control" ng-class="{'is-invalid':groupViewForm.group_name.$invalid}"
+								type="text" name="group_name" placeholder="'Group Name'"
+								ng-model="$ctrl.selectedGroup.name" required />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group ID</span>
+							<input class="form-control" type="text" name="group_id" placeholder="'Group ID'"
+								ng-model="$ctrl.selectedGroup.group_id" disabled />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Parent Group</span>
+							<input class="form-control"
+								ng-class="{'is-invalid':groupViewForm.parent_group_id.$invalid}" type="text"
+								name="parent_group_id" placeholder="N/A" ng-model="$ctrl.selectedGroup.parent_group.name"
+								disabled />
+							<button class="button" ng-class="{'col-12':isXS || isSM}"
+								ng-click="OpenGroupSearchModal()">Change Group</button>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Terms</span>
+							<input class="form-control" type="text" name="terms" placeholder="'Net 30'"
+								ng-model="$ctrl.selectedGroup.terms" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Authorized Emails</span>
+							<input class="form-control" type="text" name="auth_email"
+								placeholder="'test.com, vendorfuel.com'"
+								ng-model="$ctrl.selectedGroup.authorized_emails" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Group Invite Code</span>
+							<input class="form-control" type="text" name="inv_code" placeholder="N/A"
+								ng-model="$ctrl.selectedGroup.group_invite_code" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Order Prefix</span>
+							<input class="form-control" type="text" name="prefix" placeholder="N/A"
+								ng-model="$ctrl.selectedGroup.order_prefix" />
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Registration</span>
+							<select class="form-control" name="grp_reg"
+								ng-options="item.key as item.value for item in regValues"
+								ng-model="$ctrl.selectedGroup.group_registration_available">
+							</select>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Price Sheet</span>
+							<select class="form-control" type="text" name="price_sheet"
+								placeholder="'Price Sheet ID'" ng-model="$ctrl.selectedGroup.default_price_sheet"
+								ng-options="priceSheet.price_sheet_id as priceSheet.sheet for priceSheet in priceSheets">
+							</select>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text min-w-25">Shipping Mode</span>
+							<select class="form-control" type="text" name="shipping_mode"
+								placeholder="'Shipping Mode'" ng-model="$ctrl.selectedGroup.shipping_mode"
+								ng-options="key as value for (key, value) in shippingModes">
+							</select>
+						</div>
+					</form>
+					<div class="col-md-7">
+						<uib-tabset>
+							<uib-tab index="0" heading="Users">
+								<div>
+									<button class="button mb-3"
+										ng-click="OpenCustomerSearchModal()">
+										Edit Customers
+									</button>
+									<div class="row px-3">
+										<div class="col-3">Group Role</div>
+										<div class="col-3">Name</div>
+										<div class="col-2">Status</div>
+										<div class="col-4">Email</div>
+									</div>
+									<div class="p-3" ng-class="{'min-scroll':!isXS}">
+										<div class="" ng-if="$ctrl.selectedGroup.customers.data.length <= 0">
+											<h3>There are no Users in this group.</h3>
+										</div>
+										<div class="col p-3 vf-list-item cursor-pointer" ui-sref="customers.accounts.edit({ id: user.id })"
+											ng-repeat="user in $ctrl.selectedGroup.customers.data track by $index">
+											<div class="row">
+												<div class="col-3 vf-list-text">
+													<span ng-if="!user.approver && user.group_admin">Admin</span>
+													<span ng-if="user.approver && !user.group_admin">Approver</span>
+													<span
+														ng-if="user.approver && user.group_admin">Admin/Approver</span>
+													<span ng-if="user.requestor">Requestor</span>
+													<span
+														ng-if="!user.requestor && !user.approver && !user.group_admin">None</span>
+												</div>
+												<div class="col-3 vf-list-text">{{user.name}}</div>
+												<div class="col-2 vf-list-text">{{user.status}}</div>
+												<div class="col-4 vf-list-text">{{user.email}}</div>
+											</div>
+										</div>
+										<div class="row  mb-3">
+											<div class="col-sm-4">
+												<span>Showing {{$ctrl.selectedGroup.customers.from || 0}} to
+													{{$ctrl.selectedGroup.customers.to ||
+													0}} of
+													{{$ctrl.selectedGroup.customers.total || 0}} entries<span>
+											</div>
+											<div class="col-sm-4 text-center mt-2">
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.prev_page_url"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page - 1)">&lsaquo; Prev</button>
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.current_page - 2 > 0"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page - 2)">{{$ctrl.selectedGroup.customers.current_page
+													- 2}}</button>
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.current_page - 1 > 0"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page - 1)">{{$ctrl.selectedGroup.customers.current_page
+													- 1}}</button>
+												<button class="button"
+													ng-disabled="true">{{$ctrl.selectedGroup.customers.current_page}}</button>
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.current_page + 1 <= $ctrl.selectedGroup.customers.last_page"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page + 1)">{{$ctrl.selectedGroup.customers.current_page
+													+ 1}}</button>
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.current_page + 2 <= $ctrl.selectedGroup.customers.last_page"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page + 2)">{{$ctrl.selectedGroup.customers.current_page
+													+ 2}}</button>
+												<button class="button"
+													ng-if="$ctrl.selectedGroup.customers.next_page_url"
+													ng-click="Show($ctrl.selectedGroup.customers.current_page + 1)">Next
+													&rsaquo;</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+							<uib-tab index="1" ng-if="$ctrl.selectedGroup.child_groups.length" heading="Child Groups">
+								<div class="row px-3">
+									<div class="col-3">ID</div>
+									<div class="col-3">Name</div>
+									<div class="col-3">Parent ID</div>
+									<div class="col-3">Price Sheet</div>
+								</div>
+								<div class="p-3" ng-class="{'min-scroll':!isXS}">
+									<div class="col p-3 vf-list-item cursor-pointer"
+										ng-click="SelectChild(group.group_id)"
+										ng-repeat="group in $ctrl.selectedGroup.child_groups track by $index">
+										<div class="row">
+											<div class="col-3 vf-list-text">{{group.group_id}}</div>
+											<div class="col-3 vf-list-text">{{group.name}}</div>
+											<div class="col-3 vf-list-text">{{group.parent_group_id}}</div>
+											<div class="col-3 vf-list-text">{{group.default_price_sheet}}</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+							<uib-tab index="2" heading="Shipping Rates">
+								<div class="row">
+									<div class="col-12">
+										<div>
+											<button class="button"
+												ng-class="{'col-12':isXS || isSM}"
+												ng-click="OpenRatesSearchModal()">
+												Modify Rates
+											</button>
+											<div class="row px-3 pt-3" ng-class="{'border-bottom':isXS}">
+												<div class="col-5">Name</div>
+												<div class="col-4 p-0">Cost</div>
+												<div class="col-3">Status</div>
+											</div>
+											<div class="p-3" ng-class="{'min-scroll':!isXS}">
+												<div class="text-center" style="font-size: .9em"
+													ng-if="$ctrl.selectedGroup.flatrates.length <= 0  &&  updatedRates.length <= 0">
+													<h5>There are no rates specified for this Group.</h5>
+												</div>
+												<div class="col p-8 vf-item-card-inner vf-list-item cursor-pointer"
+													ng-class="{'remove':rateCheck(rate)}" style="border:none;"
+													ng-repeat="rate in $ctrl.selectedGroup.flatrates track by $index">
+													<div class="row">
+														<div class="col-5 vf-list-text">{{rate.name | limitTo:
+															10}}{{rate.name.length >= 10 ? '...' : ''}}</div>
+														<div class="col-4 vf-list-text p-0">{{rate.cost}}</div>
+														<div class="col-3 vf-list-text">{{rate.enabled === 1 ?
+															'Active' : 'Inactive'}}</div>
+													</div>
+												</div>
+												<div class="col p-8 vf-item-card-inner vf-list-item cursor-pointer"
+													ng-class="rate.action" style="border:none;"
+													ng-repeat="rate in updatedRates track by $index"
+													ng-if="rate.action === 'add'">
+													<div class="row">
+														<div class="col-5 vf-list-text">{{rate.value.name | limitTo:
+															10}}{{rate.value.name.length >= 10 ? '...' : ''}}</div>
+														<div class="col-4 vf-list-text p-0">{{rate.value.cost}}
+														</div>
+														<div class="col-3 vf-list-text">{{rate.value.enabled === 1 ?
+															'Active' : 'Inactive'}}</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+							<uib-tab index="3" heading="Notes">
+								<wp-spinner
+									type="2x"
+									ng-show="savingNote">
+								</wp-spinner>							
+								<div class="row" ng-if="!savingNote">
+									<div class="col-12">
+										<div class="input-group">
+											<textarea class="form-control" maxlength="65535" type="text"
+												placeholder="Add a Note" ng-model="noteParams.note"></textarea>
+											<button class="button button-primary" ng-click="SaveNote()">Save
+												Note</button>
+										</div>
+									</div>
+									<div class="col min-scroll"
+										ng-if="customerNotes.length >= 1">
+										<div class="col-12 mb-3" ng-repeat="note in customerNotes">
+											<textarea maxlength="65535" class="form-control"
+												ng-disabled="true">{{note.note}}</textarea>
+											<p>
+												{{note.admin.name}} {{note.datetime}}
+												<button class="button button-delete float-end"
+													ng-click="DeleteNote(note.note_id)">
+													Delete
+												</button>
+											</p>
+										</div>
+									</div>
+								</div>
+						</uib-tab>
+						<uib-tab index="4" heading="Punchout">
+							<button type="button" class="button button-primary"
+								ng-click="OpenSupplierSearch()">Add
+								Profile
+							</button>
+							<div class="row p-3">
+								<div ng-if="!profile.deleted"
+									ng-repeat="profile in selectedGroup.punchout_profiles track by $index">
+									<div class="input-group mb-3">
+										<span class="input-group-text">{{profile.supplier.name}}</span>
+										<button type="button" ng-click="RemoveProfile($index)"
+											class="button button-delete">Remove</button>
+									</div>
+								</div>
+							</div>
+						</uib-tab>
+						</uib-tabset>
+					</div>
+				</div>
+				<div>
+					<button class="button button-primary"
+						ng-click="UpdateGroup()">
+						Update
+					</button>
+					<button class="button button-delete"
+						ng-click="$ctrl.deleteGroup()"
+						ng-disabled="$ctrl.isDeleting">
+						<wp-spinner
+							type="loading"
+							ng-show="$ctrl.isDeleting">
+						</wp-spinner>
+						{{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+					</button>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="3" select="TabChanged(3)" heading="Upload Group(s)">
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading" class="col p-0 vf-tab-body">
+				<form class="row" enctype="multipart/form-data" name="groupUploadForm">
+					<div class="col-md-5">
+						<div class="input-group mb-3">
+							<span class="input-group-text w-104">File</span>
+							<input class="form-control" ng-class="{'is-invalid':groupUploadForm.psName.$invalid}"
+								name="groupUploadName" ng-model="theFile.name" placeholder="Upload a File" disabled
+								required />
+							<label class="button m-0">
+								Browse <input class="custom-file" type="file" name="file" id="uploadInput"
+									onchange="angular.element(this).scope().SetFile(this), angular.element(this).scope().SetUploading()"
+									hidden />
+							</label>
+						</div>
+					</div>
+
+					<div class="d-flex align-items-center"
+						ng-if="uploading">
+						<strong>Generating your Group Sheet, please wait...</strong>
+						<div class="spinner is-active ml-auto" role="status" aria-hidden="true"></div>
+					</div>
+
+					<div class="col-md-12 p-3">
+						<div class="min-scroll-table" ng-if="groupSheetUpload && !uploading">
+							<table class="table table-striped table-fixed">
+								<thead>
+									<tr>
+										Displaying {{(groupSheetUpload.length > 5)?5:groupSheetUpload.length}}
+										results
+										of
+										total {{groupSheetUpload.length | number}}
+									</tr>
+									<tr>
+										<th title="ID">ID</th>
+										<th title="Parent ID">Parent ID</th>
+										<th title="Name">Name</th>
+										<th title="Authorized Emails">Authorized Email(s)</th>
+										<th title="Invite Code">Invite Code</th>
+										<th title="Punchout Identity">Punchout Identity</th>
+										<th title="Share Secret">Shared Secret</th>
+										<th title="Terms">Terms</th>
+										<th title="Order Prefix">Order Prefix</th>
+										<th title="Default Price Sheet">Default Price Sheet</th>
+										<th title="Group Reg. Available">Group Reg. Available</th>
+										<th title="GP Account">GP Account</th>
+									</tr>
+								</thead>
+								<tbody ng-repeat="group in groupSheetUpload track by $index">
+									<tr>
+										<td ng-repeat="attribute in group track by $index | limitTo: 5">
+											<span ng-if="attribute.length >= 1" title="{{attribute}}">{{attribute |
+												limitTo: 25}}{{attribute.length >= 25 ? '...' : ''}}</span>
+											<span ng-if="attribute.length <= 0">----</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="col-12" ng-class="{'text-end':prodSheetUpload}">
+						<button class="button button-primary mb-3" ng-class="{'col': isXS || isSM}"
+						ng-disabled="groupUploadForm.$invalid" ng-click="UploadGroup()"
+						ng-if="groupSheetUpload">Upload Group Batch</button>
+						<button class="button button-delete mb-3" ng-class="{'col': isXS || isSM}"
+							ng-click="RemoveUploadFile()" ng-if="groupSheetUpload">Remove</button>
+					</div>
+				</form>
+			</div>
+		</uib-tab>
+		<uib-tab index="4" select="TabChanged(4)" heading="Batches">
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading">
+				<div>
+					<div class="input-group">
+						<span class="input-group-text">Status</span>
+						<select class="form-control"
+							ng-options="key as value for (key, value) in batchListOptions"
+							ng-model="sortBatchParams.status" ng-change="SortBatchIndex('batch_id')"></select>
+					</div>
+					<div class="row px-3 pt-3">
+						<div class="col" ng-click="SortBatchIndex('batch_id')">Batch ID</div>
+						<div class="col" ng-click="SortBatchIndex('time_uploaded')">Upload Date</div>
+						<div class="col" ng-click="SortBatchIndex('filename')">File Name</div>
+						<div class="col" ng-click="SortBatchIndex('status')">Status</div>
+						<div class="col">Progress</div>
+					</div>
+					<div class="p-3" ng-class="{'min-scroll-table':!isXS}">
+						<wp-spinner
+							type="2x"
+							ng-show="loadingMore">
+						</wp-spinner>
+						<div ng-if="!loadingMore && batches.length <= 0" class="col text-center">
+							<span class="col m-auto">
+								<h3>No Batches found.</h3>
+							</span>
+						</div>
+						<div ng-if="!loadingMore" class="col p-3 vf-list-item cursor-pointer"
+							ng-click="batch.status == 'pending' || batch.status == 'confirmed' ? ChangeBatchTab(5, $index) : return;"
+							ng-repeat="batch in batches track by $index">
+							<div class="row">
+								<div class="col">{{batch.batch_id}}</div>
+								<div class="col">{{batch.time_uploaded}}</div>
+								<div class="col">{{batch.filename}}</div>
+								<div class="col">{{batch.status}}</div>
+								<div ng-if="batch.recordsProcessed" class="col">{{((batch.recordsProcessed /
+									batch.total_records) * 100).toFixed(2)}}%</div>
+								<div ng-if="!batch.recordsProcessed && batch.status == 'processed'" class="col">Done
+								</div>
+								<div ng-if="!batch.recordsProcessed && batch.status != 'processed'" class="col">
+									{{batch.total_records ? '0%' : 'N/A'}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="5" select="TabChanged(5)" ng-show="selectedBatch">
+			<uib-tab-heading>
+				Batch {{selectedBatch.batch_id}} <i class="dashicons dashicons-update"></i>
+			</uib-tab-heading>
+			<wp-spinner
+				type="2x"
+				ng-show="loading">
+			</wp-spinner>
+			<div ng-if="!loading" class="col p-0 vf-tab-body">
+				<div class="input-group mb-3">
+					<span class="input-group-text">Batch ID</span>
+					<input class="form-control" ng-model="selectedBatch.batch_id" type="text" disabled>
+				</div>
+				<div class="input-group mb-3">
+					<span class="input-group-text">File Name</span>
+					<input class="form-control" ng-model="selectedBatch.filename" type="text" disabled>
+				</div>
+				<div class="input-group mb-3">
+					<span class="input-group-text">Time Uploaded</span>
+					<input class="form-control" ng-model="selectedBatch.time_uploaded" type="text" disabled>
+				</div>
+				<div class="input-group mb-3">
+					<span class="input-group-text">Status</span>
+					<input class="form-control" ng-model="selectedBatch.status" type="text" disabled>
+				</div>
+				<div class="col-12 my-3">
+					<div class="min-scroll-table">
+						<table class="table table-striped table-fixed">
+							<thead>
+								<tr>
+									<th scope="col" class="padding: 10px;"
+										ng-repeat="(key, value) in batchHeaders ">{{value}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="data in selectedBatch.items">
+									<td scope="row" class="padding: 10px;" ng-repeat="(x, y) in batchHeaders">
+										{{data[x]}}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<button ng-if="selectedBatch.status == 'pending'" ng-click="ConfirmBatch()">Confirm Batch</button>
+			</div>
+		</uib-tab>
+
+	</uib-tabset>
+</div>

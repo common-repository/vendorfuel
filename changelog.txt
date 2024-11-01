@@ -1,0 +1,369 @@
+= 8.15.1 =
+* Fixed issue on most admin index pages where using the search bar could cause pagination controls to not work as expected.
+* Fixed issues with pagination on admin reports page.
+
+= 8.15.0 =
+* Changed frontend product detail page to show consistent stock messaging larger, arranged buttons similar to catalog page.
+* Fixed issues on public Cart page.
+* Fixed issue with admin page redirection after successfully resetting password.
+* Fixed issue on admin sign in form where form might be disabled if the user password wasn't long enough.
+* Removed links to product attributes from product detail page.
+
+= 8.14.0 =
+* Changed admin navigation bar, dashboard recent orders and section cards to using Material UI.
+* Changed admin sections to use React from @wordpress/element, in order to keep as compatible with Gutenberg as possible.
+* Fixed issue with error code handling for Payfabric payment gateway.
+
+= 8.13.0 =
+* Added price sheet id to admin price sheet uploads, so the user can know which price sheet was updated.
+* Added controls for cancelling synchronization of products and categories with WordPress.
+* Changed 'Submit Order' to 'Complete Order' for better clarity.
+* Changed dependencies to use latest version of WordPress components and React, to mitigate possible conflict with Gutenberg plugin (not to be confused with WordPress block editor which was once called 'Gutenberg').
+* Changed 'flat rates' to 'rates' to eventually support rates with a flat fee or a percentage of order subtotal.
+* Fixed frontend issues with address form submission.
+* Fixed issues with navigation links on admin catalog section.
+* Fixed issue with catalog search label.
+* Fixed issue where synchronization of products and categories couldn't be started if a previous synchronization was incomplete.
+
+= 8.12.0 =
+* Added ability for admin users to populate empty category images using the image from a category product.
+* Added ability for admin users to export category products.
+* Added dimensions to admin product parcel selection.
+* Changed admin navigation bar to link to catalog and customers sections instead of showing links to subsections.
+* Changed app structure so that most WordPress submenu items will link to new pages containing only content relevant to that section, rather then loading the entire app.
+* Changed pagination on most admin index pages so that users can quickly navigate to first and last pages.
+* Changed selection modal to show cleaner card UI.
+* Fixed issue with conflicting forms on admin category pages.
+* Fixed delete action on admin product exports.
+* Fixed appearance of conditions on admin shipping flat rate page.
+* Removed non-functioning user interface elements on some selection dialogs.
+
+= 8.11.0 =
+* Changed admin groups page so that users can click link to edit parent group, if one has been applied.
+* Fixed inconsistent UI for destructive buttons on admin groups page.
+* Fixed most frontend compatibility issues with classic and block themes.
+* Fixed issue where parcels couldn't be removed from a product.
+* Fixed issue on punchout return template where user might see a misleading message.
+* Fixed issue with admin product export page.
+
+= 8.10.1 =
+* Fixed issue with asset enqueuing.
+
+= 8.10.0 =
+* Added ClearSale settings and resend option for admin orders.
+* Added ClearSale and PayFabric options to admin price sheets.
+* Added fraud tab to admin order details.
+* Added recent orders to Dashboard.
+* Changed resend buttons on admin order detail page to be nested inside a dropdown.
+* Changed public JavaScript code so that dependencies are bundled together to load at once rather than loading separately.
+* Changed Bootstrap to be bundled with admin and public assets rather than loaded independently.
+* Fixed issues with product detail page image carousel and pricing tab.
+* Fixed issue with broken links on admin report download index page.
+* Removed local CSS and JavaScript library files that are now managed using NPM.
+
+= 8.9.1 =
+* Fixed issues with pagination on admin customer group tabs.
+
+= 8.9.0 =
+* Added more descriptive labels and missing headers on admin products tabs.
+* Added ability to remove parent group from customer group.
+* Added refresh button to admin order detail page.
+* Changed admin background color to match WordPress background color.
+* Changed settings analytics tab to explicitly mention Google Analytics 4 support.
+* Changed return merchandise authorization form to use data picker.
+* Fixed sorting issues on admin reports page.
+* Fixed issue with admin product pricing tab.
+* Fixed issues with admin customer groups notes.
+
+= 8.8.0 =
+* Added confirmation for deleting flat rates, and fixed some visual issues with tabs.
+* Fixed responsive issue with plugin navigation.
+* Fixed issues with order return merchandise authorization form.
+* Fixed issues with admin promo code pages.
+* Fixed issue with selecting product images using the WordPress media library.
+
+= 8.7.1 =
+* Fixed issue with button arrangement on admin collections page.
+
+= 8.7.0 =
+* Changed punchout suppliers admin index and forms to use new UI.
+* Changed admin index UI to say 'No items found' instead of 'No rows'.
+
+= 8.6.2 =
+* Added some missing headers for reports.
+
+= 8.6.1 =
+* Fixed issue with reports not appearing.
+
+= 8.6.0 =
+* Account and cart menus can be easily added to other WordPress themes using .vendorfuel-account-menu and .vendorfuel-cart-menu classes.
+* New form UI for shipping parcels, gateway and warehouse. Separated shipping mode to individual form.
+* Improved frontend address validation.
+
+= 8.5.2 =
+* Fixed issues where upload index pages might initially show data from another upload index page.
+
+= 8.5.1 =
+* Fixed issue with upload indexes showing wrong fields.
+
+= 8.5.0 =
+* Improved plugin navigation with dropdown menus and icons.
+* Most index tables use Material UI Data Grid and now feature the ability to preview items in a dialog box.
+* Scheduled reports can be unscheduled.
+* Fixed issues with downloadable spreadsheet templates.
+* Fixed inventory control issue on admin product detail page.
+* Fixed issue where page title wouldn't update when viewing other pages in the plugin settings.
+
+= 8.4.0 =
+* Added ability to download exported product data and delete report downloads.
+* Added ability to upload product inventory.
+* Edit/view buttons added to most index pages so that other fields can be clickable or selectable.
+* Delete buttons added to most index pages.
+
+= 8.3.3 =
+* Fixed issues with reports referring to non-existent fields.
+
+= 8.3.2 =
+* Rolled back minimum PHP version to 7.4.
+
+= 8.3.1 =
+* Fixed issues with index pages.
+
+= 8.3.0 =
+* Improved most index pages with better user interface, pagination and state saving so that users can return to their search results instead.
+* Updated uploader details so they show more information about successes and failures.
+* Fixed issues with reports scheduling section.
+
+= 8.2.0 =
+* Updated and improved visual consistency of top navigation bar, breadcrumbs, page headers, top page navigation and other UI elements.
+* Added creation and update timestamps to some admin pages.
+* Fixed visual issue with shipping mode form.
+* Fixed issue with category uploader.
+
+= 8.1.4 =
+* Added Approver and Requestor fields to Groups customer tab.
+
+= 8.1.3 =
+* Fixed issues with wrapping tabs on some admin pages.
+* FIxed issues with admin edit product pages.
+
+= 8.1.2 =
+* Fixed issue with empty search queries on catalog page.
+
+= 8.1.1 =
+* Fixed visual issues with customer accounts page.
+* Fixed visual issues with frontend account and order forms.
+* Fixed redirection issue on Welcome page.
+
+= 8.1.0 =
+* Fixed issues with product document form.
+* Cleaned up backend code.
+
+= 8.0.6 =
+* Improved warning notifications if store is missing API key or SSL.
+* Fixed minor visual inconsistencies.
+
+= 8.0.5 =
+* Fixed responsive issues with tab headings.
+
+= 8.0.4 =
+* Fixed issues with tables not supporting responsive viewports.
+* Fixed minor visual inconsistencies across pages and forms.
+
+= 8.0.3 =
+* Fixed issues with inconsistent breadcrumb styling.
+
+= 8.0.2 =
+* Improved header appearance.
+* Interaction speed improved across certain admin sections.
+
+= 8.0.1 =
+* Fixed issues with Checkout page's saved addresses.
+
+= 8.0.0 =
+* Updated frontend templates to use Bootstrap 5.
+
+= 7.10.0 =
+* Updated frontend templates to consistently use only Bootstrap classes for visual consistency.
+* Fixed issues with admin customer roles.
+
+= 7.9.0 =
+* Improved separation of plugin from theme.
+* Removed option to load separate version of Bootstrap for frontend.
+
+= 7.8.8 =
+* Phone number fields are now required on checkout page.
+
+= 7.8.7 =
+* Fixed issues with mixed punchout customers not seeing menu items.
+* Fixed issue where empty subcategories could appear in navigation.
+
+= 7.8.6 =
+* Fixed issue with cart item font size.
+* Fixed issues with mixed punchout customers not seeing menu items.
+
+= 7.8.5 =
+* Fixed issue in admin section with category products UI. Products are now displayed in a table like collection products.
+* Added image filename and dimensions to admin product page.
+
+= 7.8.4 =
+* Updated cost sheets uploader UI.
+
+= 7.8.3 =
+* Fixed issue where collection image wasn't being saved properly.
+* Updated collections UI.
+
+= 7.8.2 =
+* Fixed issues with notes for customer accounts.
+
+= 7.8.1 =
+* Fixed issue with parcel validation in downloadable template.
+* Fixed issues with admin users pages.
+
+= 7.8.0 =
+* Added ability to edit meta title and meta descriptions for categories.
+
+= 7.7.2 =
+* Removed usage of Bootstrap icons in admin area.
+
+= 7.7.1 =
+* Admin AngularJS and Bootstrap dependencies imported into app rather than enqueued separately for improved performance.
+
+= 7.7.0 =
+* Added ability to upload category and category tree structures.
+
+= 7.6.6 =
+* Fixed issues with collection product quick view, and added brand and UPC fields.
+
+= 7.6.5 =
+* Fixed issues with mismatched notification system, replacing with toast UI.
+
+= 7.6.4 =
+* Removed TinyMCE editor from Categories and Collections which could result in malformed content appearing.
+* Fixed issue with missing fields from reports.
+
+= 7.6.3 =
+* Fixed issue where categories wouldn't save.
+
+= 7.6.2 =
+* Added feature to export collection data for Google Merchant accounts.
+
+= 7.6.1 =
+* Fixed issue where collections weren't appearing.
+
+= 7.6.0 =
+* Added navigation menu to access main pages in the plugin app so users don't have to keep using the side menu.
+* Fixed issue with Product page forms.
+* Buttons now consistently say "Save" for saving new items, "Update" for saving existing items.
+* Fixed issues with product image uploader.
+
+= 7.5.0 =
+* Improved visual consistency of forms.
+* Revamped admin accounts and purchasing vendors UI.
+* Fixed issue where admin accounts couldn't be deactivated.
+* Fixed issues with Product uploader template.
+
+= 7.4.0 =
+* Customer groups section revamped so users can more easily access specific customer accounts via URL instead of having to navigate through tabs.
+* Uploading experience improved for customer groups.
+* Fixed issues with editing groups.
+* Removed deprecated CSV Inventory Uploader (replaced by newer Product uploader).
+
+= 7.3.2 =
+* Fixed issue where user couldn't copy an existing product to a new product.
+
+= 7.3.1 =
+* Added checkbox to overwrite price sheet when uploading.
+
+= 7.3.0 =
+* Customer accounts, products and price sheets sections revamped so users can more easily access specific customer accounts via URL instead of having to navigate through tabs.
+* Uploading experience improved for customer accounts, products and price sheets.
+* Fixed issue where customer addresses validation.
+
+= 7.2.1 =
+* Fixed issue with phone input field.
+
+= 7.2.0 =
+* Reorganized and cleaned up code.
+* Fixed issues where Reports page wouldn't display reports or notifications.
+
+= 7.1.1 =
+* Fixed issue with data table not displaying info.
+
+= 7.1.0 =
+* Updated UI for uploading customer accounts.
+* Updated submenu pages to show WordPress UI for cards, buttons and tables.
+* Revised plugin folder structure to better align with current WordPress standards.
+
+= 7.0.1 =
+* Added missing Customer Prefix field.
+
+= 7.0.0 =
+* Removed ability to sign up for a new VendorFuel account. Only existing VendorFuel accounts currently being supported.
+
+= 6.9.1 =
+* Removed deprecated confirmation options from settings page.
+
+= 6.9.0 =
+* Added ability to show messaging to customer regarding minimum spend required for free shipping in cart menu and cart page.
+* Improved Shipping flat rate admin pages so it's easier to enable free shipping for minimum spends.
+* Added setting for enabling Exclude sold-out items on catalog pages by default.
+* Fixed issue with Copy to new product button.
+
+= 6.8.2 =
+* Fixed issue with California Prop. 65 warning icon.
+
+= 6.8.1 =
+* Checkout tab fields on Customer admin page relabelled for better clarity.
+* Added button to resend order notification email on Orders admin page.
+
+= 6.8.0 =
+* Additional shipping charges can be flagged per product on Products admin page, under the Parcels tab.
+* Products with additional shipping charges display notices on the product detail and checkout pages.
+* Minor UI improvements to Products admin pages.
+
+= 6.7.2 =
+* Product and Category admin pages now give better hints regarding products missing a price.
+
+= 6.7.1 =
+* Catalog subcategory cards are now arranged in alphabetical order.
+
+= 6.7.0 =
+* Added source files and made improvements to better adhere to WordPress plugin guidelines.
+
+= 6.6.1 =
+* Fixed issue where Catalog could display an empty Filters card.
+
+= 6.6.0 =
+* Added more controls for how the catalog and product detail pages appear in settings.
+* Removed deprecated AngularJS template editor.
+
+= 6.5.0 =
+* Added setting for displaying subcategories in a card format on Catalog pages.
+
+= 6.4.0 =
+* Refactored Dashboard stats to focus on gross revenue instead of order count.
+
+= 6.3.1 =
+* Fixed issue on Catalog pages where user could inadvertently end up with no results if searching for a specific SKU.
+
+= 6.3.0 =
+* Updated Debug Mode so it logs additional console messages and loaded unminified JavaScript files for debugging purposes.
+
+= 6.2.2 =
+* Updated Bootstrap icons.
+
+== 6.1.4 ==
+* Customers required to change their password are force redirected to the password update page.
+
+== 6.1.3 ==
+* Order shipments are now being displayed to customer order history.
+
+== 6.1.1 ==
+* Various bug fixes and polish
+* Updated styling in frontend templates to be compatible with Wordpress 5.9
+* Facet search now respects applied filters
+
+== 6.1.0 ==
+* Various bug fixes and polish
+* Group approvers may now intiate a punchout session to add more items to pending approval orders

@@ -1,0 +1,14 @@
+[
+	{
+		"label": "Customers",
+		"href": "?page=vf-customers"
+	},
+	{
+		"label": "Groups",
+		"href": "?page=vf-customers#/groups"
+	},
+	{
+		"label": "Account uploads",
+		"href": "?page=vf-customers#/groups/uploads"
+	}
+]

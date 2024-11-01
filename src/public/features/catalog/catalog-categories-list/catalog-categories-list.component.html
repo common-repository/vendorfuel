@@ -1,0 +1,185 @@
+<ul class="list-unstyled" style="padding-left: 0">
+	<li ng-repeat="item in $ctrl.list | orderBy:'title' track by $index">
+		<div class="d-flex justify-content-between align-items-baseline">
+			<a
+				ng-href="/{{ $ctrl.catSlug }}/{{ item.slug }}{{ $ctrl.params }}"
+				ng-class="['pb-1 text-break', { 'fw-bold': item.active }]"
+			>
+				{{ item.title }}
+			</a>
+			<span
+				class="badge text-bg-light ms-2"
+				ng-if="item.results && (!item.tree || item.tree.length === 1)"
+			>
+				{{ $ctrl.isLoading ? '&hellip;' : (item.results | number) }}
+			</span>
+		</div>
+		<ul
+			class="children list-unstyled ps-3"
+			ng-if="item.active && item.tree.length"
+		>
+			<li ng-if="item.tree[1]">
+				<div
+					class="d-flex justify-content-between align-items-baseline"
+				>
+					<a
+						class="fw-bold pb-1 text-break"
+						ng-href="/{{ $ctrl.catSlug }}/{{ item.tree[1].slug }}{{
+							$ctrl.params
+						}}"
+					>
+						{{ item.tree[1].title }}
+					</a>
+					<span
+						class="badge text-bg-light ms-2"
+						ng-if="item.results && item.tree.length === 2"
+					>
+						{{
+							$ctrl.isLoading
+								? '&hellip;'
+								: (item.results | number)
+						}}
+					</span>
+				</div>
+				<ul
+					class="children list-unstyled ps-3"
+					ng-if="item.tree.length > 1"
+				>
+					<li ng-if="item.tree[2]">
+						<div
+							class="d-flex justify-content-between align-items-baseline"
+						>
+							<a
+								class="fw-bold pb-1 text-break"
+								ng-href="/{{ $ctrl.catSlug }}/{{
+									item.tree[2].slug
+								}}{{ $ctrl.params }}"
+							>
+								{{ item.tree[2].title }}
+							</a>
+							<span
+								class="badge text-bg-light ms-2"
+								ng-if="item.results && item.tree.length === 3"
+							>
+								{{
+									$ctrl.isLoading
+										? '&hellip;'
+										: (item.results | number)
+								}}
+							</span>
+						</div>
+						<ul
+							class="children list-unstyled ps-3"
+							ng-if="item.tree.length > 2"
+						>
+							<li ng-if="item.tree[3]">
+								<div
+									class="d-flex justify-content-between align-items-baseline"
+								>
+									<a
+										class="fw-bold pb-1 text-break"
+										ng-href="/{{ $ctrl.catSlug }}/{{
+											item.tree[3].slug
+										}}{{ $ctrl.params }}"
+									>
+										{{ item.tree[3].title }}
+									</a>
+									<span
+										class="badge text-bg-light ms-2"
+										ng-if="
+											item.results &&
+											item.tree.length === 4
+										"
+									>
+										{{
+											$ctrl.isLoading
+												? '&hellip;'
+												: (item.results | number)
+										}}
+									</span>
+								</div>
+							</li>
+							<li
+								class="d-flex justify-content-between align-items-baseline"
+								ng-repeat="subcategory in item.subcategories | orderBy:'title' track by $index"
+								ng-if="
+									item.tree.length === 3 &&
+									subcategory.results
+								"
+							>
+								<a
+									class="pb-1 text-break"
+									ng-href="/{{ $ctrl.catSlug }}/{{
+										subcategory.slug
+									}}{{ $ctrl.params }}"
+								>
+									{{ subcategory.title }}
+								</a>
+								<span
+									class="badge text-bg-light ms-2"
+									ng-if="subcategory.results"
+								>
+									{{
+										$ctrl.isLoading
+											? '&hellip;'
+											: (subcategory.results | number)
+									}}
+								</span>
+							</li>
+						</ul>
+					</li>
+
+					<li
+						class="d-flex justify-content-between align-items-baseline"
+						ng-repeat="subcategory in item.subcategories | orderBy:'title' track by $index"
+						ng-if="item.tree.length === 2 && subcategory.results"
+					>
+						<a
+							class="pb-1 text-break"
+							ng-href="/{{ $ctrl.catSlug }}/{{
+								subcategory.slug
+							}}{{ $ctrl.params }}"
+						>
+							{{ subcategory.title }}
+						</a>
+						<span
+							class="badge text-bg-light ms-2"
+							ng-if="subcategory.results"
+						>
+							{{
+								$ctrl.isLoading
+									? '&hellip;'
+									: (subcategory.results | number)
+							}}
+						</span>
+					</li>
+				</ul>
+			</li>
+
+			<li
+				class="d-flex justify-content-between align-items-baseline"
+				ng-repeat="subcategory in item.subcategories | orderBy:'title' track by $index"
+				ng-if="item.tree.length === 1 && subcategory.results"
+			>
+				<a
+					class="pb-1 text-break"
+					ng-href="/{{ $ctrl.catSlug }}/{{ subcategory.slug }}{{
+						$ctrl.params
+					}}"
+				>
+					{{ subcategory.title }}
+				</a>
+				<span
+					class="badge text-bg-light ms-2"
+					ng-if="subcategory.results"
+				>
+					{{
+						$ctrl.isLoading
+							? '&hellip;'
+							: (subcategory.results | number)
+					}}
+				</span>
+			</li>
+		</ul>
+	</li>
+</ul>

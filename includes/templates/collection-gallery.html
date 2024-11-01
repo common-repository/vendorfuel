@@ -1,0 +1,38 @@
+<vf-collection-gallery
+	class="d-block alignwide"
+	collection-id="'ID_OF_CATALOG'"
+>
+</vf-collection-gallery>
+
+<!-- Collection Gallery template -->
+<script type="text/ng-template" id="vfCollectionGallery.html">
+	<div class="container py-5">
+		<div class="d-flex justify-content-center"
+			ng-if="$ctrl.isLoading">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<div ng-if="$ctrl.collection">
+			<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4">
+				<collection-gallery-item class="col mb-4"
+					ng-repeat="item in $ctrl.products track by $index"
+					item="item">
+				</collection-gallery-item>
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- Collection Gallery Item template -->
+<script type="text/ng-template" id="collectionGalleryItem.html">
+	<div>
+		<a ng-href="{{$ctrl.url}}">
+			<div class="ratio ratio-1x1">
+				<img class="card-img lazy" style="object-fit:contain;" loading="lazy" width="320" height="320"
+					ng-src="{{$ctrl.imageSmall}}"
+					ng-attr-alt="{{$ctrl.title}}">
+			</div>
+		</a>
+	</div>
+</script>

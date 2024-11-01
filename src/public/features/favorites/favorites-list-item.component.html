@@ -1,0 +1,155 @@
+<div class="row align-items-center">
+	<div class="col-auto px-0 has-text-align-center">
+		<div class="form-check">
+			<input
+				class="form-check-input position-static"
+				type="checkbox"
+				ng-model="$ctrl.item.isChecked"
+				ng-attr-id="product-{{ $ctrl.item.product_id }}-checked"
+				ng-change="$ctrl.updateSelection()"
+			/>
+		</div>
+	</div>
+	<div class="col-3 px-0 col-md-1 has-text-align-center">
+		<a
+			ng-href="/{{ $ctrl.productSlug }}/{{ $ctrl.item.slug }}"
+			title="{{ $ctrl.item.description }}"
+		>
+			<img
+				class="img-fluid lazy"
+				loading="lazy"
+				ng-repeat="img in $ctrl.item.images"
+				ng-if="$index < 1"
+				ng-src="{{ img.thumb_url || $ctrl.imgPlacerholder }}"
+			/>
+			<img
+				class="img-fluid lazy"
+				loading="lazy"
+				ng-if="$ctrl.item.images.length <= 0"
+				ng-src="{{ $ctrl.imgPlacerholder }}"
+			/>
+		</a>
+	</div>
+	<div class="col col-md-10">
+		<div class="row align-items-center">
+			<div class="col-12 col-md-5 col-lg-6 order-md-1">
+				<a
+					ng-href="/{{ $ctrl.productSlug }}/{{ $ctrl.item.slug }}"
+					title="{{ $ctrl.item.description }}"
+				>
+					<h2 class="h6 d-md-none border-bottom pb-2 mb-2 text-break">
+						{{ $ctrl.item.description | limitTo : 30
+						}}{{ $ctrl.item.description.length >= 30 ? '...' : '' }}
+					</h2>
+					<h2 class="h5 d-none d-md-block text-break">
+						{{ $ctrl.item.description }}
+					</h2>
+				</a>
+				<p class="small"><strong>SKU: </strong>{{ $ctrl.item.sku }}</p>
+			</div>
+			<div class="col-12 col-md-3 col-lg-2 order-md-3">
+				<p class="border-bottom pb-2 mb-2 d-md-none">
+					<small>Unit Price:</small>
+					<strong
+						>{{ $ctrl.item.price | currency }}
+						<small>/{{ $ctrl.item.uom }}</small>
+					</strong>
+				</p>
+				<p class="d-none d-md-block has-text-align-center mb-0">
+					{{ $ctrl.item.price | currency }}
+					<small>/{{ $ctrl.item.uom }}</small>
+				</p>
+			</div>
+			<div class="col-12 col-md-4 col-lg-4 order-md-2">
+				<p
+					class="small has-text-align-center card-text"
+					ng-if="
+						$ctrl.item.status !== 'active' ||
+						$ctrl.item.available_qty === 0
+					"
+				>
+					{{
+						$ctrl.item.status === 'backordered'
+							? 'Backordered'
+							: $ctrl.item.status === 'discontinued'
+							? 'Discontinued'
+							: $ctrl.item.available_qty === 0
+							? 'Out of Stock'
+							: ''
+					}}
+				</p>
+				<button
+					class="btn btn-primary w-100"
+					ng-if="$ctrl.isAvailable($ctrl.item)"
+					ng-click="$ctrl.addToCart(1, $ctrl.item.product_id, $index)"
+				>
+					<span ng-show="!$ctrl.isInProgress">
+						Add to Cart
+						<i class="bi bi-cart-plus-fill"></i>
+					</span>
+					<span ng-show="$ctrl.isInProgress"
+						>Adding to Cart
+						<span
+							class="spinner-border spinner-border-sm"
+							role="status"
+							aria-hidden="true"
+						></span>
+					</span>
+				</button>
+				<div
+					ng-if="
+						$ctrl.item['available_qty'] !== 0 &&
+						$ctrl.item['cart_qty'] !== 0
+					"
+				>
+					<label for="qtyAdd" class="form-label"
+						>Quantity in Cart:
+					</label>
+					<div class="input-group">
+						<button
+							class="btn btn-primary"
+							type="button"
+							ng-click="$ctrl.updateQty($ctrl.item.cart_qty + 1, $ctrl.item.product_id, $index)"
+							ng-disabled="($ctrl.item.available_qty && $ctrl.item.cart_qty >= $ctrl.item.available_qty) ||
+							$ctrl.item.available_qty === 0 ||
+							$ctrl.isInProgress"
+						>
+							<i class="bi bi-plus"></i>
+						</button>
+						<input
+							class="form-control"
+							name="qtyAdd"
+							type="number"
+							min="0"
+							ng-min="0"
+							required
+							style="-moz-appearance: textfield"
+							max="{{ $ctrl.item.available_qty }}"
+							ng-max="$ctrl.item.available_qty"
+							ng-model="$ctrl.item.cart_qty"
+							ng-change="$ctrl.updateQty($ctrl.item.cart_qty, $ctrl.item.product_id, $index)"
+							ng-disabled="$ctrl.item.available_qty === 0 ||
+							$ctrl.isInProgress"
+						/>
+						<button
+							class="btn btn-primary"
+							type="button"
+							ng-click="$ctrl.updateQty($ctrl.item.cart_qty - 1, $ctrl.item.product_id, $index)"
+							ng-disabled="$ctrl.item.cart_qty < 0 ||
+							$ctrl.item.available_qty === 0 ||
+							$ctrl.isInProgress"
+						>
+							<i class="bi bi-dash"></i>
+						</button>
+					</div>
+				</div>
+				<button
+					class="btn btn-link btn-sm pt-2"
+					ng-click="$ctrl.removeFavorite( $ctrl.item.product_id )"
+				>
+					<i class="bi bi-heart"></i> Remove from Favorites
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

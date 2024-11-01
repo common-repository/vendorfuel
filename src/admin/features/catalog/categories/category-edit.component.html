@@ -1,0 +1,413 @@
+<layout-component heading="Edit category" breadcrumbs="$ctrl.breadcrumbs">
+	<div id="col-container" class="wp-clearfix">
+		<div id="col-left">
+			<div class="col-wrap">
+				<div class="form-wrap">
+					<form ng-submit="$ctrl.handleSubmit()" id="categoryEdit">
+						<fieldset ng-disabled="$ctrl.isBusy">
+							<div class="form-field">
+								<label for="title" >Name</label>
+								<input
+									id="title"
+									type="text"
+									ng-model="$ctrl.category.title"
+									required
+								/>
+							</div>
+							<div class="form-field">
+								<label for="description"
+									>Description</label
+								>
+								<textarea
+									id="description"
+									ng-model="$ctrl.category.description"
+									rows="3"
+								></textarea>
+							</div>
+							<div class="form-field">
+								<label for="slug" >Slug</label>
+								<input class="code"
+									type="text"
+									id="slug"
+									ng-model="$ctrl.category.slug"
+								/>
+								<p class="description">
+									Must be kebob-case (e.g. 'my-new-category').
+								</p>
+							</div>
+							<div class="form-field">
+								<label for="parentCategory">Parent</label>
+								<div
+									class="hstack justify-content-between align-items-baseline gap-2 me-3"
+								>
+									<a class="lh-sm"
+										ui-sref="catalog.categories.edit({ id: $ctrl.category.parent_id })"
+										ng-if="
+											$ctrl.category.parent_id &&
+											$ctrl.category.parent_id != 0
+										"
+									>
+										{{ $ctrl.category.parentCategoryTitle }}
+									</a>
+									<button
+										type="button"
+										class="components-button is-tertiary"
+										ng-click="$ctrl.openParentCatSearchModal()"
+									>
+										Select
+									</button>
+								</div>
+							</div>
+							<div class="form-field">
+								<label for="avatax_tax_code"
+									>Avatax Code</label
+								>
+								<input
+									type="text"
+									id="avatax_tax_code"
+									ng-model="$ctrl.category.avatax_tax_code"
+								/>
+							</div>
+							<div class="form-field">
+								<label for="unspsc"
+									><abbr
+										title="United Nations Standard Products and Services Code"
+										>UNSPSC</abbr
+									></label
+								>
+								<input
+									type="text"
+									id="unspsc"
+									ng-model="$ctrl.category.unspsc"
+								/>
+							</div>
+							<div class="form-field">
+								<label>Image URL</label>
+								<div class="hstack gap-2 me-3">
+									<input
+										class="code"
+										type="url"
+										placeholder="None"
+										ng-model="$ctrl.category.img_url"
+									/>
+									<button
+										type="button"
+										class="components-button is-tertiary"
+										ng-click="$ctrl.openMediaFrame('update_img')"
+									>
+										Browse
+									</button>
+								</div>
+							</div>
+							<div class="fieldset mt-3 border-top pt-3">
+								<h2>SEO</h2>
+								<div class="form-field">
+									<label for="meta-title"
+										>Meta Title</label
+									>
+									<input
+										id="meta-title"
+										type="text"
+										ng-model="$ctrl.category.meta.title"
+										maxlength="70"
+									/>
+								</div>
+								<div class="form-field">
+									<label for="meta-description"
+										>Meta Description</label
+									>
+									<textarea
+										id="meta-description"
+										ng-model="$ctrl.category.meta.description"
+										maxlength="155"
+										rows="3"
+									></textarea>
+								</div>
+							</div>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="col-right">
+			<div class="col-wrap">
+				<nav-tab-wrapper
+					active="$ctrl.active"
+					tabs="$ctrl.tabs"
+					handle-change="$ctrl.setActive(id)"
+				></nav-tab-wrapper>
+				<section ng-if="$ctrl.active === 'products'">
+					<h2 class="h5 my-3">Products</h2>
+						<div ng-if="$ctrl.category.products.data.length">
+							<form ng-submit="$ctrl.searchCategory()">
+								<fieldset
+									ng-disabled="!$ctrl.hasResolved || $ctrl.isBusy"
+								>
+									<div class="input-group mb-3">
+										<input
+											class="form-control"
+											type="search"
+											id="searchProduct"
+											ng-model="$ctrl.searchParams.q"
+											placeholder="Search products"
+										/>
+										<button class="btn btn-outline-secondary" type="submit">
+											Search
+										</button>
+									</div>
+								</fieldset>
+							</form>
+							<table class="wp-list-table widefat striped table-view-list">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th class="column-primary">Name</th>
+										<th>SKU</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-class="{'is-expanded': $ctrl.isExpanded[$index]}"
+										ng-repeat="product in $ctrl.category.products.data track by $index"
+									>
+										<th class="align-top" scope="row">{{ product.product_id }}</th>
+										<td class="column-primary">
+											<strong>
+												<a class="row-title"
+													ui-sref="catalog.products.edit({ id: product.product_id })"
+													target="_blank"
+													ng-attr-title="Edit {{
+														product.description
+													}} in a new tab"
+												>
+													{{ product.description }}
+												</a>
+											</strong>
+											<button type="button" class="toggle-row" ng-click="$ctrl.isExpanded[$index] = !$ctrl.isExpanded[$index]">
+												<span class="screen-reader-text">Show more details</span>
+											</button>
+										</td>
+										<td data-colname="SKU">{{ product.sku }}</td>
+										<td data-colname="Status">{{ product.status }}</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="col text-center mt-2">
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="$ctrl.category.products.prev_page_url"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page - 1)"
+								>
+									&lsaquo; Prev
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="
+										$ctrl.category.products.current_page - 2 > 0
+									"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page - 2)"
+								>
+									{{ $ctrl.category.products.current_page - 2 }}
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="
+										$ctrl.category.products.current_page - 1 > 0
+									"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page - 1)"
+								>
+									{{ $ctrl.category.products.current_page - 1 }}
+								</button>
+								<button class="btn btn-outline-primary" type="button" ng-disabled="true">
+									{{ $ctrl.category.products.current_page }}
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="
+										$ctrl.category.products.current_page + 1 <=
+										$ctrl.category.products.last_page
+									"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page + 1)"
+								>
+									{{ $ctrl.category.products.current_page + 1 }}
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="
+										$ctrl.category.products.current_page + 2 <=
+										$ctrl.category.products.last_page
+									"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page + 2)"
+								>
+									{{ $ctrl.category.products.current_page + 2 }}
+								</button>
+								<button
+									class="btn btn-outline-primary"
+									type="button"
+									ng-if="$ctrl.category.products.next_page_url"
+									ng-click="$ctrl.searchCategory($ctrl.category.products.current_page + 1)"
+								>
+									Next &rsaquo;
+								</button>
+							</div>
+						</div>
+						<div ng-if="$ctrl.editedProducts.length" class="mt-3">
+							<form>
+								<fieldset
+									ng-disabled="!$ctrl.hasResolved || $ctrl.isBusy"
+								>
+									<input
+										class="form-control"
+										type="text"
+										id="filterChanges"
+										ng-model="filterEdited"
+										placeholder="Filter changes"
+									/>
+								</fieldset>
+							</form>
+							<table
+								class="wp-list-table widefat striped table-view-list"
+								ng-if="$ctrl.editedProducts.length"
+							>
+								<caption>
+									Category product changes
+								</caption>
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th class="column-primary">Name</th>
+										<th>SKU</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-class="{'is-expanded': $ctrl.isExpanded[$index]}"
+										ng-repeat="product in $ctrl.editedProducts | filter: filterEdited as results track by $index"
+									>
+										<th class="align-top" scope="row">{{ product.value.product_id }}</th>
+										<td class="column-primary">
+											<strong>
+												<a class="row-title"
+													ui-sref="catalog.products.edit({ id: product.value.product_id })"
+													target="_blank"
+													ng-attr-title="Edit {{
+														product.value.description
+													}} in a new tab"
+												>
+														<mark ng-if="product.action === 'add'">{{ product.value.description }}</mark>
+														<del ng-if="product.action === 'remove'">{{ product.value.description }}</del>
+												</a>
+											</strong>
+											<button type="button" class="toggle-row" ng-click="$ctrl.isExpanded[$index] = !$ctrl.isExpanded[$index]">
+												<span class="screen-reader-text">Show more details</span>
+											</button>
+										</td>
+										<td data-colname="SKU">{{ product.value.sku }}</td>
+										<td data-colname="Status">{{ product.value.status }}</td>
+									</tr>
+									<tr ng-if="!results.length">
+										<td colspan="4">
+											No results matching <q>{{ filterEdited }}<q>.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<p class="submit">
+							<button
+								class="components-button is-secondary"
+								type="button"
+								ng-click="$ctrl.openSearchModalUpdate()"
+							>
+								<span ng-if="$ctrl.category.products.data.length"
+									>Add/Remove Products</span
+								><span ng-if="!$ctrl.category.products.data.length"
+									>Add Products</span
+								>
+							</button>
+						</p>
+				</section>
+				<section ng-if="$ctrl.active === 'categories'">
+					<h2 class="h5 my-3">Subcategories</h2>
+						<div class="mb-3">
+							<input
+								type="search"
+								class="form-control"
+								placeholder="Filter Subcategories"
+								ng-model="$ctrl.filterBy"
+							/>
+						</div>
+						<table class="wp-list-table widefat striped table-view-list">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th class="column-primary">Name</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-class="{'is-expanded': $ctrl.isExpanded[$index]}"
+									ng-repeat="category in $ctrl.category.subcategories | orderBy: category.title | filter: $ctrl.filterBy as filtered track by $index"
+								>
+									<th class="align-top" scope="row">{{ category.cat_id }}</th>
+									<td class="column-primary">
+										<strong>
+											<a class="row-title"
+												ui-sref="catalog.categories.edit({ id: category.cat_id })"
+											>
+												{{ category.title }}
+											</a>
+											<button type="button" class="toggle-row" ng-click="$ctrl.isExpanded[$index] = !$ctrl.isExpanded[$index]">
+												<span class="screen-reader-text">Show more details</span>
+											</button>
+										</strong>
+									</td>
+								</tr>
+								<tr ng-if="!filtered.length">
+									<td colspan="2">
+										No categories
+										<span ng-if="$ctrl.filterBy.length >= 1"
+											>matching '{{
+												$ctrl.filterBy
+											}}'</span
+										>
+										found.
+									</td>
+								</tr>
+							</tbody>
+						</table>
+				</section>
+			</div>
+		</div>
+	</div>
+	<div class="btn-toolbar gap-2">
+		<button class="components-button is-primary" type="submit" form="categoryEdit">
+			Update
+		</button>
+		<button
+			class="components-button is-tertiary is-destructive me-auto"
+			type="button"
+			ng-click="$ctrl.deleteCategory($ctrl.category.cat_id)"
+		>
+			Delete
+		</button>
+		<button class="components-button is-tertiary" type="button" ng-click="$ctrl.handleExport( $ctrl.category.cat_id )">
+			Export Products
+		</button>
+		<a
+			class="components-button is-tertiary"
+			target="_blank"
+			ng-href="/{{ $ctrl.catSlug }}/{{ $ctrl.category.slug }}"
+			ng-attr-title="{{
+				'View ' + $ctrl.category.title + ' category in a new tab'
+			}}"
+		>
+			View Category
+		</a>
+	</div>
+</layout-component>
+

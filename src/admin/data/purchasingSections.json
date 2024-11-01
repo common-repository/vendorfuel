@@ -1,0 +1,45 @@
+[
+	{
+		"header": "Vendors",
+		"icon": "building",
+		"href": "#!/purchasing/vendors",
+		"links": [
+			{ "text": "Manage vendors", "href": "#!/purchasing/vendors" },
+			{ "text": "Add new", "href": "#!/purchasing/vendors/create" }
+		]
+	},
+	{
+		"header": "Cost sheets",
+		"icon": "money-alt",
+		"href": "#!/purchasing/cost-sheets",
+		"links": [
+			{
+				"text": "Manage cost sheets",
+				"href": "#!/purchasing/cost-sheets"
+			},
+			{
+				"text": "Upload cost sheets",
+				"href": "#!/purchasing/cost-sheets/uploads/create"
+			},
+			{
+				"text": "Manage batch uploads",
+				"href": "#!/purchasing/cost-sheets/uploads"
+			}
+		]
+	},
+	{
+		"header": "Document profiles",
+		"icon": "admin-page",
+		"href": "#!/purchasing/document-profiles",
+		"links": [
+			{
+				"text": "Manage document profiles",
+				"href": "#!/purchasing/document-profiles"
+			},
+			{
+				"text": "Add new document profile",
+				"href": "#!/purchasing/document-profiles/create"
+			}
+		]
+	}
+]

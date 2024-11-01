@@ -1,0 +1,32 @@
+<nav aria-label="breadcrumb" ng-if="$ctrl.breadcrumbs.length">
+	<ol class="breadcrumb p-2 bg-light rounded">
+		<li
+			ng-class="[
+				'breadcrumb-item',
+				{
+					active: $ctrl.$last
+				}
+			]"
+			ng-repeat="breadcrumb in $ctrl.breadcrumbs"
+			ng-if="!$last"
+		>
+			<a
+				href="{{ breadcrumb.hash || breadcrumb.link }}"
+				ng-if="breadcrumb.hash || breadcrumb.link"
+			>
+				{{ breadcrumb.name }}
+			</a>
+			<a ui-sref="{{ breadcrumb.state }}" ng-if="breadcrumb.state">
+				{{ breadcrumb.name }}
+			</a>
+		</li>
+		<li
+			class="breadcrumb-item active"
+			aria-current="page"
+			ng-repeat="breadcrumb in $ctrl.breadcrumbs"
+			ng-if="$last"
+		>
+			{{ breadcrumb.name }}
+		</li>
+	</ol>
+</nav>

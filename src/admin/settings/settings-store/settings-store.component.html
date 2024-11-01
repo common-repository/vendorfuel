@@ -1,0 +1,159 @@
+<h2 class="h5 my-3">Store settings</h2>
+<form name="form" ng-submit="$ctrl.update()">
+	<fieldset ng-disabled="$ctrl.isBusy ">
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">
+						<label for="name">Store Name</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text"
+							id="name"
+							ng-model="$ctrl.store.name"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="url">Store URL</label>
+					</th>
+					<td>
+						<input
+							type="url"
+							class="regular-text code"
+							id="url"
+							ng-model="$ctrl.store.url"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Options</th>
+					<td>
+						<fieldset ng-disabled="$ctrl.isBusy">
+							<legend class="screen-reader-text">
+								<span>Options</span>
+							</legend>
+							<label for="inventory">
+								<input
+									id="inventory"
+									name="inventory"
+									ng-model="$ctrl.store.options['Inventory System']"
+									type="checkbox"
+								/>
+								Enable inventory system
+							</label>
+							<br />
+							<label for="two-factor">
+								<input
+									id="two-factor"
+									name="two-factor"
+									ng-model="$ctrl.store.options['Admin Two Factor Authentication']"
+									type="checkbox"
+								/>
+								Enable two-factor authentication for admin users
+							</label>
+							<br />
+							<label for="verify-users">
+								<input
+									id="verify-users"
+									name="verify-users"
+									ng-model="$ctrl.store.options['Verify Users']"
+									type="checkbox"
+								/>
+								Enable customer verification
+							</label>
+							<br />
+							<label for="disable-guests">
+								<input
+									id="disable-guests"
+									name="disable-guests"
+									ng-model="$ctrl.store.options['Disable Guests']"
+									type="checkbox"
+								/>
+								Disable guest checkout, requiring customers to
+								register and sign in to complete checkout
+								process
+							</label>
+							<br />
+							<label for="disable-rma">
+								<input
+									id="disable-rma"
+									name="disable-rma"
+									ng-model="$ctrl.store.options['Disable RMA']"
+									type="checkbox"
+								/>
+								Disable
+								<abbr title="Return Merchandise Authorization"
+									>RMA</abbr
+								>
+								for customers
+							</label>
+							<br />
+							<label for="disable-billing-address">
+								<input
+									id="disable-billing-address"
+									name="disable-billing-address"
+									ng-model="$ctrl.store.options['Disable Billing Address']"
+									type="checkbox"
+								/>
+								Disable separate billing address during checkout
+							</label>
+							<br />
+							<label for="force-role">
+								<input
+									id="force-role"
+									name="force-role"
+									ng-model="$ctrl.store.options['Force Role']"
+									type="checkbox"
+								/>
+								Require customer role during registration
+							</label>
+							<br />
+							<label for="credit-line">
+								<input
+									id="credit-line"
+									name="credit-line"
+									ng-model="$ctrl.store.options['Credit Line Default On']"
+									type="checkbox"
+								/>
+								Enable credit line for new customer accounts
+							</label>
+							<br />
+							<label for="manual-verification">
+								<input
+									id="manual-verification"
+									name="manual-verification"
+									ng-model="$ctrl.store.options['Customers Require Manual Verification']"
+									type="checkbox"
+								/>
+								Require manual verification for new customers
+							</label>
+							<br />
+							<label for="email-verification">
+								<input
+									id="email-verification"
+									name="email-verification"
+									ng-model="$ctrl.store.options['Customer Emails Require Verification']"
+									type="checkbox"
+								/>
+								Require email verification for new customers
+							</label>
+						</fieldset>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</fieldset>
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-disabled="$ctrl.isUpdating"
+			type="submit"
+		>
+			Save Changes
+		</button>
+	</p>
+</form>

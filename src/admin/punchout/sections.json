@@ -1,0 +1,16 @@
+[
+	{
+		"title": "Suppliers",
+		"to": "suppliers",
+		"links": [
+			{
+				"text": "All Suppliers",
+				"to": "suppliers"
+			},
+			{
+				"text": "Add New",
+				"to": "suppliers/create"
+			}
+		]
+	}
+]

@@ -1,0 +1,27 @@
+[
+	{
+		"title": "Mode",
+		"to": "mode",
+		"body": "Select between free, rate and parcel-based shipping."
+	},
+	{
+		"title": "Gateways",
+		"to": "gateways",
+		"body": "Manage Shippo and other gateways."
+	},
+	{
+		"title": "Warehouse",
+		"to": "warehouse",
+		"body": "Manage warehouse address."
+	},
+	{
+		"title": "Rates",
+		"link": "?page=vendorfuel#!/shipping/rates/0",
+		"body": "Manage shipping rates."
+	},
+	{
+		"title": "Parcels",
+		"to": "parcels",
+		"body": "Manage shipping parcels."
+	}
+]

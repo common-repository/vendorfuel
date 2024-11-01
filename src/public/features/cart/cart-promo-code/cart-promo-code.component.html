@@ -1,0 +1,42 @@
+<form ng-submit="$ctrl.addPromoCode($ctrl.code)">
+	<label for="promo-code" class="form-label">Promo Code</label>
+	<fieldset class="border-0 p-0" ng-disabled="$ctrl.isAddingPromoCode">
+		<div class="input-group">
+			<input
+				type="text"
+				id="promo-code"
+				class="form-control"
+				aria-label="Promo code"
+				required
+				ng-model="$ctrl.code"
+				minlength="1"
+				maxlength="12"
+			/>
+			<button class="btn btn-secondary" type="submit">Apply</button>
+		</div>
+	</fieldset>
+	<small class="form-text">Enter promo code if you have one.</small>
+</form>
+<div
+	class="alert alert-success fade show"
+	ng-repeat="item in $ctrl.promoCodes track by $index"
+>
+	<button
+		type="button"
+		class="btn-close"
+		ng-click="$ctrl.removePromoCode(item.promo_code_id)"
+		aria-label="Remove promo code"
+		title="Remove promo code"
+	></button>
+	<h5 class="alert-heading">
+		Promo code: <span class="badge text-bg-light">{{ item.code }}</span>
+	</h5>
+	<span ng-if="item.discount_type === 'percentage'"
+		>{{ item.discount | number : 0 }}% OFF</span
+	>
+	<span ng-if="item.discount_type === 'discount'"
+		>{{ item.discount_total | currency }} OFF</span
+	>
+	<hr />
+	<p class="mb-0">Discount: {{ item.discount_total | currency }}</p>
+</div>

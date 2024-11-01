@@ -1,0 +1,7 @@
+@use "../../../node_modules/@wordpress/base-styles/variables";
+
+ol.breadcrumb {
+	margin-left: 0;
+	margin-top: var(--grid-unit-20);
+	font-size: variables.$default-font-size;
+}

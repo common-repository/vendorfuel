@@ -1,0 +1,559 @@
+<h2>VendorFuel settings</h2>
+<form name="form">
+	<fieldset ng-disabled="$ctrl.isLoading">
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">
+						<label for="apiKey"
+							>VendorFuel API Key
+							<span class="description">(required)</span></label
+						>
+					</th>
+					<td
+						ng-class="[
+							'form-required',
+							{
+								'form-invalid':
+									!$ctrl.settings.api_key && !$ctrl.isLoading
+							}
+						]"
+					>
+						<input
+							type="text"
+							class="regular-text"
+							id="apiKey"
+							ng-model="$ctrl.settings.api_key"
+							required
+						/>
+						<p class="description">
+							Please enter your VendorFuel API key.
+						</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<fieldset ng-disabled="!$ctrl.settings.api_key || $ctrl.isUpdating">
+			<h2>Catalog settings</h2>
+			<p class="description">
+				If you change your default category or product slugs, go to
+				<em>WordPress > Settings > Permalinks</em> and select
+				<em>Save Changes</em> to update the permalinks.
+			</p>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="product-slug">Product Slug</label>
+						</th>
+						<td>
+							<input
+								type="text"
+								class="regular-text"
+								id="product-slug"
+								ng-model="$ctrl.settings.product_slug"
+								placeholder="products"
+							/>
+							<span>Default: <code>products</code></span>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<label for="cat-slug">Category Slug</label>
+						</th>
+						<td>
+							<input
+								type="text"
+								class="regular-text"
+								id="cat-slug"
+								ng-model="$ctrl.settings.cat_slug"
+								placeholder="categories"
+							/>
+							<span>Default: <code>categories</code></span>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Enabled Filters</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Enabled filters</span>
+								</legend>
+								<label for="enableRecyclable">
+									<input
+										type="checkbox"
+										name="enableRecyclable"
+										id="enableRecyclable"
+										ng-model="$ctrl.settings.enableRecyclable"
+										ng-true-value="1"
+										ng-false-value="0"
+									/>
+									Enable <em>Only recycled</em>, which allows
+									users to filter only items with Post
+									Consumer Recycled Content</label
+								><br />
+								<label for="enableAbilityOne">
+									<input
+										type="checkbox"
+										name="enableAbilityOne"
+										id="enableAbilityOne"
+										ng-model="$ctrl.settings.enableAbilityOne"
+									/>
+									Enable <em>AbilityOne</em></label
+								><br />
+								<label for="enableCoreList">
+									<input
+										type="checkbox"
+										name="enableCoreList"
+										id="enableCoreList"
+										ng-model="$ctrl.settings.enableCoreList"
+									/>
+									Enable <em>Core List</em></label
+								><br />
+								<label for="enableGSA">
+									<input
+										type="checkbox"
+										name="enableGSA"
+										id="enableGSA"
+										ng-model="$ctrl.settings.enableGSA"
+									/>
+									Enable
+									<em
+										><abbr
+											title="U.S. General Services Administration"
+											>GSA</abbr
+										></em
+									></label
+								><br />
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Disabled Filters</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Disabled filters</span>
+								</legend>
+								<label for="disableFacets">
+									<input
+										type="checkbox"
+										name="disableFacets"
+										id="disableFacets"
+										ng-model="$ctrl.settings.disableFacets"
+									/>
+									Disable facet filters such as brands,
+									manufacturers and attributes</label
+								>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Inventory Filters</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Inventory filters</span>
+								</legend>
+								<label for="excludeSoldOut">
+									<input
+										type="checkbox"
+										name="excludeSoldOut"
+										id="excludeSoldOut"
+										ng-model="$ctrl.settings.excludeSoldOut"
+									/>
+									Exclude sold-out items by default on
+									inventory controlled catalogs</label
+								>
+							</fieldset>
+							<p class="description">
+								If unchecked, users can still exclude sold-out
+								items from the catalog if inventory control is
+								enabled.
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Subcategory Cards</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Subcategory cards</span>
+								</legend>
+								<label for="showSubcategoryCards">
+									<input
+										type="checkbox"
+										name="showSubcategoryCards"
+										id="showSubcategoryCards"
+										ng-model="$ctrl.settings.showSubcategoryCards"
+									/>
+									Show up to
+									<label for="subcategoryCardsLimit"
+										><input
+											name="subcategoryCardsLimit"
+											type="number"
+											min="0"
+											step="1"
+											id="subcategoryCardsLimit"
+											ng-model="$ctrl.settings.subcategoryCardsLimit"
+											class="small-text"
+										/>
+										subcategory cards</label
+									>
+									on catalog pages</label
+								>
+							</fieldset>
+							<p class="description">
+								Leave number field blank or set to 0 to show
+								cards for all subcategories.
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Product Detail Settings</h3>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="relatedProductsTitle"
+								>Related products title
+							</label>
+						</th>
+						<td>
+							<input
+								type="text"
+								class="regular-text"
+								id="relatedProductsTitle"
+								ng-model="$ctrl.settings.relatedProductsTitle"
+								placeholder="Related products"
+							/>
+							<p class="description">
+								The title for the related products on the
+								product detail page. Defaults to 'Related
+								products'.
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Related Products Placement</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Related products placement</span>
+								</legend>
+								<label for="showRelatedAboveSpecs">
+									<input
+										type="checkbox"
+										name="showRelatedAboveSpecs"
+										id="showRelatedAboveSpecs"
+										ng-model="$ctrl.settings.showRelatedAboveSpecs"
+									/>
+									Display any related products above the
+									products specifications on the product
+									detail page</label
+								>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Reviews</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Reviews</span>
+								</legend>
+								<label for="showReviews">
+									<input
+										type="checkbox"
+										name="showReviews"
+										id="showReviews"
+										ng-model="$ctrl.settings.showReviews"
+									/>
+									Show product reviews</label
+								>
+							</fieldset>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Cart settings</h3>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">Minimum Spend Notice</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Minimum spend notice</span>
+								</legend>
+								<label for="showFreeShipping">
+									<input
+										type="checkbox"
+										name="showFreeShipping"
+										id="showFreeShipping"
+										ng-model="$ctrl.settings.showFreeShipping"
+										ng-true-value="1"
+										ng-false-value="0"
+									/>
+									Show free shipping minimum spend requirement
+									on the cart menu and cart page</label
+								>
+							</fieldset>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Checkout settings</h3>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">Additional checkout fields</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Additional checkout fields</span>
+								</legend>
+								<fieldset>
+									<label for="company-name" class="w-25">
+										<input
+											type="checkbox"
+											name="company-name"
+											id="company-name"
+											ng-model="$ctrl.settings.checkout.company_name_option"
+										/>
+										Company/Organization</label
+									>
+									<label for="company-name-required">
+										<input
+											type="checkbox"
+											name="company-name-required"
+											id="company-name-required"
+											ng-model="$ctrl.settings.checkout.company_name_option_required"
+											ng-disabled="!$ctrl.settings.checkout.company_name_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+								<fieldset>
+									<label for="purchase-order" class="w-25">
+										<input
+											type="checkbox"
+											name="purchase-order"
+											id="purchase-order"
+											ng-model="$ctrl.settings.checkout.purchase_order_option"
+										/>
+										Purchase Order Number</label
+									>
+									<label for="purchase-order-required">
+										<input
+											type="checkbox"
+											name="purchase-order-required"
+											id="purchase-order-required"
+											ng-model="$ctrl.settings.checkout.purchase_order_option_required"
+											ng-disabled="!$ctrl.settings.checkout.purchase_order_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+								<fieldset>
+									<label for="issuing-office" class="w-25">
+										<input
+											type="checkbox"
+											name="issuing-office"
+											id="issuing-office"
+											ng-model="$ctrl.settings.checkout.issuing_office_option"
+										/>
+										Issuing Office</label
+									>
+									<label for="issuing-office-required">
+										<input
+											type="checkbox"
+											name="issuing-office-required"
+											id="issuing-office-required"
+											ng-model="$ctrl.settings.checkout.issuing_office_option_required"
+											ng-disabled="!$ctrl.settings.checkout.issuing_office_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+								<fieldset>
+									<label for="cost-center" class="w-25">
+										<input
+											type="checkbox"
+											name="cost-center"
+											id="cost-center"
+											ng-model="$ctrl.settings.checkout.cost_center_option"
+										/>
+										Cost Center Code</label
+									>
+									<label for="cost-center-required">
+										<input
+											type="checkbox"
+											name="cost-center-required"
+											id="cost-center-required"
+											ng-model="$ctrl.settings.checkout.cost_center_option_required"
+											ng-disabled="!$ctrl.settings.checkout.cost_center_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+								<fieldset>
+									<label for="attention" class="w-25">
+										<input
+											type="checkbox"
+											name="attention"
+											id="attention"
+											ng-model="$ctrl.settings.checkout.attention_option"
+										/>
+										Attention</label
+									>
+									<label for="attention-required">
+										<input
+											type="checkbox"
+											name="attention-required"
+											id="attention-required"
+											ng-model="$ctrl.settings.checkout.attention_option_required"
+											ng-disabled="!$ctrl.settings.checkout.attention_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+								<fieldset>
+									<label for="notes" class="w-25">
+										<input
+											type="checkbox"
+											name="notes"
+											id="notes"
+											ng-model="$ctrl.settings.checkout.notes_option"
+										/>
+										Notes</label
+									>
+									<label for="notes-required">
+										<input
+											type="checkbox"
+											name="notes-required"
+											id="notes-required"
+											ng-model="$ctrl.settings.checkout.notes_option_required"
+											ng-disabled="!$ctrl.settings.checkout.notes_option"
+										/>
+										Require this field during
+										checkout?</label
+									>
+								</fieldset>
+							</fieldset>
+							<p class="description">
+								Check any of the following fields to display
+								them during checkout. Checking 'Required' will
+								be make the field required. To replace any of
+								these fields for a customer, go to the customer
+								account's settings, under the Checkout tab.
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Registration settings</h3>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">Require address</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Require address</span>
+								</legend>
+								<label for="require-address">
+									<input
+										type="checkbox"
+										name="require-address"
+										id="require-address"
+										ng-model="$ctrl.settings.requireAddress"
+										ng-true-value="1"
+										ng-false-value="0"
+									/>
+									Require address during registration of new
+									users</label
+								>
+							</fieldset>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset ng-disabled="$ctrl.isUpdating">
+			<h2>Development settings</h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="apiURL"
+								>API URL
+								<span class="description"
+									>(required)</span
+								></label
+							>
+						</th>
+						<td
+							ng-class="[
+								'form-required',
+								{
+									'form-invalid':
+										!$ctrl.settings.api_url &&
+										!$ctrl.isLoading
+								}
+							]"
+						>
+							<input
+								type="url"
+								class="regular-text code"
+								id="apiURL"
+								ng-model="$ctrl.settings.api_url"
+								required
+								placeholder="e.g. https://api.vendorfuel.com"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Debug mode</th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text">
+									<span>Debug mode</span>
+								</legend>
+							</fieldset>
+							<label for="debug">
+								<input
+									type="checkbox"
+									name="debug"
+									id="debug"
+									ng-model="$ctrl.settings.debug"
+								/>
+								Send additional log messages to the browser
+								console</label
+							>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+	</fieldset>
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-click="$ctrl.update( $ctrl.settings )"
+			ng-disabled="$ctrl.isUpdating"
+		>
+			Save Changes
+		</button>
+	</p>
+</form>

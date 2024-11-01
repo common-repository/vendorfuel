@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h4><strong ng-bind-html="modalTitle"></strong></h4>
+</div>
+<div class="modal-body">
+  <p ng-bind-html="modalMessage"></p>
+</div>
+<div class="modal-footer">
+  <div class="hstack gap-1">
+    <button
+      ng-class="highlightedButton == 0 ? 'button button-primary' : 'button'"
+      ng-click="Cancel()"
+    >
+      {{optionCancel}}
+    </button>
+    <button
+      ng-class="highlightedButton == 1 ? 'button button-primary' : 'button'"
+      ng-click="Confirm()"
+    >
+      {{optionConfirm}}
+    </button>
+  </div>
+</div>

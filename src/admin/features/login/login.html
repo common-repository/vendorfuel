@@ -1,0 +1,70 @@
+<h2 class="text-center mb-3">Sign in to your VendorFuel account</h2>
+<div class="col-12 col-md-6 col-lg-4 mx-auto">
+  <form name="loginForm">
+    <fieldset ng-disabled="$ctrl.isSignedIn">
+      <div class="mb-3">
+        <label for="inputEmail" class="form-label">Email address</label>
+        <input
+          class="form-control"
+          type="email"
+          id="inputEmail"
+          ng-model="user.loginEmail"
+          ng-pattern='/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'
+          required
+          autofocus
+        />
+      </div>
+      <div class="mb-3">
+        <label for="inputPassword" class="form-label">Password</label>
+        <div class="input-group">
+          <input
+            class="form-control"
+            type="password"
+            id="inputPassword"
+            minlength="8"
+            ng-model="user.loginPassword"
+            ng-attr-type="{{ showPassword ? 'text':'password'}}"
+            required
+          />
+          <button
+            ng-click="ToggleShowPassword('password')"
+            class="button"
+            type="button"
+          >
+            <span
+              ng-class="showPassword ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"
+            ></span>
+          </button>
+        </div>
+      </div>
+      <div class="d-grid mb-3">
+        <button
+          class="button button-primary button-hero"
+          ng-disabled="loginForm.$invalid || loggingIn"
+          ng-click="Login()"
+        >
+          {{ loggingIn ? 'Signing' : 'Sign' }} in
+        </button>
+      </div>
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          id="remember_me"
+          type="checkbox"
+          name="remember_me"
+          ng-model="remember_me"
+        />
+        <label for="remember_me" class="form-check-label">
+          Remember for 7 days
+        </label>
+      </div>
+    </fieldset>
+    <a ui-sref="reset-password">Forgot Password? <b>Click Here</b></a>
+  </form>
+  <div
+    class="col mb-3 alert alert-danger"
+    ng-repeat="error in admin.LoginErrors()"
+  >
+    <strong>Error:</strong> {{error}}
+  </div>
+</div>

@@ -1,0 +1,218 @@
+<breadcrumb-component breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-component>
+<h1>Add new price sheet</h1>
+
+<form name="new.priceSheet">
+	<div class="row">
+		<div class="col-lg-4" class="needs-validation">
+			<div
+				ng-class="
+					new.priceSheet.name.$invalid ? 'has-danger' : 'has-success'
+				"
+			>
+				<div class="mb-3">
+					<label class="form-label" for="name">Name</label>
+					<input
+						id="name"
+						class="form-control"
+						ng-class="
+							new.priceSheet.name.$invalid
+								? 'is-invalid'
+								: 'is-valid'
+						"
+						ng-model="addParams.name"
+						name="name"
+						type="search"
+						minlength="1"
+						required
+					/>
+					<div class="invalid-feedback">
+						Please set a name for the Price Sheet.
+					</div>
+				</div>
+			</div>
+			<div class="form-check mb-3">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					ng-model="addParams.default_price_sheet"
+					id="default_price_sheet"
+				/>
+				<label for="default_price_sheet" class="form-check-label">
+					Make Default
+				</label>
+			</div>
+			<fieldset class="border-top mt-3 pt-3">
+				<legend class="h6 text-muted text-uppercase">
+					Third-party integration
+				</legend>
+				<div class="mb-3">
+					<label for="add_site_id" class="form-label"
+						>Site ID for Microsoft Dynamics GP Export</label
+					>
+					<input
+						class="form-control"
+						type="text"
+						id="add_site_id"
+						ng-model="addParams.site_id"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="add_gp_ps" class="form-label"
+						>Microsoft Dynamics GP Price Sheet</label
+					>
+					<input
+						class="form-control"
+						type="text"
+						id="add_gp_ps"
+						ng-model="addParams.gp_price_sheet"
+					/>
+				</div>
+			</fieldset>
+
+			<div class="mb-3">
+				<label for="transaction_type"
+					>Override PayFabric Transaction Type Default</label
+				>
+				<div class="hstack align-items-bottom">
+					<div class="form-check form-check-inline">
+						<input
+							class="form-check-input"
+							type="radio"
+							name="transaction_type"
+							id="transaction_type-book"
+							ng-model="addParams.transaction_type"
+							value="Book"
+						/>
+						<label
+							class="form-check-label"
+							for="transaction_type-book"
+						>
+							Book
+						</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input
+							class="form-check-input"
+							type="radio"
+							name="transaction_type"
+							id="transaction_type-sale"
+							ng-model="addParams.transaction_type"
+							value="Sale"
+						/>
+						<label
+							class="form-check-label"
+							for="transaction_type-sale"
+						>
+							Sale
+						</label>
+					</div>
+					<button
+						class="btn btn-link text-decoration-none btn-sm"
+						ng-click="$ctrl.resetTransactionType()"
+						ng-if="addParams.transaction_type"
+						type="button"
+					>
+						Reset
+					</button>
+				</div>
+			</div>
+			<div class="form-check mb-3">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					ng-model="addParams.clearSaleDisabled"
+					id="clearSaleDisabled"
+				/>
+				<label for="clearSaleDisabled" class="form-check-label">
+					Disable ClearSale
+				</label>
+				<p class="description">
+					Disables ClearSale fraud protection for orders placed on
+					this price sheet.
+				</p>
+			</div>
+			<button
+				class="btn btn-primary"
+				type="button"
+				title="{{
+					!addParams.products
+						? 'A price sheet must have items in order to be added.'
+						: ''
+				}}"
+				ng-click="AddPricesheet()"
+				ng-disabled="new.priceSheet.$invalid || !addParams.products"
+			>
+				Save
+			</button>
+		</div>
+		<div class="col-lg-8">
+			<div class="card shadow-sm">
+				<div class="card-body">
+					<div class="hstack gap-2 align-items-baseline mb-2">
+						<h5 class="card-title">Products</h5>
+						<button
+							class="btn btn-outline-primary btn-sm"
+							ng-click="OpenSearchModalAdd()"
+							type="button"
+						>
+							Add products
+						</button>
+					</div>
+					<div
+						class="text-center p-5 border rounded mb-3"
+						ng-if="!addParams.products.length"
+					>
+						Click 'Add products' to get started.
+					</div>
+					<div class="row row-cols-2 row-cols-md-4 g-3">
+						<div
+							class="col"
+							ng-repeat="product in addParams.products track by $index"
+						>
+							<div
+								class="card shadow-sm h-100"
+								ng-click="EditPrice($index)"
+							>
+								<img
+									ng-if="product.value.image"
+									ng-src="{{ product.value.image.thumb_url }}"
+									class="card-img-top"
+								/>
+								<div class="card-body">
+									<h5 class="card-title text-truncate">
+										{{ product.value.description }}
+									</h5>
+									<h6 class="card-subtitle mb-2 text-muted">
+										{{ product.value.sku }}
+									</h6>
+									<div class="form-floating">
+										<input
+											ng-attr-id="price-{{ $index }}"
+											class="form-control"
+											maxlength="10"
+											ng-class="{
+												'is-invalid':
+													new.priceSheet[
+														'price' + $index
+													].$invalid
+											}"
+											name="price{{ $index }}"
+											placeholder="$0.00"
+											ng-model="product.value.price"
+											format="currency"
+											ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+											required
+										/>
+										<label ng-attr-for="price-{{ $index }}"
+											>Price</label
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

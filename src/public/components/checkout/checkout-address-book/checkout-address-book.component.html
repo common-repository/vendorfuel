@@ -1,0 +1,105 @@
+<vf-spinner ng-show="$ctrl.isLoading"> </vf-spinner>
+
+<div
+	ng-if="!$ctrl.isGuest && $ctrl.isAuthed && !$ctrl.isLoading"
+	class="bg-light mb-3 p-3"
+>
+	<h3>Saved Addresses</h3>
+
+	<div class="alert alert-warning" ng-if="$ctrl.isLocked && !$ctrl.profiles.length">
+		Locked {{ $ctrl.type }} is enabled for your account, but you don't have any saved addresses. Please contact your administrator to add {{ $ctrl.type }} addresses to your account.
+	</div>
+
+	<form role="search">
+		<div class="input-group">
+			<label for="filter" class="input-group-text">Filter Addresses</label>
+			<input
+				type="search"
+				id="filter"
+				class="form-control"
+				name="q"
+				ng-model="$ctrl.q"
+			/>
+		</div>
+	</form>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Address</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr
+				ng-repeat="profile in $ctrl.profiles | filter: $ctrl.q as results track by $index"
+			>
+				<td class="align-baseline">
+					<div ng-if="profile.billing_name || profile.shipping_name"><em>{{ profile.billing_name || profile.shipping_name }}</em></div>
+					{{ profile.first_name }} {{ profile.last_name }}
+					<span class="has-cyan-bluish-gray-color"
+						ng-if="!profile.billing_name &&
+						!profile.shipping_name &&
+						!profile.first_name &&
+						!profile.last_name">&mdash;</span>
+				</td>
+				<td class="align-baseline">
+					{{ profile.address1 }}<br ng-if="profile.address2" />
+					{{ profile.address2 }}<br />
+					{{ profile.city }}, {{ profile.state }} {{ profile.zip }}
+					<div class="small" ng-if="profile.email || profile.phone">
+						{{ profile.email }}<br ng-if="profile.phone" />
+						{{ profile.phone | tel }}
+					</div>
+				</td>
+				<td class="align-middle">
+					<div
+					class="btn-toolbar justify-content-end"
+					role="toolbar"
+					aria-label="Toolbar for editing address profile"
+				>
+					<div class="btn-toolbar" ng-hide="$ctrl.isConfirmingProfileDeletion[ $index ] && !$ctrl.status.delete[ $index ]">
+						<button class="btn btn-primary btn-sm"
+							ng-click="$ctrl.selectProfile( profile, $ctrl.type, $index )"
+							ng-disabled="$ctrl.isSelected[ $index ]"
+							>{{ $ctrl.isSelected[ $index ] ? 'Selected' : 'Select' }}
+						</button>
+						<button class="btn btn-secondary btn-sm ms-1"
+							ng-click="$ctrl.setDefaultProfile( profile.id, $ctrl.type, $index )"
+							ng-if="$ctrl.defaultId !== profile.id"
+						>
+							{{ $ctrl.status.setDefault[ $index ] ? 'Setting' : 'Set as Default' }}
+						</button>
+						<button class="btn btn-danger btn-sm ms-1"
+							ng-if="!$ctrl.isLocked"
+							ng-click="$ctrl.isConfirmingProfileDeletion[ $index ] = true"
+							>Delete</button
+						>
+					</div>
+					<div ng-if="$ctrl.isConfirmingProfileDeletion[ $index ] && !$ctrl.status.delete[ $index ]">
+						<div class="btn-toolbar align-items-baseline">
+							<span class="small me-2">Delete profile?</span>
+							<button class="btn btn-secondary btn-sm" ng-click="$ctrl.isConfirmingProfileDeletion[ $index ] = false"
+								>Cancel</button
+							>
+							<button class="btn btn-danger btn-sm ms-1"
+								ng-click="$ctrl.deleteProfile( profile.id, $ctrl.type, $index )"
+								>{{ $ctrl.isRemoving[ profile.billing_id ] ? 'Deleting' : 'Delete' }}</button
+							>
+						</div>
+					</div>
+				</div>
+				</td>
+			</tr>
+			<tr ng-if="!results.length">
+				<td colspan="3">No results found<span ng-if="$ctrl.q"> for <q>{{ $ctrl.q }}</span>.</q></td>
+			</tr>
+		</tbody>
+	</table>
+	<button class="btn btn-primary"
+		ng-if="!$ctrl.isLocked"
+		ng-click="$ctrl.createProfile( $ctrl.type )"
+	>
+		Create New Saved Address
+	</button>
+</div>

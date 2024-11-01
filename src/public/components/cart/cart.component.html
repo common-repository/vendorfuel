@@ -1,0 +1,72 @@
+<alert-list></alert-list>
+
+<wp-group background-color="very-light-gray" ng-if="!$ctrl.isAuthed">
+	<h3 class="has-text-align-center">Your shopping cart is empty.</h3>
+	<p class="has-text-align-center">
+		Please
+		<a ng-href="{{ $ctrl.pageUrls.catalog }}">continue shopping</a> or
+		<a ng-href="{{ $ctrl.pageUrls.login }}">sign in</a> to view your current
+		cart or any saved carts.
+	</p>
+</wp-group>
+
+<div
+	class="d-flex justify-content-center"
+	ng-if="$ctrl.isAuthed && $ctrl.isLoading"
+>
+	<div class="spinner-border" role="status">
+		<span class="sr-only">Loading...</span>
+	</div>
+</div>
+
+<p
+	class="has-text-align-center has-black-color has-light-green-cyan-background-color has-text-color has-background"
+	ng-if="
+		$ctrl.showFreeShipping &&
+		$ctrl.totalAmount &&
+		$ctrl.minOrderAmount &&
+		$ctrl.minOrderAmount > $ctrl.totalAmount
+	"
+>
+	Add {{ $ctrl.minOrderAmount - $ctrl.totalAmount | currency }} to your cart
+	to qualify for free shipping.
+</p>
+
+<div class="wp-block-columns" ng-if="$ctrl.isAuthed">
+	<div
+		class="wp-block-column"
+		ng-style="$ctrl.cart.items && { 'flex-basis': '75%' }"
+	>
+		<cart-summary
+			total-amount="$ctrl.totalAmount"
+			cart-count="$ctrl.cartCount"
+			cart="$ctrl.cart"
+		>
+		</cart-summary>
+		<cart-items
+			cart="$ctrl.cart"
+			is-loading="$ctrl.isLoading"
+			ng-show="!$ctrl.isLoading"
+		>
+		</cart-items>
+	</div>
+	<div
+		class="wp-block-column"
+		style="flex-basis: 25%"
+		ng-if="$ctrl.cart && $ctrl.cart.items"
+	>
+		<cart-promo-code
+			promo-codes="$ctrl.promoCodes"
+			promo-discount="$ctrl.promoDiscount"
+			total-amount="$ctrl.totalAmount"
+		></cart-promo-code>
+		<cart-order-details
+			cart="$ctrl.cart"
+			total-amount="$ctrl.totalAmount"
+			subtotal="$ctrl.subtotal"
+			cart-count="$ctrl.cartCount"
+			promo-discount="$ctrl.promoDiscount"
+		>
+		</cart-order-details>
+	</div>
+</div>

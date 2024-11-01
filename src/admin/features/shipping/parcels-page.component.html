@@ -1,0 +1,189 @@
+<layout-component heading="Parcels" breadcrumbs="$ctrl.breadcrumbs">
+	<uib-tabset active="activeTab">
+		<uib-tab index="0" select="TabChanged(0)" heading="Parcels">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<bs-search-box-legacy
+					q="searchParams.q"
+					on-submit="SearchParcels(1, query)"
+					is-loading="loadingMore">
+				</bs-search-box-legacy>
+				<table class="table table-striped table-sm">
+					<thead>
+						<tr>
+							<th ng-click="SortIndex('id')">ID</th>
+							<th ng-click="SortIndex('title')">Name</th>
+							<th ng-click="SortIndex('length')">Length</th>
+							<th ng-click="SortIndex('width')">Width</th>
+							<th ng-click="SortIndex('height')">Height</th>
+							<th ng-click="SortIndex('distance_unit')">Distance Unit</th>
+						</tr>
+					</thead>
+					<tbody>
+						<spinner-component ng-if="loadingMore"></spinner-component>
+
+						<tr class="cursor-pointer" ng-if="!loadingMore" ng-repeat="parcel in shippingParcels.data track by $index">
+							<td>{{parcel.id}}</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="ChangeTab(2, $index, $event)">
+										{{parcel.title}}
+									</a>
+								</strong>
+							</td>
+							<td>{{parcel.length}}</td>
+							<td>{{parcel.width}}</td>
+							<td>{{parcel.height}}</td>
+							<td>{{parcel.distance_unit}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{shippingParcels.from || 0}} to {{shippingParcels.to || 0}} of {{shippingParcels.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="btn btn-secondary" ng-if="shippingParcels.prev_page_url" ng-click="SearchParcels(shippingParcels.current_page - 1)">&lsaquo; Prev</button>
+						<button class="btn btn-secondary" ng-if="shippingParcels.current_page - 2 > 0" ng-click="SearchParcels(shippingParcels.current_page - 2)">{{shippingParcels.current_page - 2}}</button>
+						<button class="btn btn-secondary" ng-if="shippingParcels.current_page - 1 > 0" ng-click="SearchParcels(shippingParcels.current_page - 1)">{{shippingParcels.current_page - 1}}</button>
+						<button class="btn btn-secondary" ng-disabled="true">{{shippingParcels.current_page}}</button>
+						<button class="btn btn-secondary" ng-if="shippingParcels.current_page + 1 <= shippingParcels.last_page" ng-click="SearchParcels(shippingParcels.current_page + 1)">{{shippingParcels.current_page + 1}}</button>
+						<button class="btn btn-secondary" ng-if="shippingParcels.current_page + 2 <= shippingParcels.last_page" ng-click="SearchParcels(shippingParcels.current_page + 2)">{{shippingParcels.current_page + 2}}</button>
+						<button class="btn btn-secondary" ng-if="shippingParcels.next_page_url" ng-click="SearchParcels(shippingParcels.current_page + 1)">Next &rsaquo;</button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label for="rpp">Per Page: </label>
+						<select class="form-select" id="rpp" ng-model="searchParams.rpp" ng-change="SearchParcels(1)" ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add new">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="addParcelForm">
+							<div class="mb-3">
+								<label for="create-name" class="form-label">Name</label>
+								<input id="create-name" class="form-control" type="text" name="name" ng-model="createParcel.title" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Length</label>
+								<input class="form-control" type="number" min="0" name="length" ng-model="createParcel.length"
+								ng-class="{'is-invalid': updateParcelForm.length.$invalid}" pattern="[0-9]+" required />
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Width</label>
+								<input class="form-control" type="number" min="0" name="width" ng-model="createParcel.width" pattern="[0-9]+"
+								required />
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Height</label>
+								<input class="form-control" type="number" min="0" name="height" ng-model="createParcel.height"
+								ng-class="{'is-invalid': updateParcelForm.width.$invalid}" pattern="[0-9]+" required />
+							</div>
+							<div class="mb-3">
+								<label for="create-distance-unit" class="form-label">
+									Distance unit
+								</label>
+								<select id="create-distance-unit" class="form-select" name="distance_unit" ng-model="createParcel.distance_unit" ng-selected="createParcel.distance_unit" ng-options="key as value for (key, value) in distanceUnits" required></select>
+							</div>
+							<button class="btn btn-primary" ng-click="CreateParcel()" ng-disabled="addParcelForm.$invalid">Save</button>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="TabChanged(2)" ng-show="selectedParcel" heading="Edit parcel">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="updateParcelForm">
+							<div class="mb-3">
+								<label for="edit-name" class="form-label">Name</label>
+								<input id="edit-name" class="form-control" type="text" name="name"  ng-model="selectedParcel.title" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Length</label>
+								<input class="form-control" type="number" min="0" name="length" ng-model="selectedParcel.length"
+								ng-class="{'is-invalid': updateParcelForm.length.$invalid}" pattern="[0-9]+" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Width</label>
+								<input class="form-control" type="number" min="0"  ng-class="{'is-invalid': updateParcelForm.width.$invalid}" name="width" ng-model="selectedParcel.width" pattern="[0-9]+" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Height</label>
+								<input class="form-control" type="number" min="0" name="height" ng-model="selectedParcel.height" ng-class="{'is-invalid': updateParcelForm.width.$invalid}" pattern="[0-9]+" required>
+							</div>
+							<div class="mb-3">
+								<label for="edit-distance-unit" class="form-label">
+									Distance unit
+								</label>
+								<select id="edit-distance-unit" class="form-select" name="distance_unit" ng-model="selectedParcel.distance_unit" ng-selected="selectedParcel.distance_unit" ng-options="key as value for (key, value) in distanceUnits" required></select>
+							</div>
+							<button class="btn btn-primary mt-3" ng-click="UpdateParcel()" ng-disabled="updateParcelForm.$invalid">Update</button>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="3" select="TabChanged(3)" heading="Gateways">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="updateGateways">
+							<div class="mb-3">
+								<label class="form-label">Shippo key</label>
+								<input class="form-control" type="text" name="key" ng-model="gateways.shippo" required>
+							</div>
+							<button class="btn btn-primary" ng-click="UpdateGateways()" ng-disabled="updateGateways.$invalid">Update Gateway</button>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="4" select="TabChanged(4)" heading="Warehouse">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="updateWarehouseForm">
+							<div class="mb-3">
+								<label class="form-label">Street 1</label>
+								<input class="form-control" type="text" name="s1"  ng-model="warehouse.street1" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Street 2</label>
+								<input class="form-control" type="text" name="s2" ng-model="warehouse.street2">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">City</label>
+								<input class="form-control" type="text" name="city" ng-model="warehouse.city" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">State</label>
+								<input class="form-control" type="text" name="state"  ng-model="warehouse.state" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Zip</label>
+								<input class="form-control" type="text" name="zip" ng-model="warehouse.zip" required>
+							</div>
+							<button class="btn btn-primary" ng-click="UpdateWarehouse()" ng-disabled="updateWarehouseForm.$invalid">Update Warehouse</button>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>
+

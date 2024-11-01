@@ -1,0 +1,12 @@
+[
+	{
+		"name": "tenant-login",
+		"url": "/tenant-login",
+		"component": "tenantLoginPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	}
+]

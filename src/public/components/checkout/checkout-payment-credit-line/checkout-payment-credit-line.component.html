@@ -1,0 +1,30 @@
+<p>Checkout with Credit Line</p>
+
+<div class="mb-3" ng-hide="$ctrl.isComplete">
+	<button
+		class="btn btn-primary"
+		ng-click="$ctrl.submit()"
+		ng-disabled="$ctrl.isInProgress"
+	>
+		Complete Order
+	</button>
+</div>
+
+<div
+	class="alert alert-warning"
+	ng-if="$ctrl.isInProgress && !$ctrl.isComplete"
+>
+	Completing order, please wait and do not refresh the page.
+</div>
+
+<div class="alert alert-success" role="alert" ng-if="$ctrl.isComplete">
+	<h3>Checkout Complete for Order {{ $ctrl.orderId }}</h3>
+	<p>
+		{{
+			$ctrl.isPending
+				? 'Your order is now pending approval.'
+				: 'Your order has been submitted!'
+		}}
+	</p>
+	<a class="btn btn-primary" href="/"> Go to Home </a>
+</div>

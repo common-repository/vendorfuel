@@ -1,0 +1,188 @@
+<button class="btn btn-outline-primary" ng-click="$ctrl.handleClick()">
+	Select {{ $ctrl.modelName }}
+</button>
+
+<div
+	class="modal fade"
+	id="selectModal-{{ $ctrl.uuid }}"
+	tabindex="-1"
+	aria-labelledby="selectModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="selectModalLabel">
+					Select {{ $ctrl.modelName }}
+				</h1>
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="modal"
+					aria-label="Close"
+				></button>
+			</div>
+			<div class="modal-body">
+				<div class="hstack gap-3">
+					<form
+						class="w-100"
+						name="searchForm"
+						ng-submit="$ctrl.handleQuery()"
+					>
+						<fieldset ng-disabled="$ctrl.isBusy">
+							<label for="search" class="visually-hidden"
+								>Search</label
+							>
+							<div class="input-group">
+								<input
+									class="form-control"
+									type="search"
+									name="search"
+									id="search"
+									ng-attr-placeholder="Search {{
+										$ctrl.modelName
+									}}"
+									ng-model="$ctrl.q"
+								/>
+								<button
+									aria-label="Reset query"
+									class="btn btn-outline-secondary"
+									ng-click="$ctrl.handleResetQuery()"
+									ng-if="$ctrl.q"
+									type="button"
+								>
+									<i
+										class="bi bi-x-lg"
+										aria-hidden="true"
+									></i>
+								</button>
+								<button
+									aria-label="Search"
+									class="btn btn-outline-secondary"
+									type="submit"
+								>
+									<i
+										class="bi bi-search"
+										aria-hidden="true"
+									></i>
+								</button>
+							</div>
+						</fieldset>
+					</form>
+					<nav
+						aria-label="Modal navigation"
+						class="hstack gap-2"
+						ng-if="$ctrl.data.last_page > 1"
+					>
+						<span class="text-nowrap">
+							{{ $ctrl.data.current_page | number }} of
+							{{ $ctrl.data.last_page | number }}
+						</span>
+						<ul class="pagination justify-content-end mb-0">
+							<li
+								ng-class="[
+									'page-item',
+									{
+										disabled: $ctrl.data.current_page === 1
+									}
+								]"
+							>
+								<button
+									aria-label="Previous"
+									class="page-link"
+									ng-click="$ctrl.handleChangePage( $ctrl.data.current_page - 1)"
+									ng-disabled="data.current_page === 1 || $ctrl.isBusy"
+								>
+									<i
+										class="bi bi-chevron-left"
+										aria-hidden="true"
+									></i>
+								</button>
+							</li>
+							<li
+								ng-class="[
+									'page-item',
+									{
+										disabled:
+											$ctrl.data.current_page ===
+											$ctrl.data.last_page
+									}
+								]"
+							>
+								<button
+									aria-label="Next"
+									class="page-link"
+									ng-click="$ctrl.handleChangePage( $ctrl.data.current_page + 1)"
+									ng-disabled="$ctrl.data.current_page ===
+									$ctrl.data.last_page || $ctrl.isBusy"
+								>
+									<i
+										class="bi bi-chevron-right"
+										aria-hidden="true"
+									></i>
+								</button>
+							</li>
+						</ul>
+					</nav>
+				</div>
+				<table class="table mb-0">
+					<caption ng-if="$ctrl.data && !$ctrl.data.data.length">
+						No results found.
+					</caption>
+					<thead>
+						<colgroup>
+							<col />
+							<col class="w-100" />
+						</colgroup>
+						<tr>
+							<th scope="col">
+								<div class="form-check">ID</div>
+							</th>
+							<th scope="col">Name</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="row in $ctrl.data.data track by $index">
+							<th scope="row">
+								<div class="form-check">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										ng-attr-name="row-{{ $index }}"
+										ng-attr-id="row-{{ $index }}"
+										ng-model="row.isChecked"
+									/>
+									<label
+										class="form-check-label"
+										ng-attr-for="row-{{ $index }}"
+									>
+										{{ row[$ctrl.idProperty] }}
+									</label>
+								</div>
+							</th>
+							<td>
+								{{ row[$ctrl.nameProperty] }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button
+					type="button"
+					class="btn btn-outline-primary border-0"
+					data-bs-dismiss="modal"
+				>
+					Cancel
+				</button>
+				<button
+					type="button"
+					class="btn btn-primary"
+					ng-click="$ctrl.handleClose()"
+				>
+					Select
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

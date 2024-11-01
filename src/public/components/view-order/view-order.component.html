@@ -1,0 +1,243 @@
+<layout-component>
+	<div class="alert alert-info" role="alert" ng-if="!$ctrl.hasPermission">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<div
+		class="alert alert-info"
+		role="alert"
+		ng-if="$ctrl.hasPermission && !$ctrl.orderId"
+	>
+		Sorry, we are unable to retrieve order information. Please go to your
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.orders }}"
+			>Order History</a
+		>
+		to view order details.
+	</div>
+
+	<div ng-if="$ctrl.hasPermission && $ctrl.orderId">
+		<div class="d-flex justify-content-center" ng-if="$ctrl.isLoading">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+
+		<div ng-if="!$ctrl.isLoading">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th scope="row" class="text-end">Order ID</th>
+						<td>
+							{{ $ctrl.orderId }}
+						</td>
+					</tr>
+					<tr>
+						<th scope="row" class="text-end">Date</th>
+						<td>
+							{{
+								$ctrl.order['order_date_time'] | date : 'medium'
+							}}
+						</td>
+					</tr>
+					<tr>
+						<th scope="row" class="text-end">Payment Method</th>
+						<td>
+							{{ $ctrl.order['payment_method'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.payment_method === 'Credit Card'">
+						<th scope="row" class="text-end">Credit Card</th>
+						<td>
+							{{ $ctrl.order['credit_card'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['cost_center_code']">
+						<th scope="row" class="text-end">Cost Center Code</th>
+						<td>
+							{{ $ctrl.order['cost_center_code'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['rr_po_num']">
+						<th scope="row" class="text-end">Purchase Order</th>
+						<td>
+							{{ $ctrl.order['rr_po_num'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['issuing_office']">
+						<th scope="row" class="text-end">Issuing Office</th>
+						<td>
+							{{ $ctrl.order['issuing_office'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['organization']">
+						<th scope="row" class="text-end">Organization</th>
+						<td>
+							{{ $ctrl.order['organization'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['attention']">
+						<th scope="row" class="text-end">Attention</th>
+						<td>
+							{{ $ctrl.order['attention'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['approver_notes']">
+						<th scope="row" class="text-end">Approver Notes</th>
+						<td>
+							{{ $ctrl.order['approver_notes'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['notes']">
+						<th scope="row" class="text-end">Notes</th>
+						<td>
+							{{ $ctrl.order['notes'] }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order['custom_fields'].f1.name">
+						<th scope="row" class="text-end">
+							{{ $ctrl.order['custom_fields'].f1.name }}
+						</th>
+						<td>
+							{{ $ctrl.order['custom_fields'].f1.value }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="row">
+				<div class="col-md-6">
+					<h2>Shipping Information</h2>
+					<address>
+						<p class="mb-0">
+							{{ $ctrl.order.shipping.first_name }}
+							{{ $ctrl.order.shipping.last_name }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.shipping.address1 }}
+							<br ng-if="$ctrl.order.shipping.address2" />
+							{{ $ctrl.order.shipping.address2 }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.shipping.city }},
+							{{ $ctrl.order.shipping.state }}
+							{{ $ctrl.order.shipping.zip }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.shipping.email }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.shipping.phone | tel }}
+						</p>
+					</address>
+				</div>
+				<div class="col-md-6">
+					<h2>Billing Information</h2>
+					<address>
+						<p class="mb-0">
+							{{ $ctrl.order.billing.first_name }}
+							{{ $ctrl.order.billing.last_name }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.billing.address1 }}
+							<br ng-if="$ctrl.order.billing.address2" />
+							{{ $ctrl.order.billing.address2 }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.billing.city }},
+							{{ $ctrl.order.billing.state }}
+							{{ $ctrl.order.billing.zip }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.billing.email }}
+						</p>
+						<p class="mb-0">
+							{{ $ctrl.order.billing.phone | tel }}
+						</p>
+					</address>
+				</div>
+			</div>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>
+							<abbr title="Stock Keeping Unit"> SKU </abbr>
+						</th>
+						<th>Item</th>
+						<th class="text-end">
+							<abbr title="Quantity"> QTY </abbr>
+						</th>
+						<th class="text-end">Price</th>
+						<th class="text-end">Extended</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in $ctrl.order.items">
+						<td>
+							{{ item.sku }}
+						</td>
+						<td>
+							{{ item.description }}
+						</td>
+						<td class="text-end">
+							{{ item.qty | number }}
+						</td>
+						<td class="text-end">
+							{{ item.price | currency }}
+						</td>
+						<td class="text-end">
+							{{ item.extended_price | currency }}
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr class="text-end">
+						<th id="subtotal" colspan="4">Subtotal</th>
+						<td headers="subtotal">
+							{{ $ctrl.order.subtotal | currency }}
+						</td>
+					</tr>
+					<tr class="text-end">
+						<th id="shipping" colspan="4">Shipping</th>
+						<td headers="shipping">
+							{{ $ctrl.order.shipping_total | currency }}
+						</td>
+					</tr>
+					<tr
+						class="text-end text-success"
+						ng-if="$ctrl.order.promo_discount"
+					>
+						<td id="discount" colspan="4">Discount</td>
+						<td headers="discount">
+							-{{ $ctrl.order.promo_discount | currency }}
+						</td>
+					</tr>
+					<tr class="text-end">
+						<th id="tax" colspan="4">Tax</th>
+						<td headers="tax">
+							{{ $ctrl.order.tax | currency }}
+						</td>
+					</tr>
+					<tr class="text-end">
+						<th id="total" colspan="4">Total</th>
+						<td headers="total">
+							<b>{{ $ctrl.order.total_amt | currency }}</b>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+
+			<order-change-logs
+				ng-if="$ctrl.order.logs && $ctrl.order.logs.length"
+				logs="$ctrl.order.logs"
+			>
+			</order-change-logs>
+		</div>
+	</div>
+</layout-component>

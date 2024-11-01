@@ -1,0 +1,9 @@
+.btn > .dashicons {
+	vertical-align: baseline;
+}
+
+.btn.wp-hide-pw > .dashicons {
+	font-size: 1rem;
+	top: unset;
+	vertical-align: bottom;
+}

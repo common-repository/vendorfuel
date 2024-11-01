@@ -1,0 +1,220 @@
+<h2>Customer Reviews</h2>
+
+<bs-spinner ng-if="$ctrl.isLoading"> </bs-spinner>
+
+<div class="row" ng-if="!$ctrl.isLoading">
+	<div class="col-md-4">
+		<product-rating
+			ng-if="$ctrl.averageRating"
+			rating="$ctrl.averageRating"
+		>
+		</product-rating>
+
+		<!-- Rating Histogram -->
+		<div
+			class="container-fluid my-3 rating-histogram"
+			ng-if="$ctrl.averageRating"
+		>
+			<div
+				class="row mb-2"
+				ng-repeat="rating in $ctrl.histogram track by $index"
+			>
+				<div class="col-auto">
+					{{ rating.stars }}
+					<i
+						class="bi bi-star-fill has-luminous-vivid-amber-color"
+					></i>
+				</div>
+				<div class="col">
+					<div class="progress">
+						<div
+							class="progress-bar"
+							role="progressbar"
+							aria-valuemin="0"
+							aria-valuemax="100"
+							ng-style="{'width': rating.percentage+'%'}"
+							ng-attr-aria-label="Percentage of users who rated this product {{ rating.stars }} stars."
+							ng-attr-aria-valuenow="{{ rating.percentage | number:0 }}"
+						>
+							{{ rating.percentage | number:0 }}{{
+							rating.percentage ? '%' : '' }}
+						</div>
+					</div>
+				</div>
+				<div class="col-auto">{{ rating.total }}</div>
+			</div>
+		</div>
+
+		<!-- Add Review -->
+		<button
+			class="btn btn-secondary"
+			ng-if="!$ctrl.isWritingReview"
+			ng-click="$ctrl.createReview()"
+		>
+			Write a Review
+		</button>
+	</div>
+
+	<div class="col-md-8">
+		<div
+			id="writeReview"
+			ng-class="['collapse', {
+                'show': $ctrl.isWritingReview
+            }]"
+		>
+			<h3>Write a Review</h3>
+			<div ng-if="!$ctrl.isSignedIn">
+				<div class="alert alert-info">
+					You must be
+					<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}"
+						>signed in</a
+					>
+					or
+					<a
+						class="alert-link"
+						ng-href="{{ $ctrl.pageUrls.register }}"
+						>register a new account</a
+					>
+					to add a review.
+				</div>
+				<a
+					class="btn btn-secondary"
+					ng-href="{{ $ctrl.pageUrls.login }}"
+				>
+					Sign In for Review
+				</a>
+			</div>
+			<form id="formReview" name="form" ng-if="$ctrl.isSignedIn">
+				<div class="p-0" ng-if="!$ctrl.reviewSubmitted">
+					<div class="mb-3">
+						<label for="reviewName" class="form-label">Name</label>
+						<input
+							type="text"
+							name="display_name"
+							id="displayName"
+							required
+							maxlength="200"
+							ng-class="['form-control', {
+                                'is-invalid':form.display_name.$invalid && form.display_name.$touched
+                            }]"
+							ng-model="$ctrl.review.display_name"
+						/>
+						<div class="invalid-feedback">
+							Please enter your name.
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="reviewRating" class="form-label"
+							>Rating</label
+						>
+						<span>
+							<i
+								ng-class="['bi ms-1', {
+								'bi-star': $ctrl.review.rating < star,
+								'bi-star-fill has-luminous-vivid-amber-color': $ctrl.review.rating >= star,
+							}]"
+								ng-repeat="star in [1,2,3,4,5] track by $index"
+							></i>
+							<span class="ms-1"
+								>{{ $ctrl.review.rating }} of 5 stars</span
+							>
+						</span>
+						<input
+							class="form-control-range"
+							type="range"
+							name="rating"
+							id="rating"
+							min="1"
+							max="5"
+							ng-model="$ctrl.review.rating"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="reviewTitle" class="form-label"
+							>Title</label
+						>
+						<input
+							type="text"
+							name="title"
+							id="reviewTitle"
+							placeholder="Review title"
+							required
+							maxlength="200"
+							ng-class="['form-control', {
+                                'is-invalid':form.title.$invalid && form.title.$touched
+                            }]"
+							ng-model="$ctrl.review.title"
+						/>
+						<div class="invalid-feedback">
+							Please enter a title for your review.
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="reviewContent" class="form-label"
+							>Review</label
+						>
+						<textarea
+							name="content"
+							id="reviewContent"
+							placeholder="Please tell us your thoughts in 15-300 characters."
+							required
+							ng-class="['form-control',{
+                                'is-invalid':form.content.$invalid && form.content.$touched
+                            }]"
+							ng-model="$ctrl.review.content"
+							ng-minlength="15"
+							ng-maxlength="300"
+						>
+						</textarea>
+						<div class="invalid-feedback">
+							Please enter your review details in 15-300
+							characters.
+						</div>
+					</div>
+					<div class="mb-3">
+						<button
+							class="btn btn-primary"
+							ng-disabled="form.$invalid || $ctrl.reviewSubmitted || $ctrl.isSubmittingReview"
+							ng-click="$ctrl.submitReview()"
+						>
+							{{ $ctrl.isSubmittingReview ? 'Submitting' :
+							'Submit' }} Review
+						</button>
+					</div>
+				</div>
+			</form>
+			<alert-list ng-if="$ctrl.reviewSubmitted"> </alert-list>
+			<wp-spacer height-in-pixels="50"></wp-spacer>
+		</div>
+		<div ng-if="!$ctrl.reviews.total && !$ctrl.isWritingReview">
+			<p>Be the first to add a review for this product!</p>
+		</div>
+		<wp-latest-comments
+			comments="$ctrl.reviews.data"
+			ng-if="$ctrl.reviews.total"
+		>
+		</wp-latest-comments>
+		<div class="page-links" ng-if="$ctrl.reviews.last_page > 1">
+			Pages:
+			<span
+				ng-repeat="x in [].constructor($ctrl.reviews.last_page) track by $index"
+			>
+				<a
+					href="#"
+					class="post-page-numbers text-decoration-none"
+					ng-click="$ctrl.changePage($index + 1, $event)"
+					ng-if="$ctrl.reviews.current_page !== ( $index + 1 )"
+				>
+					{{ $index + 1 }}
+				</a>
+				<span
+					class="post-page-numbers current"
+					aria-current="page"
+					ng-if="$ctrl.reviews.current_page === ( $index + 1 )"
+				>
+					{{ $index + 1 }}
+				</span>
+			</span>
+		</div>
+	</div>
+</div>

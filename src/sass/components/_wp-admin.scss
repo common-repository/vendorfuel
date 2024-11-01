@@ -1,0 +1,37 @@
+@use "../../../node_modules/@wordpress/base-styles/variables";
+
+/* Contextual help */
+.contextual-help-tabs ul {
+	padding-left: 0;
+}
+
+.contextual-help-sidebar {
+	& > p {
+		margin: 1em 0;
+	}
+}
+.contextual-help-tabs,
+.contextual-help-tabs-wrap,
+.contextual-help-sidebar {
+	font-size: variables.$default-font-size;
+}
+
+.help-tab-content p,
+.contextual-help-sidebar p {
+	line-height: 1.6;
+}
+
+.contextual-help-sidebar {
+	box-sizing: content-box;
+}
+
+.contextual-help-sidebar a,
+.contextual-help-tabs-wrap a,
+.contextual-help-tabs a {
+	color: var(--wp--color--blue-50);
+}
+
+.contextual-help-sidebar .dashicons {
+	font-size: 1rem;
+	text-decoration: none;
+}

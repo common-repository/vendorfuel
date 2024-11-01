@@ -1,0 +1,433 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Flat Rates</h2>
+<vf-check-auth></vf-check-auth>
+<wp-notice-list></wp-notice-list>
+
+<div class="container-fluid p-0">
+    <div ng-if="isAuthed" class="col p-0">
+        <uib-tabset active="activeTab">
+            <uib-tab index="0" select="TabChanged(0)" heading="Search">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div>
+
+                        <bs-search-box-legacy
+                            q="searchParams.q"
+                            on-submit="SearchShippingFlatRates(1, query)"
+                            is-loading="loadingMore">
+                        </bs-search-box-legacy> 
+
+                        <div class="row px-3">
+                            <div class="col-2" ng-click="SortIndex('id')">ID</div>
+                            <div class="col-2" ng-click="SortIndex('enabled')">Enabled</div>
+                            <div class="col-2" ng-click="SortIndex('name')">Name</div>
+                            <div class="col-2" ng-click="SortIndex('name')">Label</div>
+                            <div class="col-2" ng-click="SortIndex('amount')">Amount</div>
+                            <div class="col-2" ng-click="SortIndex('free_if_total')">Free shipping for min. order</div>
+                        </div>
+                        <div class="p-3 min-scroll">
+                            <wp-spinner
+                                type="2x"
+                                ng-show="loadingMore">
+                            </wp-spinner>
+                            <div class="text-center" ng-if="flatRates.data.length <= 0 && !loadingMore">
+                                <span class="col m-auto">
+                                    <h3>No Flat Rate(s) <span ng-if="searchTerm.length >= 1">matching
+                                            '{{searchTerm}}'</span> found.</h3>
+                                </span>
+                            </div>
+                            <div class="col p-3 vf-list-item cursor-pointer" ng-class="{'border-bottom': !$last}"
+                                ng-if="!loadingMore" ng-click="ChangeTab(2, $index)"
+                                ng-repeat="rate in flatRates.data track by $index">
+                                <div class="row">
+                                    <div class="col-2">{{ rate.id }}</div>
+                                    <div class="col-2 text-capitalize">{{ rate.enabled }}</div>
+                                    <div class="col-2">{{ rate.name }}</div>
+                                    <div class="col-2">{{ rate.label }}</div>
+                                    <div class="col-2">{{ rate.amount | currency }}</div>
+                                    <div class="col-2 text-capitalize">{{ rate.free_if_total }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row  mb-3">
+                            <div class="col-sm-4">
+                                <span>Showing {{flatRates.from || 0}} to {{flatRates.to || 0}} of {{flatRates.total ||
+                                    0}} entries<span>
+                            </div>
+                            <div class="col-sm-4 text-center mt-2">
+                                <button class="button" ng-if="flatRates.prev_page_url"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page - 1)">&lsaquo; Prev</button>
+                                <button class="button" ng-if="flatRates.current_page - 2 > 0"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page - 2)">{{flatRates.current_page
+                                    - 2}}</button>
+                                <button class="button" ng-if="flatRates.current_page - 1 > 0"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page - 1)">{{flatRates.current_page
+                                    - 1}}</button>
+                                <button class="button"
+                                    ng-disabled="true">{{flatRates.current_page}}</button>
+                                <button class="button"
+                                    ng-if="flatRates.current_page + 1 <= flatRates.last_page"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page + 1)">{{flatRates.current_page
+                                    + 1}}</button>
+                                <button class="button"
+                                    ng-if="flatRates.current_page + 2 <= flatRates.last_page"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page + 2)">{{flatRates.current_page
+                                    + 2}}</button>
+                                <button class="button" ng-if="flatRates.next_page_url"
+                                    ng-click="SearchShippingFlatRates(flatRates.current_page + 1)">Next &rsaquo;</button>
+                            </div>
+                            <div class="col-sm-4  justify-content-end">
+                                <label for="rpp">Per Page: </label>
+                                <select class="form-control" style="display: inline-block;" id="rpp"
+                                    ng-model="searchParams.rpp" ng-change="SearchShippingFlatRates(1)"
+                                    ng-options="value for value in rppValues">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="TabChanged(1)" heading="Add">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div class="row">
+                        <form class="col-md-7 mx-auto" name="addFlatRate">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Name</span>
+                                <input class="form-control" ng-class="{'is-invalid': addFlatRate.name.$invalid}"
+                                    type="text" name="name" placeholder="Name" ng-model="createFlatRate.name" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Label</span>
+                                <input class="form-control" ng-class="{'is-invalid': addFlatRate.label.$invalid}"
+                                    type="text" name="label" placeholder="Label" ng-model="createFlatRate.label">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Amount</span>
+                                <input class="form-control" ng-class="{'is-invalid': addFlatRate.amount.$invalid}"
+                                    format="currency" type="text" name="amount" placeholder="Amount"
+                                    ng-model="createFlatRate.amount"
+                                    ng-pattern="/(?=.*[0-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" required>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="free_if_total" ng-model="createFlatRate.free_if_total">
+                                <label class="form-check-label" for="free_if_total">
+                                    Enable free shipping for minimum order amount
+                                </label>
+                            </div>
+                            <div class="mb-3" ng-if="createFlatRate.free_if_total">
+                                <label for="free_order_total" class="form-label">Minimum order amount for free shipping</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="free_order_total" step="0.01" ng-model="createFlatRate.free_order_total">
+                                </div>
+                            </div>                            
+                            <div class="col-12 row p-0 m-0">
+                                <div class="p-0" ng-class="isLG ? 'col pt-327 max-w-141': 'col-12'">
+                                    <button class="button"
+                                        ng-click="updateModifiers(createFlatRate, 0)">
+                                        Add New Condition
+                                    </button>
+                                </div>
+                                <div class="p-3" ng-class="!isLG ? 'col' : 'col-12'"
+                                    ng-show="createFlatRate.modifiers.length >= 1">
+                                    <div class="row text-center">
+                                        <div class="col-sm-3 pe-0">
+                                            Amount
+                                        </div>
+                                        <div class="col">
+                                            If the order total is in the range of:
+                                        </div>
+                                    </div>
+                                    <div class="row  mb-3"
+                                        ng-repeat="modifier in createFlatRate.modifiers track by $index">
+                                        <div class="col-sm-3">
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': addFlatRate['amount'+$index].$invalid}"
+                                                format="currency" name="amount{{$index}}" format="currency"
+                                                ng-model="createFlatRate.modifiers[$index].amount"
+                                                ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                        </div>
+                                        <div class="input-group col">
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': addFlatRate['min'+$index].$invalid}"
+                                                format="currency" name="min{{$index}}"
+                                                ng-model="createFlatRate.modifiers[$index].order_total_min"
+                                                ng-pattern="/(?=.*[0-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                            <span class="input-group-text">To</span>
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': addFlatRate['max'+$index].$invalid}"
+                                                format="currency" name="max{{$index}}"
+                                                ng-model="createFlatRate.modifiers[$index].order_total_max"
+                                                ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                            <button class="button button-delete"
+                                                ng-click="updateModifiers(createFlatRate, 1, $index)">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Enabled</span>
+                                <div class="checkbox-addon p-5">
+                                    <input class="form-control" type="checkbox" name="enabled" ng-true-value="true"
+                                        ng-false-value="0" ng-model="createFlatRate.enabled"
+                                        ng-init="createFlatRate.enabled = 0">
+                                </div>
+                            </div>
+                            <div ng-if="!updating">
+                                <button class="button button-primary"
+                                    ng-click="CreateFlatRate()"
+                                    ng-disabled="addFlatRate.$invalid">
+                                    Add New Flat Rate
+                                </button>
+                            </div>
+
+                            <div class="d-flex align-items-center"
+                                ng-if="updating">
+                                <strong>Creating flat rate, please wait...</strong>
+                                <div class="spinner is-active ml-auto" role="status" aria-hidden="true"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="TabChanged(2)" ng-hide="!selectedFlatRate" heading="View">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <div class="row">
+                        <form class="col-md-6" name="viewFlatRate">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Name</span>
+                                <input class="form-control" ng-class="{'is-invalid': viewFlatRate.name.$invalid}"
+                                    type="text" name="name" placeholder="Name" ng-model="selectedFlatRate.name"
+                                    required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Label</span>
+                                <input class="form-control" ng-class="{'is-invalid': viewFlatRate.label.$invalid}"
+                                    type="text" name="label" placeholder="Label" ng-model="selectedFlatRate.label">
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Amount</span>
+                                <input class="form-control" ng-class="{'is-invalid': viewFlatRate.amount.$invalid}"
+                                    format="currency" name="amount" placeholder="Amount" ng-model="selectedFlatRate.amount"
+                                    ng-pattern="/(?=.*[0-9])^\$?(([0-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" required>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="free_if_total" ng-model="selectedFlatRate.free_if_total">
+                                <label class="form-check-label" for="free_if_total">
+                                    Enable free shipping for minimum order amount
+                                </label>
+                            </div>
+                            <div class="mb-3" ng-if="selectedFlatRate.free_if_total">
+                                <label for="free_order_total" class="form-label">Minimum order amount for free shipping</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="free_order_total" step="0.01" ng-model="selectedFlatRate.free_order_total">
+                                </div>
+                            </div>                            
+                            <div class="col-12 row p-0 m-0">
+                                <div class="p-0" ng-class="isLG ? 'col pt-327 max-w-141' : 'col-12'">
+                                    <button class="button"
+                                        ng-click="updateModifiers(selectedFlatRate, 0)">
+                                        Add New Condition
+                                    </button>
+                                </div>
+                                <div class="p-3" ng-class="isLG ? 'col' : 'col-12'"
+                                    ng-show="selectedFlatRate.modifiers.length >= 1">
+                                    <div class="row text-center">
+                                        <div class="col-sm-3 pe-0">
+                                            Amount
+                                        </div>
+                                        <div class="col">
+                                            If the order total is in the range of:
+                                        </div>
+                                    </div>
+                                    <div class="row  mb-3"
+                                        ng-repeat="modifier in selectedFlatRate.modifiers track by $index"
+                                        ng-if="!modifier.deleted">
+                                        <div class="col-sm-3">
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': viewFlatRate['amount'+$index].$invalid || !selectedFlatRate.modifiers[$index].amount}"
+                                                format="currency" name="amount{{$index}}" format="currency"
+                                                ng-model="selectedFlatRate.modifiers[$index].amount"
+                                                ng-pattern="/(?=.*[0-9])^\$?(([0-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                        </div>
+                                        <div class="input-group col">
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': viewFlatRate['min'+$index].$invalid || !selectedFlatRate.modifiers[$index].order_total_min}"
+                                                format="currency" name="min{{$index}}"
+                                                ng-model="selectedFlatRate.modifiers[$index].order_total_min"
+                                                ng-pattern="/(?=.*[0-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                                <span class="input-group-text">To</span>
+                                            <input class="form-control pe-0"
+                                                ng-class="{'is-invalid': viewFlatRate['max'+$index].$invalid || !selectedFlatRate.modifiers[$index].order_total_max}"
+                                                format="currency" name="max{{$index}}"
+                                                ng-model="selectedFlatRate.modifiers[$index].order_total_max"
+                                                ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/">
+                                            <button class="button button-delete"
+                                                ng-click="updateModifiers(selectedFlatRate, 1, $index)">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text min-w-25">Enabled</span>
+                                <div class="checkbox-addon p-5">
+                                    <input class="form-control" type="checkbox" name="enabled" ng-true-value="true"
+                                        ng-false-value="0" ng-model="selectedFlatRate.enabled">
+                                </div>
+                            </div>
+                            <div>
+                                <div ng-if="!updating && !deleting">
+                                    <button class="button button-primary" ng-click="UpdateFlatRate()"
+                                    ng-disabled="viewFlatRate.$invalid">
+                                    Update
+                                </button>
+                                    <button class="button button-delete"
+                                        ng-click="DeleteFlatRate()">
+                                        Delete
+                                    </button>
+                                </div>
+
+                                <div class="d-flex align-items-center"
+                                    ng-if="updating || deleting">
+                                    <strong>{{ updating ? 'Updating' : deleting ? 'Deleting' : '' }}, please wait...</strong>
+                                    <div class="spinner is-active ml-auto" role="status" aria-hidden="true"></div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="col-md-6">
+                            <div class="alert alert-warning small" ng-if="$ctrl.isNotApplied()">This flat rate is not currently applied to any customers, groups or price sheets. It will not be available during the checkout process until applied to at least one of either.</div>
+                            <uib-tabset>
+                                <uib-tab index="0" heading="Customers">
+                                    <div>
+                                        <button class="button"
+                                            ng-click="OpenCustomerSearchModal()">Edit
+                                            Customers</button>
+                                        <div class="col-12 px-3 pt-3">
+                                            <div class="row">
+                                                <div class="col-3">ID</div>
+                                                <div class="col-6">Name</div>
+                                                <div class="col-3">Status</div>
+                                            </div>
+                                        </div>
+                                        <div class="p-3 min-scroll">
+                                            <div class="text-center" ng-if="selectedFlatRate.customers.length <= 0">
+                                                <p style="font-size: .9em">This rate is not currently being applied to any
+                                                    individual customer.</p>
+                                            </div>
+                                            <div class="col p-3 vf-item-card-inner vf-list-item cursor-pointer"
+                                                ng-class="user.action" style="border:none;"
+                                                ng-repeat="user in selectedFlatRate.customers track by $index">
+                                                <div class="row">
+                                                    <div class="col-3 vf-list-text">{{user.customer_id}}</div>
+                                                    <div class="col-6 vf-list-text">{{user.name}}</div>
+                                                    <div class="col-3 vf-list-text">{{user.status}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-tab>
+                                <uib-tab index="1" heading="Groups">
+                                    <div>
+                                        <button class="button"
+                                            ng-click="OpenGroupSearchModal()">
+                                            Edit Groups
+                                        </button>
+                                        <div class="col-12 px-3 pt-3">
+                                            <div class="row">
+                                                <div class="col-3">ID</div>
+                                                <div class="col-6">Name</div>
+                                            </div>
+                                        </div>
+                                        <div class="p-3 min-scroll">
+                                            <div class="text-center" ng-if="selectedFlatRate.groups.length <= 0">
+                                                <p style="font-size: .9em">This rate is not currently being applied to any
+                                                    individual groups.</p>
+                                            </div>
+                                            <div class="col p-3 vf-item-card-inner vf-list-item cursor-pointer"
+                                                ng-class="group.action" style="border:none;"
+                                                ng-repeat="group in selectedFlatRate.groups track by $index">
+                                                <div class="row">
+                                                    <div class="col-3 vf-list-text">{{group.group_id}}</div>
+                                                    <div class="col-6 vf-list-text">{{group.name}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-tab>
+                                <uib-tab index="2" heading="Price Sheets">
+                                    <div>
+                                        <button class="button"
+                                            ng-click="OpenPriceSheetSearchModal()">
+                                            Edit Price Sheets
+                                        </button>
+                                        <div class="col-12 px-3 pt-3">
+                                            <div class="row">
+                                                <div class="col-3">ID</div>
+                                                <div class="col-6">Name</div>
+                                            </div>
+                                        </div>
+                                        <div class="p-3 min-scroll">
+                                            <div class="text-center" ng-if="selectedFlatRate.pricesheets.length <= 0">
+                                                <p style="font-size: .9em">This rate is not currently being applied to any
+                                                    individual Price Sheets.</p>
+                                            </div>
+                                            <div class="col p-3 vf-item-card-inner vf-list-item cursor-pointer"
+                                                ng-class="sheet.action" style="border:none;"
+                                                ng-repeat="sheet in selectedFlatRate.pricesheets track by $index">
+                                                <div class="row">
+                                                    <div class="col-3 vf-list-text">{{sheet.price_sheet_id}}</div>
+                                                    <div class="col-6 vf-list-text">{{sheet.sheet}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-tab>
+                                <uib-tab index="3" heading="Restricted Items">
+                                    <div>
+                                        <button class="button"
+                                            ng-click="OpenProductSearchModal()">
+                                            Edit Products
+                                        </button>
+                                        <div class="col-12 px-3 pt-3">
+                                            <div class="row">
+                                                <div class="col-3">ID</div>
+                                                <div class="col-6">Description</div>
+                                            </div>
+                                        </div>
+                                        <div class="p-3 min-scroll">
+                                            <div class="text-center" ng-if="selectedFlatRate.restricted_items.length <= 0">
+                                                <p style="font-size: .9em">This rate does not currently have any free
+                                                    shipping restricted items.</p>
+                                            </div>
+                                            <div class="col p-3 vf-item-card-inner vf-list-item cursor-pointer"
+                                                ng-class="product.action" style="border:none;"
+                                                ng-repeat="product in selectedFlatRate.restricted_items track by $index">
+                                                <div class="row">
+                                                    <div class="col-3 vf-list-text">{{product.product_id}}</div>
+                                                    <div class="col-6 vf-list-text">{{product.description}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </uib-tab>
+                            </uib-tabset>
+
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

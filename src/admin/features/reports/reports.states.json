@@ -1,0 +1,12 @@
+[
+	{
+		"name": "reports",
+		"url": "/reports",
+		"component": "reportsPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	}
+]

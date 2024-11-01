@@ -1,0 +1,21 @@
+<breadcrumb-component breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-component>
+<div class="d-flex justify-content-between align-items-center">
+	<h2>Product utilities</h2>
+</div>
+<button
+	class="btn btn-primary"
+	ng-click="$ctrl.syncProductWPPosts()"
+	ng-disabled="$ctrl.isSyncing"
+	type="button"
+>
+	{{ $ctrl.isSyncing ? 'Syncing' : 'Sync' }} product detail pages
+</button>
+<button
+	class="btn btn-outline-primary"
+	ng-click="$ctrl.generateSlugs()"
+	ng-disabled="$ctrl.isGenerating"
+	type="button"
+>
+	{{ $ctrl.isGenerating ? 'Generating' : 'Generate' }} missing slugs for
+	active products
+</button>

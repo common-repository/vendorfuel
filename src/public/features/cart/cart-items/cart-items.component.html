@@ -1,0 +1,196 @@
+<div
+	class="p-5 bg-light text-center"
+	ng-if="!$ctrl.isLoading && !$ctrl.cart.items"
+>
+	<h2>Your shopping cart is empty.</h2>
+	<p>
+		Please go to the
+		<a ng-href="{{ $ctrl.pageUrls.catalog }}">Catalog</a> to continue
+		shopping or
+		<span ng-if="!$ctrl.isSignedIn">
+			<a ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a> to access any
+			previously Saved Carts.
+		</span>
+		<span ng-if="$ctrl.isSignedIn">
+			go to your previously
+			<a ng-href="{{ $ctrl.pageUrls.savedCarts }}">Saved Carts</a>.
+		</span>
+	</p>
+	<div class="btn-toolbar justify-content-center">
+		<a class="btn btn-primary" ng-href="{{ $ctrl.pageUrls.catalog }}">
+			Go to Catalog
+		</a>
+		<a
+			class="btn btn-secondary ms-2"
+			ng-href="{{ $ctrl.pageUrls.login }}"
+			ng-if="!$ctrl.isSignedIn"
+		>
+			Sign In
+		</a>
+		<a
+			class="btn btn-secondary ms-2"
+			href="{{ $ctrl.pageUrls.savedCarts }}"
+			is-style-outline="true"
+			ng-if="$ctrl.isSignedIn"
+		>
+			Saved Carts
+		</a>
+	</div>
+</div>
+
+<div
+	ng-show="!$ctrl.isLoading && $ctrl.cart.items"
+	class="row d-none d-lg-flex px-3"
+>
+	<div class="col-10 offset-2">
+		<div class="row has-text-align-center">
+			<div class="col-4">Item Description</div>
+			<div class="col-4">Quantity</div>
+			<div class="col-2">Unit Price</div>
+			<div class="col-2">Extended</div>
+		</div>
+	</div>
+</div>
+<div class="list-group mb-3">
+	<div
+		class="list-group-item"
+		ng-repeat="item in $ctrl.cart.items track by $index"
+	>
+		<div class="row align-items-center">
+			<div class="col-4 col-lg-2">
+				<a
+					ng-href="/{{ $ctrl.productSlug }}/{{ item.slug }}"
+					ng-attr-title="{{ item.description }}"
+				>
+					<img
+						class="img-fluid lazy"
+						loading="lazy"
+						ng-repeat="img in item.images"
+						ng-if="$index < 1"
+						ng-src="{{ img.thumb_url || $ctrl.imgPlacerholder }}"
+					/>
+					<img
+						class="img-fluid lazy"
+						loading="lazy"
+						ng-if="item.images.length <= 0"
+						ng-src="{{ $ctrl.imgPlacerholder }}"
+					/>
+				</a>
+			</div>
+			<div class="col-8 col-lg-10">
+				<div class="row">
+					<div class="col-12 col-lg-4 order-lg-1">
+						<a
+							class="text-decoration-none"
+							ng-href="/{{ $ctrl.productSlug }}/{{ item.slug }}"
+							ng-attr-title="{{ item.description }}"
+						>
+							{{ item.description }}
+						</a>
+						<p class="small">
+							<strong>SKU: </strong>{{ item.sku }}
+						</p>
+					</div>
+					<div class="col-12 col-lg-2 order-lg-3">
+						<p class="border-bottom pb-2 mb-2 d-lg-none">
+							Unit Price:
+							<strong
+								>{{ item.price | currency
+								}}<small ng-if="item.uom"
+									>/{{ item.uom }}</small
+								></strong
+							>
+						</p>
+						<p class="d-none d-lg-block has-text-align-center">
+							<span class="text-nowrap">{{
+								item.price | currency
+							}}</span
+							><small ng-if="item.uom">/{{ item.uom }}</small>
+						</p>
+					</div>
+					<div class="col-12 col-lg-2 order-lg-4">
+						<p class="mb-2 d-lg-none">
+							Extended:
+							<strong>{{ item.item_total | currency }}</strong>
+						</p>
+						<p
+							class="d-none d-lg-block has-text-align-center text-nowrap"
+						>
+							{{ item.item_total | currency }}
+						</p>
+					</div>
+					<div class="col-12 col-lg-4 order-lg-2">
+						<div class="input-group">
+							<button
+								class="btn btn-primary"
+								type="button"
+								title="Add quantity in cart."
+								ng-click="$ctrl.updateQty(item.qty + 1, item.product_id, $index)"
+								ng-disabled="$ctrl.updatingQty[$index] ||
+										item.available_qty &&
+										( item.qty >= item.available_qty || item.available_qty < 1 )"
+							>
+								<i class="bi bi-plus"></i>
+							</button>
+							<input
+								class="form-control"
+								name="qtyAdd"
+								type="text"
+								min="1"
+								required
+								readonly
+								max="{{ item.available_qty }}"
+								ng-min="1"
+								ng-max="item.available_qty"
+								ng-model="item.qty"
+								ng-disabled="$ctrl.updatingQty[$index] ||
+										item.available_qty && item.available_qty < 1"
+								ng-change="$ctrl.updateQty(item.qty, item.product_id, $index)"
+							/>
+							<button
+								class="btn btn-primary"
+								type="button"
+								title="Reduce quantity in cart."
+								ng-click="$ctrl.updateQty(item.qty - 1, item.product_id, $index)"
+								ng-disabled="$ctrl.updatingQty[$index] ||
+										item.qty <= 1 ||
+										( item.available_qty && item.available_qty < 1 )"
+							>
+								<i class="bi bi-dash"></i>
+							</button>
+						</div>
+						<button
+							class="btn btn-link btn-sm pt-2"
+							title="Remove item from cart."
+							ng-click="$ctrl.remove(item.product_id)"
+						>
+							<i class="bi bi-cart-dash-fill"></i>
+							Remove From Cart
+						</button>
+						<cart-add-to-favorites
+							is-favorite="item.isFavorite"
+							product-id="item.product_id"
+						>
+						</cart-add-to-favorites>
+					</div>
+				</div>
+				<button
+					class="btn btn-link btn-sm prop65-popover"
+					data-content="{{ item.prop65Warning }}"
+					ng-if="item.prop65"
+				>
+					<img
+						loading="lazy"
+						style="width: 1rem"
+						ng-src="{{ $ctrl.warningIcon }}"
+						ng-attr-title="{{ ctrl.prop65Warning }}"
+					/>
+					<span class="d-none d-md-inline">
+						California esidents: See Prop. 65 warning
+					</span>
+					<span class="d-md-none"> CA Prop. 65 warning </span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

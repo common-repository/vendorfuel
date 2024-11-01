@@ -1,0 +1,18 @@
+<meta itemprop="name" content="{{ $ctrl.product.description }}" />
+<meta itemprop="sku" content="{{ $ctrl.product.sku }}" />
+<meta itemprop="mpn" content="{{ $ctrl.product.mfg_part_num }}" />
+<div itemprop="brand" itemtype="http://schema.org/Brand" itemscope>
+	<meta itemprop="name" content="{{ $ctrl.product.brand_name }}" />
+</div>
+<meta itemprop="description" content="{{ $ctrl.product.long_description }}" />
+<link
+	itemprop="image"
+	ng-if="$ctrl.product.images.length > 0"
+	ng-href="{{ $ctrl.product.images[0].med_url }}"
+/>
+<div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
+	<link itemprop="url" ng-href="{{ $ctrl.productUrl }}" />
+	<meta itemprop="availability" ng-attr-content="{{ $ctrl.availability }}" />
+	<meta itemprop="priceCurrency" content="USD" />
+	<meta itemprop="price" content="{{ $ctrl.product.price }}" />
+</div>

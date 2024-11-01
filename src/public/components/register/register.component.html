@@ -1,0 +1,439 @@
+<layout-component>
+	<header class="pb-3" ng-if="$ctrl.pageTitle">
+		<h1 class="has-text-align-center py-3 border-bottom">
+			{{ $ctrl.pageTitle }}
+		</h1>
+	</header>
+
+	<div
+		class="alert alert-info"
+		role="alert"
+		ng-if="$ctrl.isSignedIn && !$ctrl.isVerifying"
+	>
+		You are already signed in. Please go to your
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.account }}">Account</a>
+		page or
+		<a href="#" class="alert-link" ng-click="$ctrl.onClickSignOut($event)"
+			>Sign Out</a
+		>
+		to register a different account.
+	</div>
+
+	<div
+		class="d-flex justify-content-center"
+		ng-if="$ctrl.isLoading && !$ctrl.isSignedIn"
+	>
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<form
+		name="form"
+		class="needs-validation mb-3"
+		novalidate
+		ng-hide="
+			$ctrl.isLoading ||
+			$ctrl.isSignedIn ||
+			$ctrl.isAccountCreated ||
+			$ctrl.isVerifying
+		"
+	>
+		<div class="mb-3">
+			<label for="name" class="form-label">Name</label>
+			<input
+				type="text"
+				class="form-control"
+				id="name"
+				name="name"
+				autocomplete="name"
+				required
+				ng-model="$ctrl.form.name"
+				ng-minlength="2"
+				ng-pattern="$ctrl.formPatterns.name"
+				ng-class="{
+					'is-valid': form.name.$valid,
+					'is-invalid': form.name.$invalid && form.name.$touched
+				}"
+			/>
+			<small class="invalid-feedback">Please enter your name.</small>
+		</div>
+		<div class="row">
+			<div class="mb-3 col-md">
+				<label for="name" class="form-label"
+					>Company/Organization</label
+				>
+				<input
+					type="text"
+					class="form-control"
+					id="company"
+					name="company"
+					autocomplete="organization"
+					ng-model="$ctrl.form.company"
+				/>
+			</div>
+			<div class="mb-3 col-auto" ng-if="$ctrl.roles.length">
+				<label for="role" class="form-label">Role</label>
+				<select
+					class="form-control"
+					id="role"
+					name="role"
+					ng-model="$ctrl.form.role"
+					ng-required="$ctrl.hasForcedRole"
+					ng-change="$ctrl.onChangeRole()"
+					ng-class="{
+						'is-valid': form.role.$valid && $ctrl.form.role.id,
+						'is-invalid': form.role.$invalid && form.name.$touched
+					}"
+					ng-options="role as role.name for role in $ctrl.roles track by role.id"
+				></select>
+				<small class="invalid-feedback">Please select a role.</small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="mb-3 col-md">
+				<label for="email" class="form-label">Email</label>
+				<input
+					type="email"
+					class="form-control"
+					placeholder="name@example.com"
+					id="email"
+					name="email"
+					autocomplete="email"
+					required
+					ng-model="$ctrl.form.email"
+					ng-pattern="$ctrl.formPatterns.email"
+					ng-class="{
+						'is-valid': form.email.$valid,
+						'is-invalid': form.email.$invalid && form.email.$touched
+					}"
+				/>
+				<small class="invalid-feedback"
+					>Please enter your email address.</small
+				>
+			</div>
+			<div class="mb-3 col-md">
+				<label for="emailConfirmation" class="form-label"
+					>Reenter Email</label
+				>
+				<input
+					type="email"
+					class="form-control"
+					placeholder="name@example.com"
+					id="emailConfirmation"
+					name="emailConfirmation"
+					autocomplete="off"
+					required
+					ng-model="$ctrl.form.email_confirmation"
+					ng-pattern="$ctrl.formPatterns.email"
+					ng-change="$ctrl.confirmEmails(form.email, form.emailConfirmation)"
+					ng-class="{
+						'is-valid':
+							form.emailConfirmation.$valid &&
+							$ctrl.form.email === $ctrl.form.email_confirmation,
+						'is-invalid':
+							form.emailConfirmation.$touched &&
+							$ctrl.form.email !== $ctrl.form.email_confirmation
+					}"
+				/>
+				<small class="invalid-feedback"
+					>Please make sure that your email addresses match.</small
+				>
+			</div>
+		</div>
+		<div class="row">
+			<div class="mb-3 col-md">
+				<label for="password" class="form-label">Password</label>
+				<div class="input-group">
+					<input
+						class="form-control"
+						type="password"
+						name="password"
+						id="password"
+						minlength="8"
+						required
+						autocomplete="new-password"
+						aria-describedby="passwordHelp"
+						ng-model="$ctrl.form.password"
+						ng-attr-type="{{
+							$ctrl.isShowingPassword ? 'text' : 'password'
+						}}"
+						ng-pattern="$ctrl.formPatterns.password"
+						ng-class="{
+							'is-valid': form.password.$valid,
+							'is-invalid':
+								form.password.$invalid && form.password.$touched
+						}"
+						spellcheck="false"
+					/>
+					<button
+						class="btn btn-secondary"
+						ng-class="{ active: $ctrl.isShowingPassword }"
+						ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword"
+					>
+						<i
+							class="bi"
+							ng-class="{
+								'bi-eye-fill': $ctrl.isShowingPassword,
+								'bi-eye-slash-fill': !$ctrl.isShowingPassword
+							}"
+						></i>
+					</button>
+				</div>
+				<div class="progress mt-1">
+					<div
+						class="progress-bar"
+						role="progressbar"
+						aria-valuenow="25"
+						aria-valuemin="0"
+						aria-valuemax="100"
+						ng-style="{
+							width:
+								$ctrl.getPasswordStrength(form.password) + '%'
+						}"
+						ng-class="{
+							'bg-success': form.password.$valid,
+							'bg-warning': form.password.$invalid,
+							'bg-danger':
+								$ctrl.getPasswordStrength(form.password) < 50
+						}"
+					></div>
+				</div>
+				<small
+					id="passwordHelp"
+					ng-class="[
+						'form-text',
+						{
+							'has-vivid-red-color':
+								form.password.$invalid && form.password.$touched
+						}
+					]"
+				>
+					{{
+						form.password.$valid
+							? 'Password valid.'
+							: 'Passwords must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, a special character (*,!,$, etc.) and a number.'
+					}}
+				</small>
+			</div>
+			<div class="mb-3 col-md">
+				<label for="passwordConfirmation" class="form-label"
+					>Reenter Password</label
+				>
+				<div class="input-group">
+					<input
+						class="form-control"
+						type="password"
+						name="passwordConfirmation"
+						id="passwordConfirmation"
+						required
+						autocomplete="new-password"
+						ng-model="$ctrl.form.password_confirmation"
+						ng-attr-type="{{
+							$ctrl.isShowingConfirmPassword ? 'text' : 'password'
+						}}"
+						minlength="8"
+						ng-class="{
+							'is-valid':
+								form.passwordConfirmation.$valid &&
+								$ctrl.form.password ===
+									$ctrl.form.password_confirmation,
+							'is-invalid':
+								form.passwordConfirmation.$touched &&
+								$ctrl.form.password !==
+									$ctrl.form.password_confirmation
+						}"
+						ng-change="$ctrl.confirmPasswords($ctrl.form.password, $ctrl.form.passwordConfirmation)"
+						ng-pattern="$ctrl.formPatterns.password"
+						spellcheck="false"
+					/>
+					<button
+						class="btn btn-secondary"
+						ng-class="{ active: $ctrl.isShowingConfirmPassword }"
+						ng-click="$ctrl.isShowingConfirmPassword = !$ctrl.isShowingConfirmPassword"
+					>
+						<i
+							class="bi"
+							ng-class="{
+								'bi-eye-fill': $ctrl.isShowingConfirmPassword,
+								'bi-eye-slash-fill':
+									!$ctrl.isShowingConfirmPassword
+							}"
+						></i>
+					</button>
+				</div>
+				<div class="progress mt-1">
+					<div
+						class="progress-bar"
+						role="progressbar"
+						aria-valuenow="25"
+						aria-valuemin="0"
+						aria-valuemax="100"
+						ng-style="{
+							width:
+								$ctrl.getPasswordStrength(
+									form.passwordConfirmation
+								) + '%'
+						}"
+						ng-class="{
+							'bg-success':
+								$ctrl.form.password ===
+								$ctrl.form.password_confirmation,
+							'bg-warning':
+								$ctrl.form.password !==
+								$ctrl.form.password_confirmation,
+							'bg-danger':
+								$ctrl.getPasswordStrength(
+									form.passwordConfirmation
+								) < 50
+						}"
+					></div>
+				</div>
+				<small
+					id="passwordConfirmationHelp"
+					ng-class="[
+						'form-text',
+						{
+							'has-vivid-red-color':
+								form.passwordConfirmation.$invalid &&
+								form.passwordConfirmation.$touched
+						}
+					]"
+				>
+					{{
+						form.passwordConfirmation.$valid &&
+						$ctrl.password === $ctrl.passwordConfirmation
+							? 'Your passwords match.'
+							: 'Please verify your password.'
+					}}
+				</small>
+			</div>
+		</div>
+		<fieldset class="mb-3" ng-if="$ctrl.form.documents.length">
+			<legend>Documents</legend>
+
+			<div
+				class="mb-3"
+				ng-repeat="doc in $ctrl.form.documents track by $index"
+			>
+				<input
+					type="file"
+					onchange="angular.element(this).scope().$ctrl.attachFile(this)"
+					ng-class="['form-control', { 'is-valid': doc.fileDetails }]"
+					ng-attr-name="{{ 'doc' + doc.id }}"
+					ng-attr-id="{{ 'doc-' + doc.id }}"
+					ng-required="doc.required"
+				/>
+				<label class="form-label" ng-attr-for="{{ 'doc-' + doc.id }}">
+					{{
+						doc.fileDetails
+							? doc.fileDetails.name
+							: 'Choose a ' + doc.name + ' to upload'
+					}}
+				</label>
+				<small class="valid-feedback" ng-if="doc.fileDetails">
+					{{ doc.fileDetails.size | number }} KB |
+					{{ doc.fileDetails.type }}
+				</small>
+				<small
+					class="form-text"
+					ng-if="!doc.fileDetails && doc.required"
+				>
+					Please upload {{ doc.name }}.
+				</small>
+			</div>
+		</fieldset>
+		<div class="btn-toolbar justify-content-between">
+			<button
+				class="btn btn-primary"
+				type="submit"
+				ng-disabled="form.$invalid ||
+					$ctrl.isSubmitting ||
+				   $ctrl.form.email !== $ctrl.form.email_confirmation ||
+				   $ctrl.form.password !== $ctrl.form.password_confirmation"
+				ng-click="$ctrl.onSubmit()"
+			>
+				Create Account
+			</button>
+			<button class="btn btn-secondary" ng-click="$ctrl.onClickResend()">
+				Resend Verification Email
+			</button>
+		</div>
+	</form>
+
+	<form
+		name="verificationForm"
+		class="needs-validation mb-3"
+		novalidate
+		ng-if="$ctrl.isNotVerified"
+		ng-submit="$ctrl.submitVerificationForm( $ctrl.form.email )"
+	>
+		<p class="form-text">
+			Please enter the email address you originally registered under to
+			resend you a verification email.
+		</p>
+		<fieldset ng-disabled="$ctrl.isSubmitted">
+			<div class="mb-3">
+				<label for="email" class="form-label">Email</label>
+				<input
+					type="email"
+					class="form-control"
+					id="email"
+					name="email"
+					autocomplete="email"
+					required
+					ng-model="$ctrl.form.email"
+					ng-pattern="$ctrl.formPatterns.email"
+					ng-class="{
+						'is-valid': verificationForm.email.$valid,
+						'is-invalid':
+							verificationForm.email.$invalid &&
+							verificationForm.email.$touched
+					}"
+				/>
+				<small class="invalid-feedback"
+					>Please enter your email address.</small
+				>
+			</div>
+		</fieldset>
+		<button
+			class="btn btn-primary"
+			type="submit"
+			ng-disabled="verificationForm.$invalid || $ctrl.isSubmitting || $ctrl.isSubmitted"
+		>
+			Submit
+		</button>
+	</form>
+
+	<div
+		class="alert alert-success"
+		role="alert"
+		ng-if="$ctrl.isAccountCreated"
+	>
+		<h2>Account created</h2>
+		<p>
+			Your account has been set up! Click the 'Home' button below to be
+			redirected to the home page. You should also be receiving a welcome
+			email shortly. Make sure to check your spam folder!
+		</p>
+		<div class="btn-toolbar">
+			<a class="btn btn-primary" href="/">Go to Home</a>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-href="{{ $ctrl.pageUrls.catalog }}"
+			>
+				Go to Catalog
+			</a>
+		</div>
+	</div>
+
+	<div class="alert alert-info" role="alert" ng-if="$ctrl.isVerified">
+		<p>Click the 'Home' button below to be redirected to the home page.</p>
+		<div class="btn-toolbar">
+			<a class="btn btn-primary" href="/">Go to Home</a>
+			<a class="btn btn-secondary" ng-href="{{ $ctrl.pageUrls.catalog }}">
+				Go to Catalog
+			</a>
+		</div>
+	</div>
+</layout-component>

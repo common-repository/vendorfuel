@@ -1,0 +1,200 @@
+<h2 class="h4 mt-4 pt-4 border-top">Your Order</h2>
+
+<table class="table">
+	<tbody>
+		<tr>
+			<th scope="row">Subtotal</th>
+			<td class="text-end">
+				{{ $ctrl.subtotal | currency }}
+			</td>
+		</tr>
+		<tr ng-show="$ctrl.promoDiscount > 0">
+			<th scope="row">Discounts</th>
+			<td class="text-end">
+				{{ $ctrl.promoDiscount | currency }}
+			</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th scope="row">Estimated Total</th>
+			<td class="text-end">
+				{{ $ctrl.totalAmount | currency }}
+			</td>
+		</tr>
+	</tfoot>
+</table>
+
+<p>Please proceed to checkout for final total.</p>
+
+<div ng-if="!$ctrl.isSignedIn">
+	<p>
+		Sign in or create an account now and enjoy an easier and faster checkout
+		process.
+	</p>
+	<div class="btn-toolbar justify-content-center">
+		<a
+			class="btn btn-primary btn-lg w-100 mb-2"
+			ng-href="{{ $ctrl.pageUrls.checkout }}"
+		>
+			Checkout as Guest
+		</a>
+	</div>
+	<div class="hstack justify-content-around gap-3 mb-3">
+		<a
+			class="btn btn-link ms-auto"
+			ng-href="{{ $ctrl.pageUrls.register }}?referrer=cart"
+			>Register</a
+		>
+		<div class="vr"></div>
+		<a class="btn btn-link me-auto" ng-href="{{ $ctrl.pageUrls.login }}"
+			>Sign in</a
+		>
+	</div>
+</div>
+
+<div ng-if="$ctrl.isSignedIn">
+	<form
+		ng-if="$ctrl.cart.punchout"
+		method="POST"
+		style="display: inline"
+		action="{{ $ctrl.cart.punchout.return_url }}"
+	>
+		<input
+			type="hidden"
+			name="cxml-urlencoded"
+			id="cxml-urlencoded"
+			value="{{ $ctrl.cart.punchout.cxml }}"
+		/><input
+			type="submit"
+			value="Checkout"
+			id="btnCheckoutPO"
+			class="btn btn-primary w-100 btn-lg my-2"
+		/>
+	</form>
+	<div
+		class="btn-toolbar justify-content-center"
+		ng-if="!$ctrl.cart.punchout"
+	>
+		<a
+			class="btn btn-primary btn-lg w-100 mb-2"
+			ng-href="{{ $ctrl.pageUrls.checkout }}"
+		>
+			Checkout
+		</a>
+	</div>
+</div>
+
+<div class="btn-toolbar justify-content-center align-items-stretch mb-2">
+	<button
+		class="btn btn-secondary flex-grow-1 me-2"
+		ng-disabled="$ctrl.isSaveCartFormVisible || $ctrl.isClearCartFormVisible"
+		ng-if="$ctrl.isSignedIn"
+		ng-click="$ctrl.handleToggleSaveCartForm()"
+	>
+		Save Cart
+	</button>
+	<button
+		class="btn btn-danger flex-grow-1"
+		ng-disabled="$ctrl.isClearCartFormVisible || $ctrl.isSaveCartFormVisible"
+		ng-click="$ctrl.handleToggleClearCartForm()"
+	>
+		Clear Cart
+	</button>
+</div>
+
+<div class="card mb-3" ng-if="$ctrl.isSaveCartFormVisible">
+	<form
+		name="saveCartForm"
+		class="card-body"
+		ng-submit="$ctrl.saveCart($ctrl.cartName)"
+	>
+		<fieldset class="border-0 p-0" ng-disabled="$ctrl.isBusy">
+			<div class="mb-3">
+				<label for="cart-name" class="form-label"
+					>Saved Cart Name <small>(required)</small></label
+				>
+				<div class="input-group">
+					<input
+						type="text"
+						class="form-control"
+						id="cart-name"
+						aria-describedby="cart-name-help"
+						ng-model="$ctrl.cartName"
+						minlength="1"
+						ng-minlength="1"
+						required
+					/>
+					<button
+						class="btn btn-secondary"
+						ng-disabled="saveCartForm.$invalid || $ctrl.isBusy"
+						ng-click="$ctrl.saveCart($ctrl.cartName)"
+					>
+						Save
+					</button>
+				</div>
+				<small id="cart-name-help" class="form-text"
+					>Please enter a name for your saved cart.</small
+				>
+			</div>
+			<div ng-if="$ctrl.savedCarts">
+				<p class="small">
+					You can also add your current cart items to a previously
+					<a ng-href="{{ $ctrl.pageUrls.savedCarts }}">saved carts</a
+					>.
+				</p>
+				<div class="list-group mb-3">
+					<button
+						type="button"
+						class="list-group-item d-flex justify-content-between align-items-baselint text-start"
+						ng-click="$ctrl.updateSavedCart( item.cart_title )"
+						ng-repeat="item in $ctrl.savedCarts"
+					>
+						<span>
+							{{ item.cart_title }}
+						</span>
+						<span class="badge text-bg-light rounded-pill"
+							>{{ item.num_items | number }} items</span
+						>
+					</button>
+				</div>
+			</div>
+			<div class="btn-toolbar">
+				<button
+					class="btn btn-outline-primary border-0 ms-auto"
+					ng-click="$ctrl.handleToggleSaveCartForm()"
+				>
+					{{ $ctrl.hasSavedCart ? 'Close' : 'Cancel' }}
+				</button>
+			</div>
+		</fieldset>
+	</form>
+</div>
+
+<div ng-if="$ctrl.isClearCartFormVisible" class="card mb-3 border-warning">
+	<div class="card-body">
+		<p>This will clear all items from your shopping cart.</p>
+		<div class="hstack justify-content-end gap-2">
+			<button
+				type="button"
+				class="btn btn-outline-primary border-0"
+				ng-click="$ctrl.handleToggleClearCartForm()"
+				ng-disabled="$ctrl.isBusy"
+			>
+				Cancel
+			</button>
+			<button
+				type="button"
+				class="btn btn-danger"
+				ng-click="$ctrl.clearCart()"
+				ng-disabled="$ctrl.isBusy"
+			>
+				Clear
+			</button>
+		</div>
+	</div>
+</div>
+
+<cart-split-checkout></cart-split-checkout>
+<cart-request-quote></cart-request-quote>
+<cart-download-csv></cart-download-csv>

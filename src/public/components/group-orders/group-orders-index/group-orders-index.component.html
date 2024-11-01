@@ -1,0 +1,236 @@
+<layout-component>
+	<div
+		class="alert alert-info"
+		role="alert"
+		ng-if="!$ctrl.isSignedIn"
+	>
+		Please <a class="alert-link" ng-href="{{$ctrl.pageUrls.login}}">Sign In</a> or
+		<a class="alert-link" ng-href="{{$ctrl.pageUrls.register}}">Create an Account</a> to view this page.
+	</div>
+
+	<div
+		class="alert alert-info"
+		role="alert"
+		ng-if="$ctrl.isSignedIn && ! $ctrl.isApprover"
+	>
+		You must be have Approver permissions to view this page.
+	</div>
+
+	<div ng-if="$ctrl.isApprover">
+		<div ng-if="!$ctrl.orderId">
+			<form
+				role="search"
+				ng-submit="$ctrl.changeQuery( $ctrl.q )"
+			>
+				<select-group on-change="$ctrl.getOrders()"></select-group>
+				<fieldset ng-disabled="$ctrl.isLoading">
+					<label for="search-orders" class="screen-reader-text">Search</label>
+					<div class="input-group mb-3">
+						<button class="btn btn-outline-secondary"
+							ng-click="$ctrl.isShowingFilters = !$ctrl.isShowingFilters"
+						>
+							{{ $ctrl.isShowingFilters ? 'Hide' : 'Show' }} Filters
+						</button>
+						<input
+							type="search"
+							id="search-orders"
+							class="form-control"
+							name="s"
+							ng-model="$ctrl.q"
+						/>
+						<button type="submit" class="btn btn-outline-secondary">Search</button>
+					</div>
+					<div class="form-check form-check-inline" ng-repeat="status in $ctrl.statuses">
+						<input class="form-check-input" type="radio" ng-attr-id="{{ status.label }}" ng-value="status" ng-model="$ctrl.status" ng-change="$ctrl.changeStatus()">
+						<label class="form-check-label" ng-attr-for="{{ status.label }}">{{ status.label }}</label>
+					</div>
+				</fieldset>
+				<div
+					class="p-3 bg-light"
+					ng-if="$ctrl.isShowingFilters"
+				>
+					<fieldset>
+						<legend>Filters</legend>
+						<div class="input-group">
+							<label for="search-orders-filter" class="input-group-text">Search for</label>
+							<input
+								type="search"
+								id="search-orders-filter"
+								class="form-control"
+								name="filter"
+								ng-model="$ctrl.filter.term"
+							/>
+							<label for="search-orders-filter-field" class="input-group-text">in</label>
+							<select
+								class="form-select"
+								name="searchOrdersFilterField"
+								id="search-orders-filter-field"
+								ng-model="$ctrl.filter.field"
+							>
+								<optgroup
+									ng-repeat="group in $ctrl.filterOptions"
+									ng-attr-label="{{ group.label }}"
+									ng-if="group.options"
+								>
+									<option ng-repeat="option in group.options" ng-value="option.field">
+										{{ option.label }}
+									</option>
+								</optgroup>
+								<option
+									ng-repeat="option in $ctrl.filterOptions"
+									ng-value="option.field"
+									ng-if="!option.options"
+								>
+									{{ option.label }}
+								</option>
+							</select>
+						</div>
+					</fieldset>
+				</div>
+			</form>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>
+							<a href="#" ng-click="$ctrl.changeSortBy( $event, 'order_id' )"
+								>ID
+								<span
+									style="text-decoration: none"
+									ng-if="$ctrl.params.orderBy === 'order_id'"
+									ng-class="['bi', {
+										'bi-sort-up': $ctrl.params.direction === 'asc',
+										'bi-sort-down': $ctrl.params.direction === 'desc',
+									}]"
+								></span>
+							</a>
+						</th>
+						<th>Total</th>
+						<th>
+							<a href="#" ng-click="$ctrl.changeSortBy( $event, 'order_date' )"
+								>Date
+								<span
+									style="text-decoration: none"
+									ng-if="$ctrl.params.orderBy === 'order_date'"
+									ng-class="['bi', {
+										'bi-sort-up': $ctrl.params.direction === 'asc',
+										'bi-sort-down': $ctrl.params.direction === 'desc',
+									}]"
+								></span>
+							</a>
+						</th>
+						<th>
+							<a href="#" ng-click="$ctrl.changeSortBy( $event, 'status' )"
+								>Status
+								<span
+									style="text-decoration: none"
+									ng-if="$ctrl.params.orderBy === 'status'"
+									ng-class="['bi', {
+										'bi-sort-up': $ctrl.params.direction === 'asc',
+										'bi-sort-down': $ctrl.params.direction === 'desc',
+									}]"
+								></span>
+							</a>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="$ctrl.isLoading && ( !$ctrl.orders || !$ctrl.orders.total )">
+						<td colspan="4" class="has-text-align-center">Loading&hellip;</td>
+					</tr>
+					<tr
+						class="table-info"
+						ng-if="!$ctrl.isLoading && $ctrl.orders && !$ctrl.orders.total"
+					>
+						<td colspan="4" class="has-text-align-center">No results.</td>
+					</tr>
+					<tr ng-repeat="order in $ctrl.orders.data track by $index">
+						<td>
+							<a
+								href="#"
+								ng-click="$ctrl.goToDetail( $event, order.order_id, order.status )"
+								ng-if="!$ctrl.isLoading"
+								>{{ order.order_id }}</a
+							>
+							<span class="has-cyan-bluish-gray-color" ng-if="$ctrl.isLoading" aria-hidden="true"
+								>&hellip;</span
+							>
+						</td>
+						<td>
+							<span ng-if="!$ctrl.isLoading">{{ order.total_amt | currency }}</span>
+							<span class="has-cyan-bluish-gray-color" ng-if="$ctrl.isLoading" aria-hidden="true"
+								>&hellip;</span
+							>
+						</td>
+						<td>
+							<span ng-if="!$ctrl.isLoading">{{ order.order_date | date:'short'}}</span>
+							<span class="has-cyan-bluish-gray-color" ng-if="$ctrl.isLoading" aria-hidden="true"
+								>&hellip;</span
+							>
+						</td>
+						<td>
+							<strong
+								ng-if="!$ctrl.isLoading"
+								ng-class="{
+							'has-very-dark-gray-color': order.status === 'created',
+							'has-vivid-red-color': order.status === 'cancelled',
+							'has-luminous-vivid-orange-color': order.status.includes('pending'),
+							'text-success': order.status === 'completed',
+						}"
+								>{{ order.status | uppercase }}</strong
+							>
+							<span class="has-cyan-bluish-gray-color" ng-if="$ctrl.isLoading" aria-hidden="true"
+								>&hellip;</span
+							>
+						</td>
+					</tr>
+				</tbody>
+				<caption ng-if="!$ctrl.isLoading && $ctrl.orders.total">
+					{{ $ctrl.orders.from | number }} to {{ $ctrl.orders.to | number }} of {{ $ctrl.orders.total
+					| number }} items
+				</caption>
+			</table>
+
+			<!-- Pagination -->
+			<div
+				class="alignwide wp-block-query-pagination d-flex justify-content-between"
+				ng-if="$ctrl.pages && $ctrl.pages.length > 1"
+			>
+				<a
+					href="#"
+					class="wp-block-query-pagination-previous small"
+					ng-click="$ctrl.changePage( $event, $ctrl.currentPage - 1 )"
+					ng-if="$ctrl.currentPage !== 1"
+					>&laquo; Previous Page</a
+				>
+				<div class="wp-block-query-pagination-numbers">
+					<span ng-repeat="page in $ctrl.pages track by $index">
+						<span class="page-numbers current" aria-current="page" ng-if="$ctrl.currentPage === page">
+							{{ page }}
+						</span>
+						<a
+							class="page-numbers"
+							href="#"
+							ng-click="$ctrl.changePage( $event, page )"
+							ng-if="$ctrl.showPage( page, $ctrl.currentPage, $ctrl.pages.length)"
+							>{{ page }}</a
+						>
+						<span
+							ng-if="$ctrl.showEllipse( page, $ctrl.currentPage, $ctrl.pages.length)"
+						>
+							<span class="page-numbers dots">&hellip;</span>
+					</span>
+				</div>
+				<a
+					href="#"
+					class="wp-block-query-pagination-next small"
+					ng-click="$ctrl.changePage( $event, $ctrl.currentPage + 1 )"
+					ng-if="$ctrl.currentPage !== $ctrl.pages.length"
+					>Next Page &raquo;</a
+				>
+			</div>
+		</div>
+		<group-orders-detail ng-if="$ctrl.orderId" order-id="$ctrl.orderId"></group-orders-detail>
+	</div>
+
+</layout-component>
+

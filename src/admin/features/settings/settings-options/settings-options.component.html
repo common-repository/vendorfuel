@@ -1,0 +1,31 @@
+<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+<form name="form" ng-hide="$ctrl.isLoading">
+	<fieldset class="mb-3" ng-disabled="$ctrl.isUpdating">
+		<legend>Options</legend>
+		<div
+			class="form-check mb-3"
+			ng-repeat="option in $ctrl.options track by $index"
+		>
+			<input
+				class="form-check-input"
+				type="checkbox"
+				ng-model="option.value"
+				ng-attr-id="{{ 'option-' + $index }}"
+			/>
+			<label
+				class="form-check-label"
+				ng-attr-for="{{ 'option-' + $index }}"
+			>
+				{{ option.key }}
+			</label>
+		</div>
+	</fieldset>
+	<button
+		class="btn btn-primary"
+		ng-click="$ctrl.update($ctrl.options)"
+		ng-disabled="$ctrl.isUpdating"
+	>
+		{{ $ctrl.isUpdating ? 'Updating' : 'Update' }}
+	</button>
+</form>

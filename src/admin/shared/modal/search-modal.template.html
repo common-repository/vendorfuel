@@ -1,0 +1,218 @@
+<div class="modal-header">
+	<h1 class="modal-title fs-5">{{ modalTitle }}</h1>
+	<button
+		type="button"
+		class="btn-close"
+		ng-click="Cancel()"
+		aria-label="close"
+	></button>
+</div>
+<div class="modal-body p-3">
+	<div class="input-group mb-3">
+		<button
+			class="btn btn-outline-secondary dropdown-toggle"
+			type="button"
+			data-bs-toggle="dropdown"
+			aria-haspopup="true"
+			aria-expanded="false"
+		>
+			{{filterBy[tab]}}
+		</button>
+		<div class="dropdown-menu">
+			<a
+				class="dropdown-item"
+				ng-click="filterBy[tab] = 'Search For'"
+				ng-show="filterBy[tab] === 'Filter Results'"
+				>Search For</a
+			>
+			<a
+				class="dropdown-item"
+				ng-click="filterBy[tab] = 'Filter Results'"
+				ng-show="filterBy[tab] === 'Search For'"
+				>Filter Results</a
+			>
+		</div>
+		<input
+			class="form-control"
+			type="text"
+			ng-keypress="$event.keyCode === 13 && Search(pageConfig.tabs[tab].http.params.rpp, 1)"
+			ng-model="pageConfig.tabs[tab].http.params.q"
+			placeholder="Search..."
+		/>
+		<button
+			class="btn btn-outline-secondary"
+			ng-click="Search(pageConfig.tabs[tab].http.params.rpp, 1)"
+		>
+			Search
+		</button>
+	</div>
+
+	<spinner-component ng-if="loading"></spinner-component>
+
+	<uib-tabset ng-show="!loading" active="activeTab">
+		<uib-tab active="tab" index="0" select="TabChanged(0)" heading="Add">
+			<div class="alert alert-warning mb-0" ng-if="!results[0].length">
+				No items found.
+			</div>
+			<div
+				style="
+					max-height: calc(100vh - 500px);
+					overflow-y: scroll;
+					overflow-x: hidden;
+				"
+			>
+				<div
+					class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"
+					ng-if="results[0].length"
+				>
+					<div
+						class="col"
+						ng-repeat="result in results[0] | filter:  (filterBy[tab] === 'Filter Results' ? pageConfig.tabs[tab].http.params.q : '') track by $index"
+					>
+						<div
+							ng-class="['card h-100', {'text-bg-success': addedIds.includes(rawResults[0][$index][pageConfig.tabs[0].id])}]"
+							ng-click="selectItem($index, tab)"
+							style="cursor: pointer"
+						>
+							<img
+								ng-src="{{result[pageConfig.tabs[0].fields[1]]}}"
+								class="card-img-top"
+								alt=""
+								ng-if="pageConfig.tabs[0].fields[1] === 'image' && result[pageConfig.tabs[0].fields[1]]"
+							/>
+							<div class="card-body">
+								<h5 class="card-subtitle text-muted mb-1 h6">
+									{{ result[pageConfig.tabs[0].fields[0]] }}
+								</h5>
+								<h6
+									class="card-title h6"
+									ng-if="pageConfig.tabs[0].fields[1] !== 'image'"
+								>
+									{{ result[pageConfig.tabs[0].fields[1]] }}
+								</h6>
+								<p
+									class="card-text mb-1 text-truncate small"
+									ng-repeat="field in pageConfig.tabs[0].fields track by $index"
+									ng-if="$index > 1"
+									title="{{ result[field] }}"
+								>
+									{{ result[field] }}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab
+			index="1"
+			select="TabChanged(1)"
+			heading="Remove"
+			ng-if="!hasOneTab"
+		>
+			<div class="alert alert-warning mb-0" ng-if="!results[1].length">
+				No items found.
+			</div>
+			<div
+				style="
+					max-height: calc(100vh - 500px);
+					overflow-y: scroll;
+					overflow-x: hidden;
+				"
+			>
+				<div
+					class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"
+					ng-if="results[1].length"
+				>
+					<div
+						class="col"
+						ng-repeat="result in results[1] | filter:  (filterBy[tab] === 'Filter Results' ? pageConfig.tabs[tab].http.params.q : '') track by $index"
+					>
+						<div
+							ng-class="['card h-100', {'text-bg-danger': removedIds.includes(rawResults[1][$index][pageConfig.tabs[1].id])}]"
+							ng-click="selectItem($index, tab)"
+							style="cursor: pointer"
+						>
+							<img
+								ng-src="{{result[pageConfig.tabs[1].fields[1]]}}"
+								class="card-img-top"
+								alt=""
+								ng-if="pageConfig.tabs[1].fields[1] === 'image' && result[pageConfig.tabs[1].fields[1]]"
+							/>
+							<div class="card-body">
+								<h5 class="card-subtitle text-muted mb-1 h6">
+									{{ result[pageConfig.tabs[1].fields[0]] }}
+								</h5>
+								<p
+									class="card-title h6"
+									ng-if="pageConfig.tabs[1].fields[1] !== 'image'"
+								>
+									{{ result[pageConfig.tabs[1].fields[1]] }}
+								</p>
+								<p
+									class="card-text mb-1 text-truncate small"
+									ng-repeat="field in pageConfig.tabs[1].fields track by $index"
+									ng-if="$index > 1"
+									title="{{ result[field] }}"
+								>
+									{{ result[field] }}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+	</uib-tabset>
+	<nav class="hstack gap-1 align-items-baseline justify-content-end mt-3">
+		<span class="small mx-2">
+			{{ pagination[tab].total | number }} items
+		</span>
+		<span ng-if="pagination[tab].last_page > 1">
+			<button
+				aria-label="First"
+				class="btn btn-outline-primary btn-sm"
+				ng-click="Search(1)"
+				ng-disabled="pagination[tab].current_page === 1"
+			>
+				<i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+			</button>
+			<button
+				aria-label="Previous"
+				class="btn btn-outline-primary btn-sm"
+				ng-click="Search( pagination[tab].current_page - 1)"
+				ng-disabled="pagination[tab].current_page === 1"
+			>
+				<i class="bi bi-chevron-left" aria-hidden="true"></i>
+			</button>
+			<span class="small mx-2"
+				>{{ pagination[tab].current_page }} of {{
+				pagination[tab].last_page }}</span
+			>
+			<button
+				aria-label="Next"
+				class="btn btn-outline-primary btn-sm"
+				ng-click="Search( pagination[tab].current_page + 1)"
+				ng-disabled="pagination[tab].current_page === pagination[tab].last_page"
+			>
+				<i class="bi bi-chevron-right" aria-hidden="true"></i>
+			</button>
+			<button
+				aria-label="Last"
+				class="btn btn-outline-primary btn-sm"
+				ng-click="Search( pagination[tab].last_page )"
+				ng-disabled="pagination[tab].current_page === pagination[tab].last_page"
+			>
+				<i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+			</button>
+		</span>
+	</nav>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-outline-primary border-0 me-1" ng-click="Cancel()">
+		{{optionCancel}}
+	</button>
+	<button class="btn btn-primary" ng-click="Confirm()">
+		{{optionConfirm}}
+	</button>
+</div>

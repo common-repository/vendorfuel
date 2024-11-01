@@ -1,0 +1,179 @@
+<form name="rmaForm">
+	<div class="modal-header">
+		<h5 class="modal-title">Add return merchandise authorization</h5>
+		<button
+			type="button"
+			class="btn-close"
+			ng-click="cancel()"
+			aria-label="Close"
+		></button>
+	</div>
+	<div class="modal-body">
+		<table class="table table-sm">
+			<tbody>
+				<tr>
+					<th scope="row">Customer ID</th>
+					<td>{{ order.customer_id }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Order ID</th>
+					<td>{{ order.order_id }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Purchase ID</th>
+					<td>{{ item.purch_id }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Product ID</th>
+					<td>{{ item.product_id }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Purchase date</th>
+					<td>{{ item.purchase_date | date: 'short' }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Quantity</th>
+					<td>{{ item.qty | number }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Price</th>
+					<td>{{ item.price | currency }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<fieldset>
+			<div class="mb-3">
+				<label class="form-label" for="status"
+					>Status <small>(required)</small></label
+				>
+				<select
+					ng-class="['form-select', {'is-invalid':rmaForm.status.$invalid && rmaForm.status.$touched}]"
+					name="status"
+					id="status"
+					ng-options="key as value for (key, value) in returnStatuses"
+					ng-model="item.return_status"
+					required
+				></select>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="date"
+					>Return Date <small>(required)</small></label
+				>
+				<input
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.date.$invalid && rmaForm.date.$touched}"
+					type="date"
+					id="date"
+					name="date"
+					ng-model="item.return_request_date"
+					required
+				/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="rtnNotes"
+					>Return Notes <small>(required)</small></label
+				>
+				<textarea
+					maxlength="65535"
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.rtnNotes.$invalid && rmaForm.rtnNotes.$touched}"
+					type="text"
+					name="rtnNotes"
+					id="rtnNotes"
+					placeholder="Item was damaged, defective, etc."
+					ng-model="item.return_request_notes"
+					required
+				></textarea>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="respNotes"
+					>Response Notes <small>(required)</small></label
+				>
+				<textarea
+					maxlength="65535"
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.respNotes.$invalid && rmaForm.respNotes.$touched}"
+					type="text"
+					id="respNotes"
+					name="respNotes"
+					placeholder="Return was accepted, etc."
+					ng-model="item.return_response_notes"
+					required
+				></textarea>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="reason"
+					>Return Reason <small>(required)</small></label
+				>
+				<select
+					class="form-select"
+					ng-class="{'is-invalid':rmaForm.reason.$invalid && rmaForm.reason.$touched}"
+					type="text"
+					name="reason"
+					id="reason"
+					ng-options="key as value for (key, value) in returnReasons"
+					ng-model="item.return_reason"
+					required
+				></select>
+			</div>
+			<div class="mb-3">
+				<label for="rtnNum" class="form-label"
+					>Number of Items to be Returned
+					<small>(required)</small></label
+				>
+				<input
+					id="rtnNum"
+					name="rtnNum"
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.rtnNum.$invalid && rmaForm.rtnNum.$touched}"
+					type="number"
+					ng-model="item.return_qty"
+					required
+					min="0"
+				/>
+			</div>
+			<div class="mb-3">
+				<label for="numBoxes" class="form-label"
+					>Number of Boxes to be Returned
+					<small>(required)</small></label
+				>
+				<input
+					id="numBoxes"
+					name="numBoxes"
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.numBoxes.$invalid && rmaForm.numBoxes.$touched}"
+					type="number"
+					ng-model="item.return_boxes"
+					required
+					min="0"
+				/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="contact"
+					>Return Contact <small>(required)</small></label
+				>
+				<input
+					class="form-control"
+					ng-class="{'is-invalid':rmaForm.contact.$invalid && rmaForm.contact.$touched}"
+					type="text"
+					id="contact"
+					name="contact"
+					ng-model="item.return_contact"
+					required
+				/>
+			</div>
+		</fieldset>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-outline-primary" ng-click="cancel()">
+			Cancel
+		</button>
+		<button
+			class="btn btn-primary"
+			ng-click="confirm()"
+			ng-disabled="rmaForm.$invalid"
+		>
+			Confirm
+		</button>
+	</div>
+</form>

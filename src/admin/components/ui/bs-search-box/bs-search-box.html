@@ -1,0 +1,63 @@
+<form ng-submit="$ctrl.submit()">
+	<fieldset ng-disabled="$ctrl.isLoading">
+		<div class="input-group mb-3">
+			<button
+				class="btn btn-outline-primary"
+				aria-label="Advanced filters"
+				type="button"
+				ng-click="$ctrl.toggleShowFilters()"
+				ng-if="$ctrl.filterFields"
+			>
+				{{ $ctrl.isShowingFilters ? 'Hide' : 'Show' }} Filters
+			</button>
+			<input
+				type="search"
+				class="form-control"
+				aria-label="Search query"
+				ng-change="$ctrl.changeInput( $ctrl.q )"
+				ng-model="$ctrl.q"
+			/>
+			<button class="btn btn-outline-primary" type="submit">
+				Search
+			</button>
+		</div>
+		<div class="collapse" id="search-box-filters">
+			<div class="row gx-5 row-cols-2">
+				<div class="col mb-3" ng-repeat="filter in $ctrl.filterFields">
+					<div class="row">
+						<label
+							ng-attr-for="{{ filter.field }}"
+							class="col-auto col-form-label col-form-label-sm"
+						>
+							{{ filter.label }}
+						</label>
+						<div class="col">
+							<input
+								type="search"
+								class="form-control"
+								ng-attr-id="{{ filter.field }}"
+								ng-change="$ctrl.changeInput( filter.term )"
+								ng-if="!filter.options"
+								ng-model="filter.term"
+							/>
+							<select
+								class="form-select"
+								ng-attr-id="{{ filter.field }}"
+								ng-if="filter.options"
+								ng-model="filter.term"
+							>
+								<option value="" selected>All</option>
+								<option
+									ng-repeat="(key, value) in filter.options track by $index"
+									ng-value="value"
+								>
+									{{ key }}
+								</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</form>

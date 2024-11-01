@@ -1,0 +1,19 @@
+<h3>Order Change Logs</h3>
+<dl>
+	<dt ng-repeat-start="log in $ctrl.logs">
+		SKU: {{ log.product.sku }} {{ log.pa_type === 'PA001' ? 'Price change' : log.pa_type === 'PA002'
+		? 'Stock availability change' : 'Product discontinued' }}
+	</dt>
+	<dd ng-repeat-end>
+		<span ng-if="log.pa_type === 'PA001'">
+			Original: <s>{{ log.original | currency }}</s>. Updated:
+			<em>{{ log.returned | currency }}</em>.
+		</span>
+		<span ng-if="log.pa_type === 'PA002'">
+			Original: <s>{{ log.original | number }}</s>. Updated: <em>{{ log.returned | number }}</em>.
+		</span>
+		<br />
+		{{ log.action === 'removed' ? 'Item removed' : 'Change confirmed' }} by {{ log.customer.name }}
+		<time ng-attr-datetime="{{ log.updated_at }}">{{ log.updated_at | date:'short' }}</time>.
+	</dd>
+</dl>

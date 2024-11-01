@@ -1,0 +1,222 @@
+<div class="dropdown account-menu">
+	<button
+		ng-class="['btn dropdown-toggle', $ctrl.btnClass]"
+		type="button"
+		data-bs-toggle="dropdown"
+		data-bs-auto-close="outside"
+		aria-expanded="false"
+	>
+		<i
+			class="bi bi-person-circle"
+			ng-hide="$ctrl.isSigningIn || $ctrl.isSigningOut"
+		>
+		</i>
+		<span
+			class="spinner-border spinner-border-sm"
+			role="status"
+			aria-hidden="true"
+			ng-show="$ctrl.isSigningIn || $ctrl.isSigningOut"
+		></span>
+		<span class="d-none d-md-inline ms-1">
+			<span ng-hide="$ctrl.isSigningIn || $ctrl.isSigningOut">
+				{{ $ctrl.isSignedIn ? 'Account' : 'Sign In' }}
+			</span>
+			<span ng-show="$ctrl.isSigningIn"> Signing In </span>
+			<span ng-show="$ctrl.isSigningOut"> Signing Out </span>
+		</span>
+	</button>
+	<div class="dropdown-menu dropdown-menu-end">
+		<div ng-if="$ctrl.isSignedIn">
+			<h6 class="dropdown-header">{{ 'Hello, ' + $ctrl.firstName }}</h6>
+			<div ng-if="$ctrl.isPunchoutOnly">
+				<div class="dropdown-divider"></div>
+				<a
+					class="dropdown-item text-decoration-none"
+					ng-href="{{ $ctrl.url.welcome }}"
+				>
+					<i class="bi bi-cart-fill me-1"></i>
+					Place Order
+				</a>
+			</div>
+			<div class="dropdown-divider"></div>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.account }}"
+			>
+				<i class="bi bi-person-circle me-1" aria-hidden="true"></i>
+				Account
+			</a>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.addresses }}"
+			>
+				<i class="bi bi-people-fill me-1" aria-hidden="true"></i>
+				Address Profiles
+			</a>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.savedCarts }}"
+			>
+				<i class="bi bi-cart-check-fill me-1" aria-hidden="true"></i>
+				Saved Carts
+			</a>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.favorites }}"
+			>
+				<i class="bi bi-heart-fill me-1" aria-hidden="true"></i>
+				Favorites
+			</a>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.orders }}"
+			>
+				<i class="bi bi-box-seam me-1" aria-hidden="true"></i>
+				Orders
+			</a>
+			<div ng-if="$ctrl.isAdmin || $ctrl.isApprover">
+				<div class="dropdown-divider"></div>
+				<h6 class="dropdown-header">Group Administration</h6>
+				<a
+					class="dropdown-item text-decoration-none"
+					ng-if="$ctrl.isAdmin"
+					ng-href="{{ $ctrl.url.groupAccount }}"
+				>
+					<i class="bi bi-people-fill me-1" aria-hidden="true"></i>
+					Group Account
+				</a>
+				<a
+					class="dropdown-item text-decoration-none"
+					ng-if="$ctrl.isApprover"
+					ng-href="{{ $ctrl.url.groupOrders }}"
+				>
+					<i class="bi bi-box-seam me-1" aria-hidden="true"></i>
+					Group Orders
+				</a>
+			</div>
+			<div class="dropdown-divider"></div>
+			<button class="dropdown-item" ng-click="$ctrl.logout()">
+				<i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>
+				Sign out
+			</button>
+		</div>
+		<div ng-if="!$ctrl.isSignedIn">
+			<form
+				class="px-3 py-2"
+				name="accountMenuForm"
+				id="accountMenuForm"
+				autocomplete="on"
+			>
+				<div class="alert alert-warning small" ng-show="$ctrl.alert">
+					{{ $ctrl.alert }}
+				</div>
+				<div class="mb-3">
+					<label for="inputEmail" class="form-label">Email</label>
+					<input
+						type="text"
+						id="inputEmail"
+						name="email"
+						required
+						autocomplete="email"
+						ng-class="[
+							'form-control',
+							{
+								'is-invalid':
+									accountMenuForm.email.$invalid &&
+									accountMenuForm.email.$touched
+							}
+						]"
+						ng-model="$ctrl.customer.email"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="password" class="form-label">Password</label>
+					<div class="input-group">
+						<input
+							type="password"
+							autocomplete="current-password"
+							name="password"
+							id="password"
+							data-bs-toggle="password"
+							required
+							ng-model="$ctrl.customer.password"
+							ng-attr-type="{{
+								$ctrl.isShowingPassword ? 'text' : 'password'
+							}}"
+							ng-class="[
+								'form-control',
+								{
+									'is-invalid':
+										accountMenuForm.password.$invalid &&
+										accountMenuForm.password.$touched
+								}
+							]"
+							spellcheck="false"
+						/>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							aria-label="Show password"
+							ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword"
+						>
+							<i
+								ng-class="[
+									'bi',
+									{
+										'bi-eye-fill': $ctrl.isShowingPassword,
+										'bi-eye-slash-fill':
+											!$ctrl.isShowingPassword
+									}
+								]"
+							></i>
+						</button>
+					</div>
+				</div>
+				<div class="form-check my-2">
+					<input
+						class="form-check-input"
+						type="checkbox"
+						value=""
+						id="remember-me"
+						ng-model="$ctrl.customer.remember"
+					/>
+					<label class="form-check-label" for="remember-me"
+						>Remember me</label
+					>
+				</div>
+				<button
+					class="btn btn-primary my-2"
+					type="submit"
+					autofocus
+					ng-focus="$ctrl.customer.email.length > 0 && $ctrl.customer.password.length > 0"
+					ng-click="$ctrl.login()"
+				>
+					<i
+						class="bi bi-box-arrow-in-right"
+						ng-hide="$ctrl.isSigningIn"
+					></i>
+					<span
+						class="spinner-border spinner-border-sm"
+						role="status"
+						aria-hidden="true"
+						ng-show="$ctrl.isSigningIn"
+					></span>
+					{{ $ctrl.isSigningIn ? 'Signing In' : 'Sign In' }}
+				</button>
+			</form>
+			<div class="dropdown-divider"></div>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.forgotPassword }}"
+			>
+				Forgot password?
+			</a>
+			<a
+				class="dropdown-item text-decoration-none"
+				ng-href="{{ $ctrl.url.register }}"
+			>
+				Create an account
+			</a>
+		</div>
+	</div>
+</div>

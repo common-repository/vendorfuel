@@ -1,0 +1,7 @@
+[
+	{
+		"name": "taxes",
+		"url": "/taxes",
+		"component": "taxesPage"
+	}
+]

@@ -1,0 +1,10 @@
+<div class="container">
+	<alert-list></alert-list>
+
+	<div class="alert alert-warning" role="alert" ng-if="!$ctrl.hasAPIKey">
+		Missing store API key. If you are the administrator, please go to your
+		store settings.
+	</div>
+
+	<ng-transclude></ng-transclude>
+</div>

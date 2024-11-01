@@ -1,0 +1,153 @@
+[
+	{
+		"title": "Products",
+		"to": "products",
+		"links": [
+			{
+				"text": "All Products",
+				"to": "products"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/products/create"
+			},
+			{
+				"text": "Import inventory",
+				"to": "products/inventory"
+			},
+			{
+				"text": "Import products",
+				"to": "products/uploads/create"
+			},
+			{
+				"text": "Manage imports",
+				"to": "products/uploads"
+			},
+			{
+				"text": "Manage exports",
+				"to": "products/exports"
+			},
+			{
+				"text": "Manage reviews",
+				"link": "?page=vendorfuel#!/catalog/products/reviews"
+			},
+			{
+				"text": "Utilities",
+				"to": "products/utilities"
+			}
+		]
+	},
+	{
+		"title": "Categories",
+		"to": "categories",
+		"links": [
+			{
+				"text": "All Categories",
+				"to": "categories"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/categories/create"
+			},
+			{
+				"text": "Upload categories",
+				"to": "categories/uploads/create"
+			},
+			{
+				"text": "Manage category uploads",
+				"to": "categories/uploads"
+			},
+			{
+				"text": "Upload category tree",
+				"to": "categories/tree/create"
+			},
+			{
+				"text": "Manage category tree uploads",
+				"to": "categories/tree"
+			},
+			{
+				"text": "Utilities",
+				"to": "categories/utilities"
+			}
+		]
+	},
+	{
+		"title": "Collections",
+		"to": "collections",
+		"links": [
+			{
+				"text": "All Collections",
+				"to": "collections"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/collections/create"
+			}
+		]
+	},
+	{
+		"title": "Manufacturers",
+		"to": "manufacturers",
+		"links": [
+			{
+				"text": "All Manufacturers",
+				"to": "manufacturers"
+			},
+			{
+				"text": "Add New",
+				"to": "manufacturers/create"
+			}
+		]
+	},
+
+	{
+		"title": "Price Sheets",
+		"to": "pricesheets",
+		"links": [
+			{
+				"text": "All Price Sheets",
+				"to": "pricesheets"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/pricesheets/create"
+			},
+			{
+				"text": "Upload price sheets",
+				"to": "pricesheets/uploads/create"
+			},
+			{
+				"text": "Manage price sheet uploads",
+				"to": "pricesheets/uploads"
+			}
+		]
+	},
+	{
+		"title": "Promo Codes",
+		"link": "?page=vendorfuel#!/catalog/promo-codes/0",
+		"links": [
+			{
+				"text": "All Promo Codes",
+				"link": "?page=vendorfuel#!/catalog/promo-codes/0"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/promo-codes/1"
+			}
+		]
+	},
+	{
+		"title": "Banner Areas",
+		"link": "?page=vendorfuel#!/catalog/banners/0",
+		"links": [
+			{
+				"text": "All Banner Areas",
+				"link": "?page=vendorfuel#!/catalog/banners/1"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/catalog/banners/1"
+			}
+		]
+	}
+]

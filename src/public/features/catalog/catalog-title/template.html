@@ -1,0 +1,12 @@
+<h1>
+	{{ $ctrl.title }}
+</h1>
+<p
+	class="border-bottom pb-3 d-none d-md-block"
+	ng-if="$ctrl.description"
+	ng-bind-html="$ctrl.description"
+></p>
+<catalog-subcategories
+	ng-if="$ctrl.showSubcategoryCards"
+	subcategories="$ctrl.subcategories"
+></catalog-subcategories>

@@ -1,0 +1,68 @@
+<div
+	ng-controller="PaymentProcessorController"
+	ng-init="processorIndex = 'stripe';attributeIndex1 = 'publishableKey';attributeIndex2 = 'secretKey';attributeCount = 2;"
+>
+	<form name="Stripe">
+		<div class="form-check mb-3">
+			<input
+				class="form-check-input"
+				type="checkbox"
+				id="enabled"
+				ng-model="enabled"
+				ng-true-value="1"
+				ng-false-value="0"
+			/>
+			<label for="enabled" class="form-check-label">
+				Enable as primary payment card processor
+			</label>
+		</div>
+		<div class="mb-3">
+			<label for="att1" class="form-label">Publishable Key </label>
+			<input
+				id="att1"
+				class="form-control"
+				ng-class="{'is-invalid': Stripe.att1.$invalid}"
+				name="att1"
+				type="text"
+				ng-model="attribute1"
+				required
+			/>
+			<p class="description">
+				Your API keys are available in the Stripe Dashboard. Stripe
+				includes randomly generated API keys in their code examples if
+				you are not logged in.
+			</p>
+		</div>
+		<div class="mb-3">
+			<label for="att2" class="form-label">Secret Key</label>
+			<input
+				id="att2"
+				class="form-control"
+				ng-class="{'is-invalid': Stripe.att2.$invalid}"
+				name="att2"
+				type="text"
+				ng-model="attribute2"
+				required
+			/>
+			<p class="description">
+				Your API keys are available in the Stripe Dashboard. Stripe
+				includes randomly generated API keys in their code examples if
+				you are not logged in.
+			</p>
+		</div>
+		<input
+			class="btn btn-primary"
+			type="button"
+			ng-click="updateGateway()"
+			title="{{Stripe.$invalid ? 'Please fill out the form completely.' : ''}}"
+			ng-disabled="Stripe.$invalid"
+			value="Update"
+		/>
+		<input
+			class="btn btn-outline-primary"
+			type="button"
+			ng-click="disableGateway()"
+			value="Disable"
+		/>
+	</form>
+</div>

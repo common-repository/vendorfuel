@@ -1,0 +1,519 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Collections</h2>
+<vf-check-auth></vf-check-auth>
+
+<uib-tabset active="activeTab">
+	<uib-tab index="0" select="TabChanged(0)" heading="Collections">
+		<div class="d-flex justify-content-center" ng-if="loading">
+			<spinner-component></spinner-component>
+		</div>
+		<div ng-if="!loading">
+			<div>
+
+				<bs-search-box-legacy
+					q="$ctrl.allColSearchParams.q"
+					on-submit="SearchCollections(1, query)"
+					is-loading="loadingMore">
+				</bs-search-box-legacy>
+
+				<table class="wp-list-table widefat fixed striped table-view-list">
+					<thead>
+						<tr>
+							<th class="col-1">
+								<a href="#" class="text-decoration-none"
+									ng-click="$ctrl.changeSortBy('id', $event)">
+									ID
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.allColSearchParams.sortBy === 'id'">
+									</i>
+								</a>
+							</th>
+							<th class="col">
+								<a href="#" class="text-decoration-none"
+									ng-click="$ctrl.changeSortBy('name', $event)">
+									Name
+									<i ng-class="['dashicons', {
+										'dashicons-arrow-down': $ctrl.sortAscending,
+										'dashicons-arrow-up': !$ctrl.sortAscending,
+									}]"
+										ng-if="$ctrl.allColSearchParams.sortBy === 'name'">
+									</i>
+								</a>
+							</th>
+							<th class="col">
+								Description
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-if="!collections.data.length && !loadingMore">
+							<td colspan="2">
+								No collections found<span ng-if="searchTerm.length >= 1"> matching '{{searchTerm}}'</span>.
+							</td>
+						</tr>
+						<tr
+							ng-if="!loadingMore"
+							ng-repeat="collection in collections.data track by $index">
+							<td>{{collection.id}}</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="ChangeTab( 2, $index, $event )">
+										{{collection.name}}
+									</a>
+								</strong>
+							</td>
+							<td>{{ collection.description }}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{collections.from || 0}} to {{collections.to || 0}} of
+							{{collections.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="button" ng-if="collections.prev_page_url"
+							ng-click="SearchCollections(collections.current_page - 1)">&lsaquo; Prev</button>
+						<button class="button" ng-if="collections.current_page - 2 > 0"
+							ng-click="SearchCollections(collections.current_page - 2)">{{collections.current_page - 2}}</button>
+						<button class="button" ng-if="collections.current_page - 1 > 0"
+							ng-click="SearchCollections(collections.current_page - 1)">{{collections.current_page - 1}}</button>
+						<button class="button"
+							ng-disabled="true">{{collections.current_page}}</button>
+						<button class="button"
+							ng-if="collections.current_page + 1 <= collections.last_page"
+							ng-click="SearchCollections(collections.current_page + 1)">{{collections.current_page + 1}}</button>
+						<button class="button"
+							ng-if="collections.current_page + 2 <= collections.last_page"
+							ng-click="SearchCollections(collections.current_page + 2)">{{collections.current_page + 2}}</button>
+						<button class="button" ng-if="collections.next_page_url"
+							ng-click="SearchCollections(collections.current_page + 1)">Next &rsaquo;</button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label class="form-label" for="rpp">Per Page: </label>
+						<select class="form-select" id="rpp"
+							ng-model="$ctrl.allColSearchParams.rpp" ng-change="SearchCollections(1)"
+							ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab index="1" select="TabChanged(1)" heading="Add new">
+		<div class="d-flex justify-content-center" ng-if="loading">
+			<spinner-component></spinner-component>
+		</div>
+		<div ng-if="!loading">
+			<form name="addCollection">
+				<div class="col-container">
+					<div class="col-left">
+						<div class="mb-3">
+							<label for="create-name" class="form-label">Name</label>
+							<input id="create-name" class="form-control" ng-class="{'is-invalid':addCollection.name.$invalid}"
+								type="search" minlength="3" name="name"
+								ng-model="addParams.name" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="create-description">Description</label>
+							<textarea id="create-description" class="form-control"
+								ng-model="addParams.description"></textarea>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Image/Icon</label>
+							<div class="input-group">
+								<input class="form-control" ng-model="addParams.img_url"
+									placeholder="None">
+								<button class="button" ng-click="OpenMediaFrame('add_img')">
+									Browse
+								</button>
+							</div>
+						</div>
+						<button class="button" type="button"
+							ng-click="OpenSearchModalAdd()">Add Products</button>
+						<button class="button" type="button"
+							ng-click="OpenSearchModalCategoryAdd()">Add Categories</button>
+						<button class="button button-primary" type="button" ng-click="AddCollection()"
+							ng-disabled="addCollection.name.$invalid || (addParams.products.length <= 0 && addParams.categories.length <= 0)">Save</button>
+					</div>
+					<div class="col-right">
+						<uib-tabset>
+							<uib-tab index="1" heading="Products">
+								<div class="row min-scroll m-0">
+									<div class="col text-center p-20" ng-click="OpenSearchModalAdd()"
+										ng-if="!addParams.products.length">
+										<span>
+											<h3>Click Here or 'Add Products' to get started.</h3>
+										</span>
+									</div>
+									<div class="col-6 col-md-4 vf-item-card-outer"
+										ng-repeat="product in addParams.products track by $index"
+										ng-click="$ctrl.handleEditProduct( product )">
+										<div class="vf-item-card-inner">
+											<div>
+												<p><b>{{product.value.sku}}</b></p>
+												<div class="col-12" style="min-height: 80px;"
+													ng-if="!product.value.image">
+													<div class="d-flex h-100 align-items-center justify-content-center">
+														<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+													</div>
+												</div>
+												<div class="col-12" ng-if="product.value.image">
+													<img class="img-fluid vf-item-image"
+														ng-src="{{product.value.image.thumb_url}}">
+												</div>
+												<p>{{product.value.description | limitTo: 30}}{{product.value.description.length >= 30 ? '...' : ''}}
+												</p>
+												<p>Status: {{product.value.status}}</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+							<uib-tab index="2" heading="Categories">
+								<div class="row min-scroll m-0">
+									<div class="col text-center p-20" ng-click="OpenSearchModalCategoryAdd()"
+										ng-if="!addParams.categories.length">
+										<span>
+											<h3>Click Here or 'Add Categories' to get started.</h3>
+										</span>
+									</div>
+									<div class="col-6 col-md-4 vf-item-card-outer"
+										ng-repeat="category in addParams.categories track by $index">
+										<div class="vf-item-card-inner">
+											<div>
+												<p><b>{{category.value.title}}</b></p>
+												<div class="col-12" style="min-height: 80px;"
+													ng-if="!category.value.image">
+													<div class="d-flex h-100 align-items-center justify-content-center">
+														<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+													</div>
+												</div>
+												<div class="col-12" ng-if="category.value.image">
+													<img class="img-fluid vf-item-image"
+														ng-src="{{category.value.image}}">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+						</uib-tabset>
+					</div>
+				</div>
+			</form>
+		</div>
+	</uib-tab>
+	<uib-tab index="2" select="TabChanged(2)" ng-show="selectedCollection" heading="Edit collection">
+		<div class="d-flex justify-content-center" ng-if="loading">
+			<spinner-component></spinner-component>
+		</div>
+		<div ng-if="!loading">
+			<form name="collectionForm">
+				<div class="col-container">
+					<div class="col-left">
+						<div class="mb-3">
+							<label for="edit-name" class="form-label">Name</label>
+							<input for="create-name" class="form-control" ng-class="{'is-invalid':collectionForm.name.$invalid}"
+								name="name" minlength="3" ng-model="selectedCollection.name" required />
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit-description">Description</label>
+							<textarea id="edit-description" class="form-control"
+								ng-model="selectedCollection.description"></textarea>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Collection ID</label>
+							<input class="form-control" type="number" ng-model="selectedCollection.id"
+								disabled>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Image/Icon</label>
+							<div class="input-group">
+								<input class="form-control" ng-model="selectedCollection.img_url"
+									placeholder="None">
+								<button class="button" ng-click="OpenMediaFrame('add_img')">
+									Browse
+								</button>
+							</div>
+						</div>
+						<div class="mb-2">
+							<button class="button"
+								type="button" ng-if="editedProducts.length >= 1" ng-click="ShowChanges()">
+								<span ng-if="!showChanges">Show Changes ({{editedProducts.length}})</span>
+								<span ng-if="showChanges">Show Current</span>
+							</button>
+							<button class="button"
+								ng-click="OpenSearchModalUpdate()">
+								<span ng-if="selectedCollection.products.data.length">Edit Products</span>
+								<span ng-if="!selectedCollection.products.data.length">Add Products</span>
+							</button>
+							<button class="button"
+								ng-click="OpenSearchModalCategoryUpdate()">
+								<span ng-if="selectedCollection.categories.data.length">Edit Categories</span>
+								<span ng-if="!selectedCollection.categories.data.length">Add Categories</span>
+							</button>
+						</div>
+					</div>
+					<div class="col-right">
+						<uib-tabset>
+							<uib-tab index="0" heading="Products">
+								<div class="d-flex justify-content-center" ng-if="productsLoading">
+									<spinner-component></spinner-component>
+								</div>
+								<div ng-hide="productsLoading">
+									<div ng-if="!showChanges">
+										<div class="row  m-0">
+											<div class="input-group col-8 p-0">
+												<input class="form-control" type="text" id="searchProduct"
+													ng-model="searchParams.q" placeholder="Search Products">
+												<button class="button" type="submit"
+													ng-click="SearchCollection(searchParams.rpp, 1)">Search</button>
+											</div>
+											<div class="col-4  justify-content-end pe-0">
+												<label class="form-label" for="rpp">Per Page: </label>
+												<select class="form-select" id="rpp"
+													ng-model="per_page" ng-change="SearchCollection(per_page, 1)"
+													ng-options="value for value in rppValues">
+												</select>
+											</div>
+										</div>
+										<div ng-if="!productsLoading">
+											<div class="row min-scroll m-0">
+												<div class="col text-center p-20"
+													ng-if="!selectedCollection.products.data.length">
+													<h3>Click 'Add Products' to get started.</h3>
+												</div>
+												<div class="col-6 col-md-4 vf-item-card-outer"
+													ng-repeat="product in selectedCollection.products.data track by $index"
+													ng-click="$ctrl.handleEditProduct( product )">
+													<div class="vf-item-card-inner">
+														<div>
+															<p><b>{{product.sku}}</b></p>
+															<div ng-if="!product.image">
+																<div class="d-flex h-100 align-items-center justify-content-center">
+																	<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+																</div>
+															</div>
+															<div class="col-12" ng-if="product.image">
+																<img class="img-fluid vf-item-image"
+																	ng-src="{{product.image.thumb_url}}">
+															</div>
+															<p>{{product.description | limitTo: 30}}{{product.description.length >= 30 ? '...' : ''}}
+															</p>
+															<p>Status: {{product.status}}</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col text-center mt-2">
+											<button class="button"
+												ng-if="selectedCollection.products.prev_page_url"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 1)">&lsaquo; Prev</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page - 2 > 0"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 2)">{{selectedCollection.products.current_page - 2}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page - 1 > 0"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 1)">{{selectedCollection.products.current_page - 1}}</button>
+											<button class="button"
+												ng-disabled="true">{{selectedCollection.products.current_page}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page + 1 <= selectedCollection.products.last_page"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 1)">{{selectedCollection.products.current_page + 1}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page + 2 <= selectedCollection.products.last_page"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 2)">{{selectedCollection.products.current_page + 2}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.next_page_url"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 1)">Next
+												&rsaquo;</button>
+										</div>
+									</div>
+									<div ng-if="showChanges">
+										<div class="row " ng-hide="productsLoading">
+											<div class="input-group col-12 p-0">
+												<input class="form-control" type="text" id="filterChanges"
+													ng-model="filterEdited" placeholder="Filter Changes">
+											</div>
+										</div>
+										<div class="d-flex justify-content-center" ng-if="productsLoading">
+											<spinner-component></spinner-component>
+										</div>
+										<div ng-if="!productsLoading">
+											<div class="row min-scroll">
+												<div class="col text-center p-20" ng-if="results.length <= 0">
+													<h3>No results matching '{{filterBy}}'.</h3>
+												</div>
+												<div class="col-6 col-md-4 col-lg-3 vf-item-card-outer"
+													ng-repeat="product in editedProducts | filter: filterEdited as results track by $index">
+													<div class="vf-item-card-inner" ng-class="product.action">
+														<div class="row">
+															<p class="col-12"><b>{{product.value.sku}}</b></p>
+															<div class="col-12" style="min-height: 80px;"
+																ng-if="!product.value.image">
+																<div class="d-flex h-100 align-items-center justify-content-center">
+																	<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+																</div>
+															</div>
+															<div class="col-12" ng-if="product.value.image">
+																<img class="img-fluid vf-item-image"
+																	ng-src="{{product.value.image.thumb_url}}">
+															</div>
+															<div class="col-12">
+																<p>{{product.value.description | limitTo: 30}}{{product.value.description.length >= 30 ? '...' : ''}}
+																</p>
+															</div>
+															<div class="col-12">
+																<p>SKU: {{product.value.status}}</p>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+							<uib-tab index="1" heading="Categories">
+								<div class="d-flex justify-content-center" ng-if="searchLoading">
+									<spinner-component></spinner-component>
+								</div>
+								<div ng-hide="searchLoading">
+									<div ng-if="!showChanges">
+										<div class="row  m-0">
+											<div class="input-group col-8 p-0">
+												<input class="form-control" type="text" id="searchCategories"
+													ng-model="searchParams.q" placeholder="Search Categories">
+												<button class="button" type="submit"
+													ng-click="SearchCollection(searchParams.rpp, 1)">Search</button>
+											</div>
+											<div class="col-4  justify-content-end pe-0">
+												<label class="form-label" for="rpp">Per Page: </label>
+												<select class="form-select" id="rpp"
+													ng-model="per_page" ng-change="SearchCollection(per_page, 1)"
+													ng-options="value for value in rppValues">
+												</select>
+											</div>
+										</div>
+										<div ng-if="!productsLoading">
+											<div class="row min-scroll m-0">
+												<div class="col text-center p-20"
+													ng-if="!selectedCollection.categories.data.length">
+													<h3>Click 'Add Categories' to get started.</h3>
+												</div>
+												<div class="col-6 col-md-4 vf-item-card-outer"
+													ng-repeat="category in selectedCollection.categories.data track by $index">
+													<div class="vf-item-card-inner">
+														<div>
+															<p><b>{{category.title}}</b></p>
+															<div ng-if="!category.image">
+																<div class="d-flex h-100 align-items-center justify-content-center">
+																	<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+																</div>
+															</div>
+															<div class="col-12" ng-if="category.image">
+																<img class="img-fluid vf-item-image"
+																	ng-src="{{category.image}}">
+															</div>
+															<p>{{category.title | limitTo: 30}}{{category.title.length >= 30 ? '...' : ''}}
+															</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col text-center mt-2">
+											<button class="button"
+												ng-if="selectedCollection.products.prev_page_url"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 1)">&lsaquo; Prev</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page - 2 > 0"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 2)">{{selectedCollection.products.current_page - 2}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page - 1 > 0"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page - 1)">{{selectedCollection.products.current_page - 1}}</button>
+											<button class="button"
+												ng-disabled="true">{{selectedCollection.products.current_page}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page + 1 <= selectedCollection.products.last_page"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 1)">{{selectedCollection.products.current_page + 1}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.current_page + 2 <= selectedCollection.products.last_page"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 2)">{{selectedCollection.products.current_page + 2}}</button>
+											<button class="button"
+												ng-if="selectedCollection.products.next_page_url"
+												ng-click="SearchCollection(searchParams.rpp, selectedCollection.products.current_page + 1)">Next
+												&rsaquo;</button>
+										</div>
+									</div>
+									<div ng-if="showChanges">
+										<div class="row " ng-hide="productsLoading">
+											<div class="input-group col-12 p-0">
+												<input class="form-control" type="text" id="filterChanges"
+													ng-model="filterEdited" placeholder="Filter Changes">
+											</div>
+										</div>
+										<div class="d-flex justify-content-center" ng-if="productsLoading">
+											<spinner-component></spinner-component>
+										</div>
+										<div ng-if="!productsLoading">
+											<div class="row min-scroll">
+												<div class="col text-center p-20" ng-if="results.length <= 0">
+													<h3>No results matching '{{filterBy}}'.</h3>
+												</div>
+												<div class="col-6 col-md-4 col-lg-3 vf-item-card-outer"
+													ng-repeat="product in editedProducts | filter: filterEdited as results track by $index">
+													<div class="vf-item-card-inner" ng-class="product.action">
+														<div class="row">
+															<p class="col-12"><b>{{product.value.sku}}</b></p>
+															<div class="col-12" style="min-height: 80px;"
+																ng-if="!product.value.image">
+																<div class="d-flex h-100 align-items-center justify-content-center">
+																	<i class="dashicons dashicons-format-image medium-gray-placeholder" style="font-size:2.5rem;width:auto;height:auto"></i>
+																</div>
+															</div>
+															<div class="col-12" ng-if="product.value.image">
+																<img class="img-fluid vf-item-image"
+																	ng-src="{{product.value.image.thumb_url}}">
+															</div>
+															<div class="col-12">
+																<p>{{product.value.description | limitTo: 30}}{{product.value.description.length >= 30 ? '...' : ''}}
+																</p>
+															</div>
+															<div class="col-12">
+																<p>SKU: {{product.value.status}}</p>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</uib-tab>
+						</uib-tabset>
+					</div>
+				</div>
+				<div class="hstack gap-2 justify-content-between">
+					<div>
+						<button class="components-button is-primary" type="button"
+							ng-click="AddCollection(selectedCollection.id)"
+							ng-disabled="collectionForm.name.$invalid">
+							Update
+						</button>
+						<button class="components-button is-destructive"
+							ng-click="DeleteCollection(selectedCollection.id)">
+							Delete
+						</button>
+					</div>
+					<export-to-google-shopping-button collection="selectedCollection"></export-to-google-shopping-button>
+				</div>
+			</form>
+		</div>
+	</uib-tab>
+</uib-tabset>

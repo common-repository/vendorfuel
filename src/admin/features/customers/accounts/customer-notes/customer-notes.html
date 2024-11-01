@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-center" ng-if="$ctrl.isLoading">
+	<spinner-component></spinner-component>
+</div>
+
+<ul class="list-group mb-3" ng-if="$ctrl.notes.data.length">
+	<li class="list-group-item" ng-repeat="note in $ctrl.notes.data">
+		<p class="fs-6">{{ note.content }}</p>
+		<p class="small text-muted">
+			Created {{ note.created_at | date: 'short' }} by
+			<a ng-href="mailto:{{ note.admin.email }}">{{ note.admin.name }}</a>
+		</p>
+		<wp-button on-delete="$ctrl.remove( note.id )">Delete</wp-button>
+	</li>
+</ul>
+
+<bs-pagination
+	data="$ctrl.notes"
+	is-loading="$ctrl.isLoading"
+	ng-if="$ctrl.data.total"
+	on-change="$ctrl.changePage(page, rpp)"
+>
+</bs-pagination>
+
+<form name="notesForm">
+	<fieldset>
+		<wp-form-field
+			label="Add Note"
+			field="$ctrl.content"
+			type="textarea"
+			on-change="$ctrl.change('content', value)"
+		></wp-form-field>
+	</fieldset>
+	<wp-button
+		on-click="$ctrl.save()"
+		is-primary="true"
+		is-loading="$ctrl.isSaving"
+		>{{ $ctrl.isSaving ? 'Saving' : 'Save' }}</wp-button
+	>
+</form>

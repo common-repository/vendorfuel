@@ -1,0 +1,9 @@
+import './checkout-additional-fields/checkout-additional-fields.component';
+import './checkout-address-book/checkout-address-book.component';
+import './checkout-payment-authnet/checkout-payment-authnet.component';
+import './checkout-payment-credit-line/checkout-payment-credit-line.component';
+import './checkout-payment-paypal/checkout-payment-paypal.component';
+import './checkout-payment-qualpay/checkout-payment-qualpay.component';
+import './checkout-payment-square/checkout-payment-square.component';
+import './checkout-payment-stripe/checkout-payment-stripe.component';
+import './checkout-update-saved-address/checkout-update-saved-address.component';

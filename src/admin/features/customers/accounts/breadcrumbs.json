@@ -1,0 +1,4 @@
+[
+	{ "label": "Customers", "href": "?page=vf-customers" },
+	{ "label": "Accounts", "href": "?page=vf-customers#/accounts" }
+]

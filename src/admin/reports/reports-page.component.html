@@ -1,0 +1,445 @@
+<layout-component heading="Reports" nav="$ctrl.nav">
+	<spinner-component ng-if="loading"></spinner-component>
+	<div ng-show="!loading">
+		<form name="newReport">
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="mb-3">
+						<label class="form-label" for="savedReports"
+							>Saved Reports</label
+						>
+						<div class="input-group">
+							<select
+								class="form-select"
+								id="savedReports"
+								ng-model="selectedReport"
+								ng-options="x.name for x in savedReports"
+								ng-change="AssignReport(selectedReport)"
+								ng-disabled="savedReports.length <= 0"
+							>
+								<option
+									value=""
+									hidden
+									disabled
+									ng-selected="clear"
+								>
+									{{
+										savedReports.length >= 1
+											? 'Select Report'
+											: 'No Saved Reports'
+									}}
+								</option>
+							</select>
+							<button
+								class="btn btn-primary"
+								id="updateBtn"
+								ng-click="UpdateReport(selectedReport)"
+								ng-disabled="!selectedReport"
+							>
+								Update
+							</button>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="tables">Table</label>
+						<select
+							class="form-select"
+							name="tables"
+							id="tables"
+							ng-class="{
+								'is-invalid': newReport.tables.$invalid
+							}"
+							ng-model="$ctrl.selectedParams['tables'][0]"
+							ng-options="x as x for (x, y) in storeTables"
+							ng-change="UpdateColumns($ctrl.selectedParams['tables'][0], '{{
+								$ctrl.selectedParams['tables'][0]
+							}}')"
+							required
+						>
+							<option value="" hidden disabled>
+								Select Table
+							</option>
+						</select>
+					</div>
+					<div
+						class="mb-3"
+						ng-if="$ctrl.selectedParams['tables'][0].length"
+					>
+						<label class="form-label" for="headers">Headers</label>
+						<select
+							multiple
+							class="form-select"
+							id="headers"
+							ng-class="{
+								'is-invalid': newReport.headers.$invalid
+							}"
+							name="headers"
+							ng-model="$ctrl.selectedParams['headers']"
+							ng-options="x.value as x.name group by x.table for x in allColumns"
+							required
+						></select>
+					</div>
+					<div
+						class="mb-3"
+						ng-show="$ctrl.selectedParams['headers'].length >= 1"
+					>
+						<label class="form-label" for="selectedHeader"
+							>Sort By Header</label
+						>
+						<select
+							class="form-select"
+							ng-class="{
+								'is-invalid': newReport.selectedHeader.$invalid
+							}"
+							name="selectedHeader"
+							id="selectedHeader"
+							ng-model="$ctrl.selectedParams.order"
+							ng-options="x.value as x.name group by x.table for x in allColumns"
+							ng-required="$ctrl.selectedParams['headers'].length >= 1"
+						>
+							<option value="" hidden disabled>
+								Select Table
+							</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="direction"
+							>Asc/Desc</label
+						>
+						<select
+							class="form-select"
+							ng-model="$ctrl.selectedParams.direction"
+							id="direction"
+						>
+							<option value="asc">Ascending</option>
+							<option value="desc">Descending</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="report-name">Name</label>
+						<div class="input-group">
+							<input
+								class="form-control"
+								name="reportName"
+								id="report-name"
+								placeholder="My TPS report, etc."
+								ng-model="$ctrl.selectedParams.name"
+							/>
+							<button
+								class="btn btn-primary"
+								id="saveBtn"
+								title="{{
+									!$ctrl.selectedParams.name.length
+										? 'Please add a name for the report.'
+										: 'Save the report in order to run it at a later date/time.'
+								}}"
+								ng-disabled="!$ctrl.selectedParams.name.length"
+								ng-click="SaveReport()"
+							>
+								Save
+							</button>
+							<button
+								class="btn btn-outline-primary"
+								id="downloadBtn"
+								title="{{
+									!$ctrl.selectedParams.name.length
+										? 'Please add a name for the report.'
+										: 'Download the report to the downloads tab.'
+								}}"
+								ng-disabled="!$ctrl.selectedParams.name.length"
+								ng-click="DownloadReport()"
+							>
+								Download
+							</button>
+						</div>
+					</div>
+					<div class="hstack gap-1">
+						<button
+							class="btn btn-primary"
+							id="runBtn"
+							ng-click="$ctrl.runReport(1)"
+							ng-disabled="newReport.$invalid"
+						>
+							Run Report
+						</button>
+						<button
+							class="btn btn-outline-primary"
+							ng-click="ClearReport()"
+						>
+							Reset
+						</button>
+						<delete-button
+							model-name="'report'"
+							model-id="selectedReport.id"
+							on-delete="($ctrl.destroyReport)"
+							ng-if="selectedReport"
+						/>
+					</div>
+				</div>
+				<div class="col-lg-8">
+					<h2 class="h5">Modifiers</h2>
+					<div class="mb-3">
+						<button
+							class="btn btn-outline-primary"
+							ng-click="$ctrl.addJoinRow()"
+							ng-disabled="newReport.tables.$invalid || newReport.headers.$invalid"
+						>
+							Add Join
+						</button>
+						<button
+							class="btn btn-outline-primary"
+							ng-click="$ctrl.addFilterRow()"
+							ng-disabled="newReport.tables.$invalid || newReport.headers.$invalid"
+						>
+							Add Filter
+						</button>
+					</div>
+
+					<div ng-if="$ctrl.selectedParams['joinTable'].length">
+						<h3 class="h6">Joins</h3>
+						<div
+							class="input-group mb-3"
+							ng-repeat="row in $ctrl.selectedParams['joinTable'] track by $index"
+						>
+							<select
+								class="form-select"
+								ng-model="$ctrl.selectedParams['joinTable'][$index]"
+								ng-options="x as x for (x, y) in allTables"
+								ng-change="UpdateColumns($ctrl.selectedParams['joinTable'][$index], '{{
+									$ctrl.selectedParams['joinTable'][$index]
+								}}')"
+							></select>
+							<select
+								ng-model="$ctrl.selectedParams['joinSelect'][$index]"
+								ng-class="[
+									'form-select',
+									{
+										'is-invalid':
+											!$ctrl.selectedParams['joinSelect'][
+												$index
+											]
+									}
+								]"
+								ng-options="y.value as y.name for (x, y) in allTables[$ctrl.selectedParams['joinTable'][$index]]"
+								required
+							></select>
+							<span
+								class="input-group-text"
+								ng-model="$ctrl.selectedParams['joinTerm'][$index]"
+								>equals (=)
+							</span>
+							<select
+								ng-model="$ctrl.selectedParams['joinValue'][$index]"
+								ng-class="[
+									'form-select',
+									{
+										'is-invalid':
+											!$ctrl.selectedParams['joinValue'][
+												$index
+											]
+									}
+								]"
+								ng-options="x.value as x.value group by x.table for x in allColumns"
+								required
+							></select>
+							<select
+								class="form-select"
+								ng-model="$ctrl.selectedParams['joinType'][$index]"
+								ng-options="x as y for (x, y) in joinTypes"
+							></select>
+							<button
+								class="btn btn-danger"
+								ng-click="RemoveJoin($index)"
+							>
+								Remove
+							</button>
+						</div>
+					</div>
+
+					<div ng-if="$ctrl.selectedParams['filterSelect'].length">
+						<h3 class="h6">Filters</h3>
+						<div
+							class="input-group mb-3"
+							ng-repeat="row in $ctrl.selectedParams['filterSelect'] track by $index"
+						>
+							<select
+								class="form-select"
+								ng-if="$index != 0"
+								ng-model="$ctrl.selectedParams['filterOperator'][$index]"
+								ng-options="x for x in filterOperators"
+							></select>
+							<select
+								ng-class="[
+									'form-select',
+									{
+										'is-invalid':
+											!$ctrl.selectedParams[
+												'filterSelect'
+											][$index]
+									}
+								]"
+								ng-model="$ctrl.selectedParams['filterSelect'][$index]"
+								ng-options="x.value as x.value group by x.table for x in allColumns"
+								required
+							></select>
+							<select
+								class="form-select"
+								ng-model="$ctrl.selectedParams['filterTerm'][$index]"
+								ng-options="x for x in comparators"
+								required
+							></select>
+							<input
+								type="text"
+								placeholder="Filter terms"
+								ng-model="$ctrl.selectedParams['filterValue'][$index]"
+								ng-class="[
+									'form-control',
+									{
+										'is-invalid':
+											!$ctrl.selectedParams[
+												'filterValue'
+											][$index]
+									}
+								]"
+								required
+							/>
+							<button
+								class="btn btn-danger"
+								ng-click="RemoveFilter($index)"
+							>
+								Remove
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+		<spinner-component ng-if="$ctrl.reportLoading"></spinner-component>
+		<div
+			class="col-12 my-3"
+			ng-if="$ctrl.reportData.data.length <= 0 && $ctrl.reportRan"
+		>
+			<div class="text-center" ng-if="!$ctrl.reportLoading">
+				<span class="col m-auto">
+					<h3>No Results found.</h3>
+				</span>
+			</div>
+		</div>
+		<div
+			class="col-12 my-3"
+			ng-if="$ctrl.reportData.data.length >= 1 && $ctrl.reportRan"
+		>
+			<div style="overflow: auto">
+				<spinner-component
+					ng-if="$ctrl.reportLoading"
+				></spinner-component>
+
+				<table
+					ng-if="!$ctrl.reportLoading"
+					class="table bg-white caption-top"
+				>
+					<caption>
+						Report results
+					</caption>
+					<thead>
+						<tr>
+							<th
+								scope="col"
+								ng-repeat="th in $ctrl.reportHeaders"
+							>
+								{{ th }}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="data in $ctrl.reportData.data">
+							<td
+								scope="row"
+								class="padding: 10px;"
+								ng-repeat="(x, y) in data"
+							>
+								{{ y ? y : '&mdash;' }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div ng-if="$ctrl.reportData.data">
+				<div
+					class="hstack justify-content-between align-items-baseline"
+				>
+					<div class="hstack gap-2 align-items-baseline">
+						<label
+							for="perPage"
+							class="form-label small text-nowrap"
+							>Number of items per page:</label
+						>
+						<select
+							class="form-select"
+							id="perPage"
+							ng-model="$ctrl.perPage"
+							ng-change="$ctrl.handleRowsPerPageChange()"
+							ng-options="value for value in $ctrl.perPageOptions"
+						></select>
+					</div>
+					<nav
+						class="hstack gap-1 align-items-baseline justify-content-end"
+						aria-label="Page navigation"
+					>
+						<span class="small mx-2">
+							{{ $ctrl.reportData.total }} entries
+						</span>
+						<button
+							aria-label="First"
+							class="btn btn-outline-primary btn-sm"
+							ng-click="$ctrl.handlePageChange(1)"
+							ng-disabled="$ctrl.reportData.current_page === 1"
+						>
+							<i
+								class="bi bi-chevron-double-left"
+								aria-hidden="true"
+							></i>
+						</button>
+						<button
+							aria-label="Previous"
+							class="btn btn-outline-primary btn-sm"
+							ng-click="$ctrl.handlePageChange( $ctrl.reportData.current_page - 1 )"
+							ng-disabled="$ctrl.reportData.current_page === 1"
+						>
+							<i
+								class="bi bi-chevron-left"
+								aria-hidden="true"
+							></i>
+						</button>
+						<span class="small mx-2"
+							>{{ $ctrl.reportData.current_page }} of
+							{{ $ctrl.reportData.last_page }}</span
+						>
+						<button
+							aria-label="Next"
+							class="btn btn-outline-primary btn-sm"
+							ng-click="$ctrl.handlePageChange( $ctrl.reportData.current_page + 1 )"
+							ng-disabled="$ctrl.reportData.current_page === $ctrl.reportData.last_page"
+						>
+							<i
+								class="bi bi-chevron-right"
+								aria-hidden="true"
+							></i>
+						</button>
+						<button
+							aria-label="Last"
+							class="btn btn-outline-primary btn-sm"
+							ng-click="$ctrl.handlePageChange( $ctrl.reportData.last_page )"
+							ng-disabled="$ctrl.reportData.current_page === $ctrl.reportData.last_page"
+						>
+							<i
+								class="bi bi-chevron-double-right"
+								aria-hidden="true"
+							></i>
+						</button>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</layout-component>

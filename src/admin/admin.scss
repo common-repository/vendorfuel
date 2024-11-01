@@ -1,0 +1,170 @@
+@import "~@wordpress/base-styles/variables";
+@import "~bootstrap/scss/bootstrap";
+
+$orange: #f37324;
+
+body {
+	background-color: #f0f0f1;
+}
+
+/* Override Bootstrap to align more with WordPress admin defaults. */
+h2,
+h3 {
+	font-size: 1.1rem;
+	font-weight: 600;
+	line-height: 1.4rem;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+table {
+	caption-side: initial;
+}
+
+td.column-title strong {
+	font-weight: 600;
+}
+
+.components-combobox-control__suggestions-container,
+.components-form-token-field__input-container {
+	background-color: var(--bs-white);
+}
+
+/* Animate table when loading. */
+table.table {
+	opacity: 1;
+	transition: all 0.1s ease-in-out;
+
+	&.is-busy {
+		opacity: 0.5;
+
+		td > span,
+		td a {
+			color: var(--bs-gray-400);
+			background-color: var(--bs-gray-400);
+			animation: fade-in-out 1s infinite ease-in-out;
+		}
+
+		a,
+		a > span {
+			cursor: wait;
+		}
+	}
+}
+
+@keyframes fade-in-out {
+	0% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.text-orange {
+	color: var(--bs-orange);
+}
+
+/* Override conflicts between Bootstrap and WordPress styles. */
+
+a:focus {
+	color: unset;
+	box-shadow: unset;
+	outline: unset;
+}
+
+li {
+	margin-bottom: unset;
+}
+
+ol {
+	margin-left: unset;
+}
+
+/* Adjust VendorFuel navbar to fit within #wpcontent */
+nav.navbar {
+	--wpcontent--padding-left: 20px;
+	--wpcontent--padding-right: 20px;
+	--wrap--margin-top: 10px;
+	--wrap--margin-left: 2px;
+
+	margin: calc(0px - var(--wrap--margin-top))
+		calc(0px - var(--wpcontent--padding-right)) auto
+		calc(0px - (var(--wrap--margin-left) + var(--wpcontent--padding-left)));
+}
+
+@media screen and (max-width: 782px) {
+	nav.navbar {
+		--wpcontent--padding-left: 10px;
+	}
+}
+
+.card {
+	padding: unset;
+	max-width: unset;
+	margin-top: unset;
+}
+
+input[type="checkbox"].form-check-input,
+input[type="radio"].form-check-input {
+	margin-top: 0.4rem;
+	height: 1rem;
+	width: 1rem;
+
+	&:checked::before {
+		content: none;
+	}
+}
+
+.MuiRadio-root input[type="radio"]:disabled {
+	opacity: 0;
+}
+
+.MuiFormControl-root {
+	input[type="number"],
+	input[type="password"],
+	input[type="search"],
+	input[type="text"],
+	input[type="url"] {
+		padding: 16.5px 14px;
+		min-height: unset;
+		border: none;
+		&:focus {
+			border-color: currentColor;
+			border-width: 0;
+			box-shadow: none;
+			outline-width: 0;
+			outline-style: none;
+		}
+		&.MuiInputBase-inputSizeSmall {
+			padding: 8.5px 14px;
+		}
+	}
+
+	textarea:focus {
+		box-shadow: none;
+	}
+}
+
+.MuiDataGrid-filterForm .MuiFormControl-root input[type="text"] {
+	padding: 0 8px;
+	min-height: 30px;
+}
+
+.MuiButton-contained {
+	&:hover {
+		color: #fff;
+	}
+}
+
+.MuiTablePagination-toolbar p {
+	margin-bottom: 0;
+}
+
+/* Remove validation icon that breaks form appearance if there's description text underneath a field. */
+.form-table .form-required.form-invalid td:after {
+	content: none;
+}

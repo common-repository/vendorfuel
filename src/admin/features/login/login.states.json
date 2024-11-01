@@ -1,0 +1,7 @@
+[
+	{
+		"name": "login",
+		"url": "/login",
+		"component": "loginPage"
+	}
+]

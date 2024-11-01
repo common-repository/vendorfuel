@@ -1,0 +1,69 @@
+@use "elements/table";
+@use "components/forms";
+@use "components/list-group";
+@use "components/pagination";
+@use "components/tabs";
+@use "utilities/sizing";
+@use "wp-components";
+
+/* Fix alignment issue with password icons */
+.input-group > .button {
+	& > .dashicons-hidden,
+	& > .dashicons-visibility {
+		display: inherit;
+	}
+}
+
+.btn.wp-hide-pw > .dashicons {
+	font-size: 1rem;
+	top: unset;
+	vertical-align: bottom;
+}
+
+/* \override */
+
+.row-actions span.delete {
+	button,
+	button:hover {
+		color: var(--bs-red);
+	}
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.editor {
+	height: 52vh;
+	min-height: 600px;
+}
+
+@media screen and (max-width: 782px) {
+	#wpcontent {
+		padding-right: 10px;
+		min-height: 100vh;
+		padding-bottom: 15px;
+	}
+}
+
+#bee-plugin-container {
+	position: relative;
+	height: 100vh;
+	width: auto;
+}
+
+#integrator-bottom-bar {
+	position: absolute;
+	height: 25px;
+	bottom: 0;
+	left: 5px;
+	right: 0;
+}
+
+.mce-edit-area iframe {
+	min-height: 200px;
+}
+
+li.nav-item {
+	margin-bottom: 0;
+}

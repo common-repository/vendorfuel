@@ -1,0 +1,23 @@
+[
+	{
+		"name": "orders",
+		"url": "/orders",
+		"abstract": true,
+		"template": "<ui-view/>"
+	},
+	{
+		"name": "orders.index",
+		"url": "",
+		"component": "ordersIndex"
+	},
+	{
+		"name": "orders.show",
+		"url": "/:id",
+		"component": "ordersDetail"
+	},
+	{
+		"name": "orders.tracking",
+		"url": "/tracking",
+		"component": "orderTracking"
+	}
+]

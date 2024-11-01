@@ -1,0 +1,44 @@
+<layout-component heading="Order tracking" breadcrumbs="$ctrl.breadcrumbs">
+	<div>
+		<form enctype="multipart/form-data" name="shipmentUploadForm">
+			<div class="col-md-5">
+				<div class="mb-3">
+					<label class="form-label">File</label>
+					<input
+						ng-class="[
+							'form-control',
+							{
+								'is-invalid':
+									shipmentUploadForm.zipName.$invalid
+							}
+						]"
+						type="file"
+						name="file"
+						file-model="myFiles"
+						id="uploadInput"
+						onchange="angular.element(this).scope().setFile(this), angular.element(this).scope().setUploading()"
+						required
+					/>
+				</div>
+				<div
+					class="d-flex align-items-center"
+					ng-if="$ctrl.isUploading"
+				>
+					<strong>Uploading zip, please wait...</strong>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<div ng-show="!$ctrl.isLoading && $ctrl.log">
+		<h3 class="h6">Upload Log</h3>
+		<samp>
+			<textarea class="large-text" rows="10" cols="80"
+				>{{ $ctrl.log }}
+	</textarea
+			>
+		</samp>
+	</div>
+</layout-component>

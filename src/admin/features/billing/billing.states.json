@@ -1,0 +1,24 @@
+[
+	{
+		"name": "billing",
+		"url": "/billing",
+		"component": "billingPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	},
+	{
+		"name": "billing-reset-password",
+		"url": "/billing-reset-password?code&auth",
+		"component": "billingResetPasswordPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true,
+				"code": null,
+				"auth": null
+			}
+		}
+	}
+]

@@ -1,0 +1,90 @@
+<figure class="ratio ratio-1x1">
+	<img
+		class="lazy"
+		ng-src="{{ $ctrl.placeholder }}"
+		width="150"
+		height="150"
+		alt=""
+		loading="lazy"
+		ng-if="$ctrl.images.length === 0"
+	/>
+	<div
+		id="product-carousel"
+		class="carousel slide"
+		data-ride="carousel"
+		ng-if="$ctrl.images.length > 0"
+	>
+		<ol class="carousel-indicators" ng-if="$ctrl.images.length > 1">
+			<li
+				data-bs-target="#product-carousel"
+				data-slide-to="{{ $index }}"
+				ng-repeat="image in $ctrl.images"
+				ng-class="{ active: $first }"
+			></li>
+		</ol>
+		<div class="carousel-inner h-100 d-flex align-items-center">
+			<div
+				ng-repeat="image in $ctrl.images"
+				ng-class="['carousel-item h-100', { active: $first }]"
+			>
+				<div
+					class="d-block w-100 h-100"
+					ng-style="{
+						background:
+							'url(' +
+							image.med_url +
+							') no-repeat center/contain'
+					}"
+				></div>
+			</div>
+		</div>
+		<a
+			class="carousel-control-prev"
+			href="#product-carousel"
+			role="button"
+			data-slide="prev"
+			ng-if="$ctrl.images.length > 1"
+		>
+			<i
+				class="bi bi-caret-square-left text-secondary"
+				aria-hidden="true"
+			></i>
+			<span class="visually-hidden">Previous</span>
+		</a>
+		<a
+			class="carousel-control-next"
+			href="#product-carousel"
+			role="button"
+			data-slide="next"
+			ng-if="$ctrl.images.length > 1"
+		>
+			<i
+				class="bi bi-caret-square-right text-secondary"
+				aria-hidden="true"
+			></i>
+			<span class="visually-hidden">Next</span>
+		</a>
+	</div>
+</figure>
+<div
+	class="d-flex flex-row justify-content-center align-items-center mb-3"
+	ng-if="$ctrl.images.length > 1"
+>
+	<a
+		class="mx-2"
+		href="#product-carousel"
+		data-bs-target="#product-carousel"
+		data-slide-to="{{ $index }}"
+		ng-repeat="image in $ctrl.images track by $index"
+		title="View this image"
+	>
+		<img
+			class="img-fluid lazy"
+			loading="lazy"
+			width="140"
+			height="140"
+			alt=""
+			ng-src="{{ image.thumb_url }}"
+		/>
+	</a>
+</div>

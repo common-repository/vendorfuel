@@ -1,0 +1,1303 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Customer accounts <a href="#!/customers/uploads/new" class="button">Upload customer accounts</a><a href="#!/customers/uploads" class="button">Manage batch uploads</a></h2>
+<vf-check-auth></vf-check-auth>
+<wp-notice-list></wp-notice-list>
+
+<uib-tabset 
+	active="$ctrl.activeTab" 
+	ng-if="$ctrl.isAuthed"
+	resize>
+	<uib-tab heading="Search Customers"
+		select="$ctrl.tabChanged(0)">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.isLoading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.isLoading">
+
+			<bs-search-box-legacy
+				q="$ctrl.searchParams.q"
+				on-submit="$ctrl.setQuery(query, searchBy)"
+				is-loading="loadingMore"
+				search-options="$ctrl.searchOptions">
+			</bs-search-box-legacy>   	
+
+			<table class="wp-list-table widefat fixed striped table-view-list">
+				<thead>
+					<tr>
+						<th class="col-1">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeOrderBy('id', $event)">
+								ID
+								<i ng-class="['bi', {
+									'bi-sort-numeric-down': $ctrl.sortAscending,
+									'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.orderBy === 'id'">
+								</i>							
+							</a>
+						</th>
+						<th class="col-4">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeOrderBy('name', $event)">
+								Name
+								<i ng-class="['bi', {
+									'bi-sort-alpha-down': $ctrl.sortAscending,
+									'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.orderBy === 'name'">
+								</i>																			
+							</a>
+						</th>
+						<th class="col-4">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeOrderBy('email', $event)">
+								Email
+								<i ng-class="['bi', {
+									'bi-sort-alpha-down': $ctrl.sortAscending,
+									'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.orderBy === 'email'">
+								</i>																	
+							</a>
+						</th>
+						<th class="col-3">
+							<a href="#" class="text-decoration-none"
+								ng-click="$ctrl.changeOrderBy('status', $event)">
+								Status
+								<i ng-class="['bi', {
+									'bi-sort-down': $ctrl.sortAscending,
+									'bi-sort-down-alt': !$ctrl.sortAscending,
+								}]"
+									ng-if="$ctrl.searchParams.orderBy === 'status'">
+								</i>																	
+							</a>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="text-center"
+						ng-if="$ctrl.customers.data.length <= 0 && !$ctrl.isLoadingMore">
+						<td colspan="4">
+							No customers found<span
+								ng-if="$ctrl.searchTerm.length >= 1 && $ctrl.searchedBy.length <= 0"> matching
+								'{{$ctrl.searchTerm}}'</span><span
+								ng-if="$ctrl.searchTerm.length >= 1 && $ctrl.searchedBy.length >= 1"> with the
+								{{$ctrl.searchedBy === 'id' ? 'Customer ID' : $ctrl.searchParams.searchBy}} of
+								'{{$ctrl.searchTerm}}'</span>.
+						</td>
+					</tr>
+					<tr class="cursor-pointer"
+						ng-if="!$ctrl.isLoadingMore"
+						ng-click="$ctrl.changeTab(2, $index)"
+						ng-repeat="customer in $ctrl.customers.data track by $index">
+						<td>{{customer.id}}</td>
+						<td>{{customer.name}}</td>
+						<td>{{customer.email}}</td>
+						<td>{{customer.status}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<wp-spinner
+				type="2x"
+				ng-show="$ctrl.isLoadingMore">
+			</wp-spinner>
+			<div class="row  mb-3">
+				<div class="col-sm-4">
+					<span>Showing {{$ctrl.customers.from || 0}} to {{$ctrl.customers.to || 0}} of
+						{{$ctrl.customers.total || 0}} entries<span>
+				</div>
+				<div class="col-sm-4 text-center mt-2">
+					<button class="button" ng-if="$ctrl.customers.prev_page_url"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page - 1)">&lsaquo; Prev</button>
+					<button class="button" ng-if="$ctrl.customers.current_page - 2 > 0"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page - 2)">{{$ctrl.customers.current_page -
+						2}}</button>
+					<button class="button" ng-if="$ctrl.customers.current_page - 1 > 0"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page - 1)">{{$ctrl.customers.current_page -
+						1}}</button>
+					<button class="button"
+						ng-disabled="true">{{$ctrl.customers.current_page}}</button>
+					<button class="button"
+						ng-if="$ctrl.customers.current_page + 1 <= $ctrl.customers.last_page"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page + 1)">{{$ctrl.customers.current_page +
+						1}}</button>
+					<button class="button"
+						ng-if="$ctrl.customers.current_page + 2 <= $ctrl.customers.last_page"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page + 2)">{{$ctrl.customers.current_page +
+						2}}</button>
+					<button class="button" ng-if="$ctrl.customers.next_page_url"
+						ng-click="$ctrl.setPage($ctrl.customers.current_page + 1)">Next &rsaquo;</button>
+				</div>
+				<div class="col-sm-4  justify-content-end">
+					<label class="form-label" for="per-page">Per Page: </label>
+					<select class="form-control" style="display: inline-block;" id="per-page"
+						ng-model="$ctrl.searchParams.perPage" ng-change="$ctrl.setPerPage( $ctrl.searchParams.perPage )"
+						ng-options="value for value in $ctrl.perPageValues">
+					</select>
+				</div>
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab heading="Add Customer"
+		select="$ctrl.tabChanged(1)">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.isLoading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.isLoading">
+			<h3>Add Customer</h3>
+			<form class="row" name="addForm" autocomplete="off">
+				<div class="col-md-5">
+					<div class="mb-3">
+						<label class="form-label" for="new_status">
+							Status <span class="small">(required)</span>
+						</label>
+						<select class="form-select" id="new_status" required
+							ng-model="$ctrl.customer.status"
+							ng-options="key as value for (key, value) in $ctrl.statuses">
+						</select>
+					</div>
+					<fieldset>
+						<legend class="h6">
+							Contact Info
+						</legend>
+						<div class="mb-3">
+							<label class="form-label" for="new_name">
+								Name <span class="small">(required)</span>
+							</label>
+							<input class="form-control" name="name" type="text" id="new_name" minlength="3" required
+								ng-model="$ctrl.customer.name">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit_email">
+								Email <span class="small">(required)</span>
+							</label>
+							<input class="form-control" name="customerEmail" type="email" id="edit_email" autocomplete="off" required
+								ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/"
+								ng-model="$ctrl.customer.email" >                            
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit_org">
+								Company/Organization
+							</label>
+							<input class="form-control" type="text" id="edit_org"
+								ng-model="$ctrl.customer.organization" autocomplete="organization">
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend class="h6">
+							Account Details
+						</legend>
+						<label class="form-label" for="new_pricesheet">
+							Price Sheet <span class="description">(required)</span>
+						</label>							
+						<div class="input-group mb-3">
+							<input type="text" class="form-control" id="new_pricesheet" name="pricesheet" readonly required
+								ng-model="$ctrl.selectedSheet"
+								ng-init="$ctrl.checkPriceSheet(2)">
+
+							<button class="button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Select</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<div class="input-group input-group-sm px-2">
+									<span class="input-group-text">
+										<i class="dashicons dashicons-filter medium-gray-placeholder"></i>
+									</span>
+									<input type="search" class="form-control"
+										ng-model="filterVal"
+										placeholder="Filter">
+								</div>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="#"
+									ng-repeat="priceSheet in $ctrl.priceSheets | orderBy: 'sheet' | filter: filterVal as filtered track by $index"
+									ng-click="
+										$event.preventDefault(); 
+										$ctrl.customer.price_sheet_id = priceSheet.price_sheet_id;
+										$ctrl.updatePriceSheet($ctrl.customer.price_sheet_id);
+										$ctrl.checkPriceSheet(1)"
+									>
+									{{priceSheet.sheet}}
+								</a>
+								<p class="px-4 mb-0 text-muted"
+									ng-if="filtered.length <= 0">
+									No results matching {{filterVal}}.
+								</p>																	
+							</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="new_terms">
+								Terms
+							</label>
+							<input class="form-control" type="text" id="new_terms"
+								ng-model="$ctrl.customer.terms">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="new-customer-prefix">
+								Customer prefix
+							</label>
+							<input class="form-control" type="text" id="new-customer-prefix"
+								ng-model="$ctrl.customer.customer_prefix">
+							<div class="form-text">The prefix to append to the customer ID when exporting order data for accounting services.</div>								
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="new_prefix">
+								Order prefix
+							</label>
+							<input class="form-control" type="text" id="new_prefix"
+								ng-model="$ctrl.customer.order_prefix">
+						</div>
+					</fieldset>					
+					
+					<div class="form-wrap">
+						<h4>Account Management</h4>
+						<div class="form-field wp-pwd is-open">
+							<label class="form-label" for="view_password">
+								New Password <span class="description">(required)</span>
+							</label>
+							<div class="row g-1">
+								<div class="col">
+									<span class="password-input-wrapper">
+										<input type="password" id="view_password" name="newPassword" placeholder="New Password" autocomplete="new-password" minlength="8"
+										pattern="(?=.*[0-9])(?=.*[!@#$%^&*-])(?=.*[A-Z]+)[a-zA-Z0-9!@#$%^&*]{8,}"
+											ng-class="['w-100 h-100', {
+												'empty': !$ctrl.customer.password.length,
+												'short': addForm.newPassword.$invalid,
+												'strong': $ctrl.customer.password && addForm.newPassword.$valid
+											}]"
+											ng-required="$ctrl.customer.password.length >= 1"
+											ng-attr-type="{{ $ctrl.isShowingPassword ? 'text':'password'}}"
+											ng-model="$ctrl.customer.password">												
+									</span>
+									<div id="pass-strength-result" aria-live="polite"
+										ng-class="['w-100', {
+											'short': addForm.newPassword.$invalid,
+											'strong': $ctrl.customer.password && addForm.newPassword.$valid
+										}]"
+										ng-show="addForm.newPassword.$dirty && addForm.newPassword.$viewValue">
+										{{ addForm.newPassword.$valid ? 'Valid' : 'Invalid'}}
+									</div>
+								</div>
+								<div class="col-auto">
+									<button type="button" class="button wp-hide-pw" data-bs-toggle="0" aria-label="Show password"
+										ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword">
+										<span aria-hidden="true" ng-class="$ctrl.isShowingPassword ? 'dashicons dashicons-hidden' : 'dashicons dashicons-visibility'"></span>											
+										<span class="text">{{ $ctrl.isShowingPassword ? 'Hide' : 'Show' }}</span>
+									</button>
+								</div>
+							</div>	
+							<p>Password must have at least 8 characters with at least one Capital letter, at least one lower case letter, and at least one number as well as a special character.</p>					
+						</div>
+						<div class="form-field wp-pwd is-open">
+							<label for="view_confirmpassword">
+								Confirm Password <span class="description">(required)</span>
+							</label>
+							<div class="row g-1">
+								<div class="col">
+									<span class="password-input-wrapper">
+										<input
+										ng-class="['w-100 h-100', {
+											'empty': !$ctrl.customer.password_confirmation,
+											'short': $ctrl.customer.password !== $ctrl.customer.password_confirmation,
+											'strong': $ctrl.customer.password === $ctrl.customer.password_confirmation 
+										}]"											 
+										ng-attr-type="{{ showPasswordConfirmation ? 'text':'password'}}"
+										name="confirmPassword" type="password" id="view_confirmpassword"
+										placeholder="Confirm Password" ng-model="$ctrl.customer.password_confirmation"
+										autocomplete="new-password">											
+									</span>
+									<div id="pass-strength-result" aria-live="polite"
+										ng-show="$ctrl.customer.password_confirmation"
+										ng-class="['w-100', {
+											'short': $ctrl.customer.password !== $ctrl.customer.password_confirmation,
+											'strong': $ctrl.customer.password === $ctrl.customer.password_confirmation
+										}]">
+										{{ $ctrl.customer.password === $ctrl.customer.password_confirmation ? 'Confirmed' : 'Password mismatch'}}
+									</div>
+								</div>
+								<div class="col-auto">
+									<button type="button" class="button wp-hide-pw" data-bs-toggle="0" aria-label="Show password"
+										ng-click="showPasswordConfirmation = !showPasswordConfirmation">
+										<span aria-hidden="true" ng-class="showPasswordConfirmation ? 'dashicons dashicons-hidden' : 'dashicons dashicons-visibility'"></span>
+										<span class="text">{{ showPasswordConfirmation ? 'Hide' : 'Show' }}</span>
+									</button>
+								</div>
+							</div>				
+						</div>
+						<div class="form-field">
+							<label for="view_change_pw">
+								<input type="checkbox" id="view_change_pw"
+									ng-model="$ctrl.customer.change_pw"
+									ng-checked="true">
+								Force Password Reset
+							</label>
+							<p>Checking this will force the user to reset their password the next time they sign in.</p>
+						</div>	
+					</div>
+				</div>
+				<div class="col-md-7">
+					<uib-tabset>
+						<uib-tab heading="Group">
+							<table class="form-table" role="presentation">
+								<tbody>
+									<tr>
+										<th>
+											Group
+										</th>
+										<td class="d-flex align-items-center justify-content-between">
+											<em>
+												{{ $ctrl.customer.group.name }}
+											</em>
+											<span>
+												<button class="button"
+													ng-click="$ctrl.openGroupSearchModal()">
+													{{ $ctrl.customer.group.name ? 'Change' : 'Add' }}
+												</button>
+												<button class="button button-delete"
+													ng-show="$ctrl.customer.group.name"
+													ng-click="$ctrl.removeGroup()">
+													Remove
+												</button>
+											</span>
+										</td>
+									</tr>
+									<tr	ng-if="$ctrl.customer.group">
+										<th scope="row">
+											Group Admin
+										</th>
+										<td>
+											<label for="view_admin">
+												<input type="checkbox" id="view_admin"
+													ng-model="$ctrl.customer.group.admin"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer , false)">
+													Grant ability to manage group permissions.
+											</label>
+										</td>
+									</tr>
+									<tr	ng-if="$ctrl.customer.group">
+										<th scope="row">
+											Approve Orders
+										</th>
+										<td>
+											<label class="form-label" for="view_approver">
+												<input type="checkbox" id="view_approver"
+													ng-model="$ctrl.customer.group.approver"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+													Grant ability to approve group orders.
+											</label>
+										</td>
+									</tr>
+									<tr ng-if="$ctrl.customer.group && $ctrl.customer.group.approver">
+										<th scope="row">
+											Pending Emails
+										</th>
+										<td>
+											<label class="form-label" for="view_pending_emails">
+												<input type="checkbox" id="view_pending_emails"
+													ng-model="$ctrl.customer.group.pending_emails"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+													Receive an email whenever a member of <em>{{ $ctrl.customer.group.name }}</em> submits an order that needs approval.
+											</label>
+										</td>
+									</tr>
+									<tr ng-if="$ctrl.customer.group && !$ctrl.customer.group.approver && !$ctrl.customer.group.admin">
+										<th scope="row">
+											Request Orders for Approval
+										</th>
+										<td>
+											<label class="form-label" for="view_requestor">
+												<input type="checkbox" id="view_requestor"
+													ng-model="$ctrl.customer.group.requestor"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+												Grants ability to submit pending orders to be approved later by an authorized user in <em>{{ $ctrl.customer.group.name }}</em>.
+											</label>
+										</td>
+									</tr>
+								</tbody>
+							</table>									
+						</uib-tab>
+						<uib-tab heading="Punchout">
+							<customer-punchout-tab
+								customer="$ctrl.customer"
+								on-change="$ctrl.changeCustomer( key, value )">
+							</customer-punchout-tab>
+						</uib-tab>         
+						<uib-tab heading="Checkout">
+							<fieldset class="mb-3">
+								<legend>Checkout</legend>
+								<div class="mb-2">
+									<label class="form-label" for="edit_limit_type">
+										Limit frequency
+									</label>
+									<select id="edit_limit_type" class="form-select"
+										ng-options="key as value for (key, value) in $ctrl.limitTypes"
+										ng-model="$ctrl.customer.limit_type">
+									</select>
+								</div>
+								<div class="mb-2"
+									ng-if="$ctrl.customer.limit_type && $ctrl.customer.limit_type !== 'none'">
+									<label class="form-label" for="edit_limit">
+										Limit amount
+									</label>
+									<input class="form-control" type="number" step="0.01" id="edit_limit"
+										ng-model="$ctrl.customer.limit">
+								</div>
+								<div class="mb-2">
+									<label class="form-label" for="edit_item_limit">
+										Line item limit
+									</label>
+									<input class="form-control" type="number" id="edit_item_limit"
+										ng-model="$ctrl.customer.item_limit">
+								</div>					
+								<div class="mb-2">
+									<label class="form-label" for="edit_avatax">
+										Tax code
+									</label>
+									<input class="form-control" type="text" id="edit_avatax"
+										ng-model="$ctrl.customer.avatax_entity_code">					
+								</div>
+								<div class="mb-2">
+									<label class="form-label" for="edit_customer_class">
+										Customer class
+									</label>										
+									<select id="edit_customer_class" class="form-select"
+										ng-model="$ctrl.customer.customer_class">
+										<option value="DEFAULT">Default</option>
+										<option value="COMMERCIAL">Commercial</option>
+										<option value="GOV/ED">Gov/Ed</option>
+									</select>											
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_promo_engine"
+										ng-model="$ctrl.customer.promo_engine">
+									<label class="form-check-label" for="edit_promo_engine">
+										Promo engine
+									</label>
+								</div>							
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_taxable"
+										ng-model="$ctrl.customer.taxable">
+									<label class="form-check-label" for="edit_taxable">
+										Taxable
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_lock_billing"
+										ng-model="$ctrl.customer.lock_billing">
+									<label class="form-check-label" for="edit_lock_billing">
+										Lock billing addresses
+									</label>
+									<div class="form-text">
+										Locks billing address fields during checkout so that customer must select a <a href="#" ng-click="$ctrl.editAddresses('billing', $event)" title="Edit Billing Addresses">previously saved billing address</a>. 
+									</div>		
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_lock_shipping"
+										ng-model="$ctrl.customer.lock_shipping">
+									<label class="form-check-label" for="edit_lock_shipping">
+										Lock shipping addresses
+									</label>
+									<div class="form-text">
+										Locks shipping address fields during checkout so that customer must select a <a href="#" ng-click="$ctrl.editAddresses('shipping', $event)" title="Edit Shipping Addresses">previously saved shipping address</a>.
+									</div>		
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_cost_center_is_required"
+										ng-model="$ctrl.customer.cost_center_is_required">
+									<label class="form-check-label" for="edit_cost_center_is_required">
+										Require cost center code
+									</label>
+									<div class="form-text" ng-if="$ctrl.isCostCenterRequired">
+										Cost center code is required for all customers. To change this setting, go to Settings > Plugin tab under Additional Checkout Fields.
+									</div>										
+								</div>
+							</fieldset>
+							<fieldset class="mb-3">
+								<legend>Payments</legend>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_enable_pay"
+										ng-model="$ctrl.customer.allow_payment">
+									<label class="form-check-label" for="edit_enable_pay">
+										Allow payments at checkout
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_credit_line"
+										ng-model="$ctrl.customer.credit_line">
+									<label class="form-check-label" for="edit_credit_line">
+										Enable credit line at checkout
+									</label>
+								</div>								
+							</fieldset>
+							<div class="btn-toolbar">
+								<button class="button"
+									data-bs-toggle="modal"
+									data-bs-target="#new-custom-checkout">
+									Customize Checkout Fields
+								</button>
+							</div>								
+						</uib-tab>
+					</uib-tabset>
+				</div>					
+			</form>
+			<div class="btn-toolbar">
+				<button class="button button-primary"
+					ng-disabled="addForm.$invalid || $ctrl.customer.password !== $ctrl.customer.password_confirmation"
+					ng-click="$ctrl.addCustomer()">
+					Add new customer
+				</button>  
+			</div>
+		</div>
+	</uib-tab>
+	<uib-tab heading="Edit Customer"
+		select="$ctrl.tabChanged(2)"
+		ng-show="$ctrl.selectedCustomer">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.isLoading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.isLoading">
+			<h3>Edit Customer <small>Customer ID: {{ $ctrl.customer.id }}</small></h3>
+			<form class="row mb-3" name="customerForm" autocomplete="off">
+				<div class="col-md-5">
+					<div class="mb-3">
+						<label class="form-label" for="edit_status">
+							Status <span class="small">(required)</span>
+						</label>
+						<select class="form-select" id="edit_status" required
+							ng-model="$ctrl.customer.status"
+							ng-options="key as value for (key, value) in $ctrl.statuses">
+						</select>
+					</div>
+					<fieldset>
+						<legend class="h6">
+							Contact Info
+						</legend>
+						<div class="mb-3">
+							<label class="form-label" for="edit_name">
+								Name <span class="small">(required)</span>
+							</label>
+							<input class="form-control" name="name" type="text" id="edit_name" minlength="3" required
+								ng-model="$ctrl.customer.name">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit_email">
+								Email <span class="small">(required)</span>
+							</label>
+							<input class="form-control" name="customerEmail" type="email" id="edit_email" autocomplete="off" required
+								ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/"
+								ng-model="$ctrl.customer.email" >
+								<div class="mt-2">
+									<customer-send-email
+										customer-id="$ctrl.customer.id"
+										email-type="register">
+									</customer-send-email>
+									<customer-send-email
+										customer-id="$ctrl.customer.id"
+										email-type="verified">
+									</customer-send-email>
+								</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit_org">
+								Company/Organization
+							</label>
+							<input class="form-control" type="text" id="edit_org"
+								ng-model="$ctrl.customer.organization" autocomplete="organization">
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend class="h6">
+							Account Details
+						</legend>
+						<label class="form-label" for="edit_pricesheet">
+							Price Sheet <span class="description">(required)</span>
+						</label>							
+						<div class="input-group mb-3">
+							<input type="text" class="form-control" id="edit_pricesheet" name="pricesheet" readonly required
+								ng-model="$ctrl.selectedSheet"
+								ng-init="$ctrl.checkPriceSheet(2)">
+							<button class="button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Select</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<div class="input-group input-group-sm px-2">
+									<span class="input-group-text">
+										<i class="dashicons dashicons-filter medium-gray-placeholder"></i>
+									</span>
+									<input type="search" class="form-control"
+										ng-model="filterVal"
+										placeholder="Filter">
+								</div>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="#"
+									ng-repeat="priceSheet in $ctrl.priceSheets | orderBy: 'sheet' | filter: filterVal as filtered track by $index"
+									ng-click="
+										$event.preventDefault();
+										$ctrl.customer.price_sheet_id = priceSheet.price_sheet_id;
+										$ctrl.updatePriceSheet(priceSheet.price_sheet_id);
+										$ctrl.checkPriceSheet(2)"
+									>
+									{{priceSheet.sheet}}
+								</a>
+								<p class="px-4 mb-0 text-muted"
+									ng-if="filtered.length <= 0">
+									No results matching {{filterVal}}.
+								</p>																	
+							</div>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit_terms">
+								Terms
+							</label>
+							<input class="form-control" type="text" id="edit_terms"
+								ng-model="$ctrl.customer.terms">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="edit-customer-prefix">
+								Customer prefix
+							</label>
+							<input class="form-control" type="text" id="edit-customer-prefix"
+								ng-model="$ctrl.customer.customer_prefix">
+							<div class="form-text">The prefix to append to the customer ID when exporting order data for accounting services.</div>
+						</div>						
+						<div class="mb-3">
+							<label class="form-label" for="edit_prefix">
+								Order prefix
+							</label>
+							<input class="form-control" type="text" id="edit_prefix"
+								ng-model="$ctrl.customer.order_prefix">
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend class="h6">
+							Account Management
+						</legend>
+						<button class="button mb-3"
+							ng-click="$ctrl.isSettingNewPassword = true">
+							Set New Password
+						</button>
+						<div class="mb-2"
+							ng-if="$ctrl.isSettingNewPassword">
+							<label class="form-label" for="edit_password">
+								New Password
+							</label>
+							<div class="input-group mb-2">
+								<input class="form-control" type="password" id="edit_password" name="newPassword" placeholder="New Password" autocomplete="new-password" minlength="8"
+									ng-pattern="$ctrl.passwordPattern"
+									ng-required="$ctrl.isSettingNewPassword"
+									ng-attr-type="{{ $ctrl.isShowingPassword ? 'text':'password'}}"
+									ng-model="$ctrl.customer.password">												
+								<button type="button" class="button" data-bs-toggle="0" aria-label="Show password"
+									ng-click="$ctrl.isShowingPassword = !$ctrl.isShowingPassword">
+									<i aria-hidden="true" ng-class="$ctrl.isShowingPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>											
+									<span class="text">{{ $ctrl.isShowingPassword ? 'Hide' : 'Show' }}</span>
+								</button>
+								<button class="button button-delete"
+									ng-click="$ctrl.cancelPasswordChange()">
+									Cancel
+								</button>
+							</div>
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0"
+									ng-class="['progress-bar', {
+										'w-25': customerForm.newPassword.$viewValue,
+										'w-50': customerForm.newPassword.$viewValue.length > 3,
+										'w-75': customerForm.newPassword.$viewValue.length > 6,
+										'bg-danger': customerForm.newPassword.$error.required || ( customerForm.newPassword.$error.pattern && customerForm.newPassword.$error.minlength ),
+										'bg-warning': customerForm.newPassword.$error.pattern,
+										'bg-success w-100': $ctrl.customer.password && customerForm.newPassword.$valid
+									}]"></div>
+							</div>	
+							<div class="form-text">Password must have at least 8 characters with at least one Capital letter, at least one lower case letter, and at least one number as well as a special character.</div>
+						</div>
+						<div class="mb-2"
+							ng-if="$ctrl.isSettingNewPassword">
+							<label class="form-label" for="edit_confirmpassword">
+								Confirm Password
+							</label>
+							<div class="input-group mb-2">
+								<input class="form-control" type="password" id="edit_confirmpassword" name="confirmPassword" placeholder="Confirm Password" autocomplete="new-password" minlength="8"
+									ng-pattern="$ctrl.passwordPattern"
+									ng-required="$ctrl.isSettingNewPassword"
+									ng-attr-type="{{ $ctrl.isShowingPasswordConfirmation ? 'text':'password'}}"
+									ng-model="$ctrl.customer.password_confirmation">
+								<button type="button" class="button" data-bs-toggle="0" aria-label="Show password"
+									ng-click="$ctrl.isShowingPasswordConfirmation = !$ctrl.isShowingPasswordConfirmation">
+									<i aria-hidden="true" ng-class="$ctrl.isShowingPasswordConfirmation ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+									<span class="text">{{ $ctrl.isShowingPasswordConfirmation ? 'Hide' : 'Show' }}</span>
+								</button>
+								<button class="button button-delete"
+									ng-click="$ctrl.cancelPasswordChange()">
+									Cancel
+								</button>
+							</div>
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0"
+									ng-class="['progress-bar', {
+										'w-25': customerForm.confirmPassword.$viewValue,
+										'w-50': customerForm.confirmPassword.$viewValue.length > 3,
+										'w-75': customerForm.confirmPassword.$viewValue.length > 6,
+										'bg-danger': customerForm.confirmPassword.$error.required || ( customerForm.confirmPassword.$error.pattern && customerForm.confirmPassword.$error.minlength ),
+										'bg-warning': customerForm.confirmPassword.$error.pattern,
+										'bg-success w-100': customerForm.confirmPassword.$valid && $ctrl.customer.password === $ctrl.customer.password_confirmation
+									}]"></div>
+							</div>				
+						</div>
+						<div class="mb-3">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" id="edit_change_pw"
+									ng-model="$ctrl.customer.change_pw">
+								<label class="form-check-label" for="edit_change_pw">
+									Force Password Reset
+								</label>
+							</div>							
+							<div class="form-text">Checking this will force the user to reset their password the next time they sign in.</div>
+						</div>
+					</fieldset>
+				</div>				
+				<div class="col-md-7">
+					<uib-tabset>
+						<uib-tab heading="Group">
+							<table class="form-table" role="presentation">
+								<tbody>
+									<tr>
+										<th>
+											Group
+										</th>
+										<td class="d-flex align-items-center justify-content-between">
+											<em>
+												{{ $ctrl.customer.group.name }}
+											</em>
+											<span>
+												<button class="button"
+													ng-click="$ctrl.openGroupSearchModal()">
+													{{ $ctrl.customer.group.name ? 'Change' : 'Add' }}
+												</button>
+												<button class="button button-delete"
+													ng-show="$ctrl.customer.group.name"
+													ng-click="$ctrl.removeGroup()">
+													Remove
+												</button>
+											</span>
+										</td>
+									</tr>
+									<tr	ng-if="$ctrl.customer.group">
+										<th scope="row">
+											Group Admin
+										</th>
+										<td>
+											<label class="form-label" for="edit_admin">
+												<input type="checkbox" id="edit_admin"
+													ng-model="$ctrl.customer.group.admin"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer , false)">
+													Grant ability to manage group permissions.
+											</label>
+										</td>
+									</tr>
+									<tr	ng-if="$ctrl.customer.group">
+										<th scope="row">
+											Approve Orders
+										</th>
+										<td>
+											<label class="form-label" for="edit_approver">
+												<input type="checkbox" id="edit_approver"
+													ng-model="$ctrl.customer.group.approver"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+													Grant ability to approve group orders.
+											</label>
+										</td>
+									</tr>
+									<tr ng-if="$ctrl.customer.group && $ctrl.customer.group.approver">
+										<th scope="row">
+											Pending Emails
+										</th>
+										<td>
+											<label class="form-label" for="edit_pending_emails">
+												<input type="checkbox" id="edit_pending_emails"
+													ng-model="$ctrl.customer.group.pending_emails"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+													Receive an email whenever a member of <em>{{ $ctrl.customer.group.name }}</em> submits an order that needs approval.
+											</label>
+										</td>
+									</tr>
+									<tr ng-if="$ctrl.customer.group && !$ctrl.customer.group.approver && !$ctrl.customer.group.admin">
+										<th scope="row">
+											Request Orders for Approval
+										</th>
+										<td>
+											<label class="form-label" for="edit_requestor">
+												<input type="checkbox" id="edit_requestor"
+													ng-model="$ctrl.customer.group.requestor"
+													ng-change="$ctrl.updateGroupPermissions($ctrl.customer, false)">
+												Grants ability to submit pending orders to be approved later by an authorized user in <em>{{ customer.group.name }}</em>.
+											</label>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</uib-tab>
+						<uib-tab heading="Punchout">
+							<customer-punchout-tab
+								customer="$ctrl.customer"
+								suppliers="$ctrl.suppliers"
+								on-change="$ctrl.changeCustomer( key, value )">
+							</customer-punchout-tab>
+						</uib-tab> 
+						<uib-tab heading="Notes">
+							<h4 class="h6">Notes</h4>
+							<customer-notes
+								customer-id="$ctrl.customer.id">
+							</customer-notes>
+						</uib-tab>
+						<uib-tab heading="Shipping">
+							<customer-shipping customer-rates="$ctrl.customer.shipping_flat_rates" customer-id="$ctrl.customer.id"></customer-shipping>
+						</uib-tab>
+						<uib-tab heading="Checkout">
+							<fieldset class="mb-3">
+								<legend>Checkout</legend>
+								<div class="mb-2">
+									<label class="form-label" for="edit_limit_type">
+										Limit frequency
+									</label>
+									<select id="edit_limit_type" class="form-select"
+										ng-options="key as value for (key, value) in $ctrl.limitTypes"
+										ng-model="$ctrl.customer.limit_type">
+									</select>
+								</div>								
+								<div class="mb-2"
+									ng-if="$ctrl.customer.limit_type && $ctrl.customer.limit_type !== 'none'">
+									<label class="form-label" for="edit_limit">
+										Limit amount
+									</label>
+									<input class="form-control" type="number" step="0.01" id="edit_limit"
+										ng-model="$ctrl.customer.limit">
+								</div>
+								<div class="mb-2">
+									<label class="form-label" for="edit_item_limit">
+										Line item limit
+									</label>
+									<input class="form-control" type="number" id="edit_item_limit"
+										ng-model="$ctrl.customer.item_limit">
+								</div>					
+								<div class="mb-2">
+									<label class="form-label" for="edit_avatax">
+										Tax code
+									</label>
+									<input class="form-control" type="text" id="edit_avatax"
+										ng-model="$ctrl.customer.avatax_entity_code">					
+								</div>
+								<div class="mb-2">
+									<label class="form-label" for="edit_customer_class">
+										Customer class
+									</label>										
+									<select id="edit_customer_class" class="form-select"
+										ng-model="$ctrl.customer.customer_class">
+										<option value="DEFAULT">Default</option>
+										<option value="COMMERCIAL">Commercial</option>
+										<option value="GOV/ED">Gov/Ed</option>
+									</select>											
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_promo_engine"
+										ng-model="$ctrl.customer.promo_engine">
+									<label class="form-check-label" for="edit_promo_engine">
+										Promo engine
+									</label>
+								</div>							
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_taxable"
+										ng-model="$ctrl.customer.taxable">
+									<label class="form-check-label" for="edit_taxable">
+										Taxable
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_lock_billing"
+										ng-model="$ctrl.customer.lock_billing">
+									<label class="form-check-label" for="edit_lock_billing">
+										Lock billing addresses
+									</label>
+									<div class="form-text">
+										Locks billing address fields during checkout so that customer must select a <a href="#" ng-click="$ctrl.editAddresses('billing', $event)" title="Edit Billing Addresses">previously saved billing address</a>. 
+									</div>		
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_lock_shipping"
+										ng-model="$ctrl.customer.lock_shipping">
+									<label class="form-check-label" for="edit_lock_shipping">
+										Lock shipping addresses
+									</label>
+									<div class="form-text">
+										Locks shipping address fields during checkout so that customer must select a <a href="#" ng-click="$ctrl.editAddresses('shipping', $event)" title="Edit Shipping Addresses">previously saved shipping address</a>.
+									</div>		
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_cost_center_is_required"
+										ng-model="$ctrl.customer.cost_center_is_required">
+									<label class="form-check-label" for="edit_cost_center_is_required">
+										Require cost center code
+									</label>
+									<div class="form-text" ng-if="$ctrl.isCostCenterRequired">
+										Cost center code is required for all customers. To change this setting, go to Settings > Plugin tab under Additional Checkout Fields.
+									</div>										
+								</div>
+							</fieldset>
+							<fieldset class="mb-3">
+								<legend>Payments</legend>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_enable_pay"
+										ng-model="$ctrl.customer.allow_payment">
+									<label class="form-check-label" for="edit_enable_pay">
+										Allow payments at checkout
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="edit_credit_line"
+										ng-model="$ctrl.customer.credit_line">
+									<label class="form-check-label" for="edit_credit_line">
+										Enable credit line at checkout
+									</label>
+								</div>									
+							</fieldset>	
+							<div class="btn-toolbar">
+								<button class="button"
+									data-bs-toggle="modal"
+									data-bs-target="#edit-custom-checkout">
+									Customize Checkout Fields
+								</button>
+							</div>
+						</uib-tab>
+						<uib-tab heading="Order Changes"
+							ng-show="$ctrl.customer.order_change_logs.data.length">
+							<table class="table table-striped caption-top">
+								<caption>Order changes logged as a result of a Price Availability check.</caption>
+								<thead>
+									<tr>
+										<th scope="col">Date</th>
+										<th scope="col">Customer ID</th>
+										<th scope="col">Order ID</th>
+										<th scope="col">Action</th>
+										<th scope="col">Product ID</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="log in $ctrl.customer.order_change_logs.data track by $index">
+										<td scope="row"
+											ng-bind="$ctrl.formatDate(log.created_at) |  date:'short'">
+										</td>
+										<td scope="row" style="cursor:pointer;"
+											ng-click="$ctrl.changeTab(2, $index)">
+											{{log.customer_id}}
+										</td>
+										<td scope="row">
+											<a ui-sref="orders.show({ id: log.order_id })">
+												{{log.order_id}}
+											</a>
+										</td>
+										<td scope="row">
+											{{log.action}}
+										</td>
+										<td scope="row" style="cursor:pointer;"
+											ng-click="$ctrl.goToProduct(log.product)">
+											{{log.product_id}}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</uib-tab>
+						<uib-tab heading="Docs"
+							ng-show="$ctrl.customer.documents.data.length">
+							<div class="row">
+								<div class="col-12 mb-3"
+									ng-repeat="doc in $ctrl.customer.documents.data track by $index">
+									<div class="row">
+										<div class="input-group">
+											<span class="input-group-text">{{doc.document.name}}</span>
+											<button class="button"
+												ng-click="$ctrl.viewDocument(doc.id)">Download Document</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</uib-tab>
+					</uib-tabset>
+				</div>
+			</form>
+			<div class="btn-toolbar justify-content-between">
+				<span>
+					<button class="button button-primary"
+						ng-disabled="customerForm.$invalid || $ctrl.customer.password_confirmation != $ctrl.customer.password"
+						ng-click="$ctrl.updateCustomer()">
+						Update
+					</button>
+					<button class="button"
+						ng-click="$ctrl.editAddresses('shipping', $event)">
+						Edit Shipping Addresses
+					</button>
+					<button class="button"
+						ng-click="$ctrl.editAddresses('billing', $event)">
+						Edit Billing Addresses
+					</button>
+				</span>
+				<span>
+					<customer-login
+						customer-id="$ctrl.customer.id"
+					></customer-login>
+					<customer-copy-button
+						customer-id="$ctrl.customer.id"
+						on-copy="$ctrl.onCopy( copiedCustomer )">
+					</customer-copy-button>
+				</span>
+			</div>                    
+		</div>
+	</uib-tab>
+	<uib-tab select="$ctrl.tabChanged(6)" index="6" heading="Settings">
+		<wp-spinner
+			type="2x"
+			ng-show="$ctrl.isLoading">
+		</wp-spinner>
+		<div ng-if="!$ctrl.isLoading" class="col p-0 vf-tab-body">
+			<form name="settingsForm" ng-class="{'p-3': isXS || isSM}">
+				<div class="input-group w-100  mb-3">
+					<span class="input-group-text w-260">Default customer prefix</span>
+					<input id="name" type="text" class="form-control" name="name"
+						ng-model="$ctrl.settings.store.saved.default_customer_prefix" required>
+				</div>
+				<div class="input-group wp-200  mb-3">
+					<span class="input-group-text w-260">Default order prefix</span>
+					<input id="url" type="text" class="form-control" name="name"
+						ng-model="$ctrl.settings.store.saved.default_order_prefix"
+						required>
+				</div>
+			</form>
+			<div>
+				<button class="button button-primary" 
+					ng-click="$ctrl.updateDefaultPrefix()">
+					Update
+				</button>
+			</div>
+		</div>
+	</uib-tab>
+</uib-tabset>
+
+<!-- Edit Customer Custom Checkout modal -->
+<div class="modal" id="edit-custom-checkout">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Customize Checkout Fields</h4>
+				<button type="button" class="btn-close"
+					data-bs-dismiss="modal" aria-label="close"></button>
+			</div>
+			<div class="modal-body collapse border-bottom" id="customFieldsHelp">
+				<p class="mb-1">To add or customize fields that appear on the Checkout page for this customer:</p>
+				<ul class="list-unstyled">
+					<li>
+						Add at least a name to one of the fields below to enable the Custom Field. 
+					</li>
+					<li>
+						To replace an existing Additional Checkout field, select one from the <em>Replaces</em> field. Additional Checkout fields are configured in <em>Settings > Plugin</em>. 
+					</li>
+					<li>
+						If you leave the value blank, the customer will be able to fill out the Custom Field with any value. If you enter only one value, the Custom Field will appear as a read-only value on the Checkout page. If you fill out multiple values, the customer will be able to select from any of the values you provide.
+					</li>
+				</ul>
+			</div>
+			<ul class="list-group list-group-flush">
+				<li ng-class="['list-group-item', {
+					'list-group-item-primary': $ctrl.customer['f' + p + '_name']
+				}]"
+					ng-repeat="p in [1, 2, 3, 4, 5, 6]">
+					<fieldset>
+						<legend class="h6 d-flex justify-content-between">
+							Field {{ p }}
+							<a data-bs-toggle="collapse" href="#customFieldsHelp" role="button" aria-expanded="false" aria-controls="customFieldsHelp">
+								<i class="bi bi-info-circle-fill"></i>
+							</a>
+						</legend>
+						<div class="row">
+							<div class="col">
+								<div class="row mb-2">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="Field {{p}} Name"
+										ng-attr-for="edit_f{{p}}_name">
+										Name
+									</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control form-control-sm"
+											ng-attr-id="edit_f{{p}}_name"
+											ng-model="$ctrl.customer['f' + p + '_name']">
+									</div>
+								</div>
+								<div class="row mb-2"
+									ng-if="p == 1 || p == 2">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="Field {{p}} Replace Field"
+										ng-attr-for="edit_f{{p}}_replace">
+										Replaces
+									</label>
+									<div class="col-sm-9">
+										<select class="form-select form-select-sm"
+											ng-options="key as value for (key, value) in $ctrl.replaceFields"
+											ng-attr-id="edit_f{{p}}_replace"
+											ng-model="$ctrl.customer['f' + p + '_replace_field']">
+										</select>
+									</div>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input"
+										ng-attr-id="edit_f{{p}}_required"
+										ng-model="$ctrl.customer['f' + p + '_required']">
+									<label class="form-check-label form-check-label-sm"
+										ng-attr-for="edit_f{{p}}_required">
+										Required
+									</label>
+								</div>
+							</div>
+							<div class="col">
+								<div class="row mb-2"
+									ng-repeat="value in $ctrl.customer['f' + p + '_value'] track by $index">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="F{{p}} Value ({{$index}})"
+										ng-attr-for="f{{ p }}-value-{{ $index }}">
+										Value
+									</label>
+									<div class="col-sm-9">
+										<div class="d-flex">
+											<input class="form-control form-control-sm me-1" type="text"
+												ng-attr-id="f{{ p }}-value-{{ $index }}"
+												ng-model="$ctrl.customer['f' + p + '_value'][$index]">
+											<button class="button button-delete"
+												ng-click="$ctrl.removeCustomCheckoutValue(p, $index)">
+												Remove
+											</button>
+										</div>
+									</div>
+								</div>
+								<button
+									class="button mt-2"
+									ng-click="$ctrl.addCustomCheckoutValue(p)">
+									Add F{{p}} Value
+								</button>
+							</div>
+						</div>
+					</fieldset>
+				</li>
+			</ul>				
+			<div class="modal-footer">
+				<button type="button" class="button button-primary"
+					data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- New Customer Custom Checkout modal -->
+<div class="modal" id="new-custom-checkout">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Customize Checkout Fields</h4>
+				<button type="button" class="btn-close"
+					data-bs-dismiss="modal" aria-label="close"></button>
+			</div>
+			<div class="modal-body collapse border-bottom" id="customFieldsHelp">
+				<p class="mb-1">To add or customize fields that appear on the Checkout page for this customer:</p>
+				<ul class="list-unstyled">
+					<li>
+						Add at least a name to one of the fields below to enable the Custom Field. 
+					</li>
+					<li>
+						To replace an existing Additional Checkout field, select one from the <em>Replaces</em> field. Additional Checkout fields are configured in <em>Settings > Plugin</em>. 
+					</li>
+					<li>
+						If you leave the value blank, the customer will be able to fill out the Custom Field with any value. If you enter only one value, the Custom Field will appear as a read-only value on the Checkout page. If you fill out multiple values, the customer will be able to select from any of the values you provide.
+					</li>
+				</ul>
+			</div>
+			<ul class="list-group list-group-flush">
+				<li ng-class="['list-group-item', {
+					'list-group-item-primary': $ctrl.customer['f' + p + '_name']
+				}]"
+					ng-repeat="p in [1, 2, 3, 4, 5, 6]">
+					<fieldset>
+						<legend class="h6 d-flex justify-content-between">
+							Field {{ p }}
+							<a data-bs-toggle="collapse" href="#customFieldsHelp" role="button" aria-expanded="false" aria-controls="customFieldsHelp">
+								<i class="bi bi-info-circle-fill"></i>
+							</a>
+						</legend>
+						<div class="row">
+							<div class="col">
+								<div class="row mb-2">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="Field {{p}} Name"
+										ng-attr-for="edit_f{{p}}_name">
+										Name
+									</label>
+									<div class="col-sm-9">
+										<input type="text" class="form-control form-control-sm"
+											ng-attr-id="edit_f{{p}}_name"
+											ng-model="$ctrl.customer['f' + p + '_name']">
+									</div>
+								</div>
+								<div class="row mb-2"
+									ng-if="p == 1 || p == 2">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="Field {{p}} Replace Field"
+										ng-attr-for="edit_f{{p}}_replace">
+										Replaces
+									</label>
+									<div class="col-sm-9">
+										<select class="form-select form-select-sm"
+											ng-options="key as value for (key, value) in $ctrl.replaceFields"
+											ng-attr-id="edit_f{{p}}_replace"
+											ng-model="$ctrl.customer['f' + p + '_replace_field']">
+										</select>
+									</div>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input"
+										ng-attr-id="edit_f{{p}}_required"
+										ng-model="$ctrl.customer['f' + p + '_required']">
+									<label class="form-check-label form-check-label-sm"
+										ng-attr-for="edit_f{{p}}_required">
+										Required
+									</label>
+								</div>
+							</div>
+							<div class="col">
+								<div class="row mb-2"
+									ng-repeat="value in $ctrl.customer['f' + p + '_value'] track by $index">
+									<label class="col-sm-3 col-form-label col-form-label-sm"
+										aria-label="F{{p}} Value ({{$index}})"
+										ng-attr-for="f{{ p }}-value-{{ $index }}">
+										Value
+									</label>
+									<div class="col-sm-9">
+										<div class="d-flex">
+											<input class="form-control form-control-sm me-1" type="text"
+												ng-attr-id="f{{ p }}-value-{{ $index }}"
+												ng-model="$ctrl.customer['f' + p + '_value'][$index]">
+											<button class="button button-delete"
+												ng-click="$ctrl.removeCustomCheckoutValue(p, $index)">
+												Remove
+											</button>
+										</div>
+									</div>
+								</div>
+								<button
+									class="button mt-2"
+									ng-click="$ctrl.addCustomCheckoutValue(p)">
+									Add F{{p}} Value
+								</button>
+							</div>
+						</div>
+					</fieldset>
+				</li>
+			</ul>
+			<div class="modal-footer">
+				<button type="button" class="button"
+					data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>

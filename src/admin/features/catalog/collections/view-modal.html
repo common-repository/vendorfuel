@@ -1,0 +1,135 @@
+<div class="modal-header">
+	<h4>Quick edit: {{ product.sku }}</h4>
+	<button
+		class="button"
+		ng-click="editable = !editable"
+		title="Changes made here will be published globally for your site."
+	>
+		Edit
+	</button>
+</div>
+<div class="modal-body">
+	<form name="form">
+		<fieldset ng-disabled="!editable || isBusy">
+			<div class="row">
+				<div class="col-sm-5" ng-if="product.images.length">
+					<img
+						ng-repeat="img in product.images"
+						ng-if="$first"
+						class="img-fluid"
+						ng-src="{{img.small_url}}"
+					/>
+				</div>
+				<div class="col-sm">
+					<div class="mb-3">
+						<label for="desc" class="form-label">Name</label>
+						<input
+							class="form-control"
+							id="desc"
+							name="desc"
+							ng-model="product.description"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="status" class="form-label">Status</label>
+						<select
+							class="form-select"
+							id="status"
+							name="status"
+							ng-model="product.status"
+						>
+							<option
+								value="active"
+								ng-selected="product.status === 'active'"
+							>
+								Active
+							</option>
+							<option
+								value="inactive"
+								ng-selected="product.status === 'inactive'"
+							>
+								Inactive
+							</option>
+						</select>
+					</div>
+					<div ng-if="!product.pricesheets.length">
+						No pricesheets attached. Please
+						<a
+							ui-sref="catalog.products.edit({ id: product.product_id })"
+							ng-click="handleCancel()"
+							>edit this product</a
+						>
+						directly to add pricesheets.
+					</div>
+					<div class="row mb-3" ng-if="product.pricesheets.length">
+						<div class="col-sm-6">
+							<label for="price-sheet" class="form-label"
+								>Price Sheet
+							</label>
+							<select
+								class="form-select"
+								id="price-sheet"
+								name="pricesheets"
+								ng-change="changePricesheet()"
+								ng-model="priceSheet"
+								ng-options="ps.pricesheetindex.price_sheet_id as ps.pricesheetindex.sheet for ps in product.pricesheets"
+							></select>
+						</div>
+						<div class="col-sm-6">
+							<label for="price" class="form-label">Price</label>
+							<input
+								class="form-control"
+								id="price"
+								name="price"
+								ng-model="product.pricesheets[priceIndex].price"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<label for="brand_name" class="form-label">Brand</label>
+				<input
+					class="form-control"
+					id="brand_name"
+					name="brand_name"
+					ng-model="product.brand_name"
+				/>
+			</div>
+			<div class="mb-3">
+				<label for="upc" class="form-label"
+					><abbr title="Universal Product Code">UPC</abbr></label
+				>
+				<input
+					class="form-control"
+					id="upc"
+					name="upc"
+					ng-model="product.upc"
+				/>
+			</div>
+			<div>
+				<label for="longd" class="form-label">Long Description</label>
+				<textarea
+					maxlength="65535"
+					class="form-control"
+					name="longd"
+					id="longd"
+					ng-model="product.long_description"
+				></textarea>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="button me-1" ng-click="handleCancel()">
+		{{ form.$dirty ? 'Cancel' : 'Close' }}
+	</button>
+	<button
+		class="button button-primary"
+		ng-click="handleUpdate( product )"
+		ng-if="form.$dirty"
+		ng-disabled="isBusy"
+	>
+		Update
+	</button>
+</div>

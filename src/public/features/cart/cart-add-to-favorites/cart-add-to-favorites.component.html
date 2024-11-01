@@ -1,0 +1,31 @@
+<button
+	class="btn btn-link btn-sm pt-2"
+	ng-show="$ctrl.isLoggedIn"
+	ng-click="$ctrl.toggleFavorite($ctrl.productId)"
+	ng-attr-title="{{
+		$ctrl.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'
+	}}"
+>
+	<i
+		ng-class="{
+			'bi bi-heart-fill': $ctrl.isFavorite,
+			'bi bi-heart': !$ctrl.isFavorite
+		}"
+		ng-hide="$ctrl.isInProgress"
+	>
+	</i>
+	<span
+		class="spinner-border spinner-border-sm"
+		role="status"
+		aria-hidden="true"
+		ng-show="$ctrl.isInProgress"
+	></span>
+	<span class="d-none d-lg-inline">
+		<span ng-if="$ctrl.isFavorite">
+			{{ $ctrl.isInProgress ? 'Removing' : 'Remove' }} from Favorites
+		</span>
+		<span ng-if="!$ctrl.isFavorite">
+			{{ $ctrl.isInProgress ? 'Adding' : 'Add' }} to Favorites
+		</span>
+	</span>
+</button>

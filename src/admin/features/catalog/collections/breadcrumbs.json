@@ -1,0 +1,4 @@
+[
+	{ "label": "Catalog", "href": "?page=vf-catalog" },
+	{ "label": "Collections", "href": "?page=vf-catalog#/collections" }
+]

@@ -1,0 +1,126 @@
+<layout-component heading="Orders" nav="$ctrl.nav" nav="$ctrl.nav">
+	<bs-search-box
+		filter-fields="$ctrl.filterFields"
+		is-loading="$ctrl.isLoading"
+		is-showing-filters="true"
+		q="$ctrl.params.q"
+		on-submit="$ctrl.changeQuery(q, filterFields)"
+	>
+	</bs-search-box>
+
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<div ng-if="!$ctrl.isLoading">
+		<div class="table-responsive">
+			<table class="table bg-white">
+				<thead>
+					<tr>
+						<th class="col-1">
+							<bs-table-sortable
+								label="ID"
+								field="order_id"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+						</th>
+						<th class="col-2">
+							<bs-table-sortable
+								label="Status"
+								field="status"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+						</th>
+						<th class="col-3">
+							<bs-table-sortable
+								label="Email"
+								field="email"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+						</th>
+						<th class="col-3">
+							<bs-table-sortable
+								label="First"
+								field="first_name"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+							/
+							<bs-table-sortable
+								label="Last"
+								field="last_name"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+						</th>
+						<th class="col text-end">Total</th>
+						<th class="col text-end">
+							<bs-table-sortable
+								label="Date"
+								field="order_date"
+								params="$ctrl.params"
+								on-click="$ctrl.changeSort(orderBy, direction)"
+							>
+							</bs-table-sortable>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						ng-if="!$ctrl.orders.data.length && !$ctrl.isLoadingMore"
+					>
+						<td colspan="5">
+							No Order(s)
+							<span ng-if="$ctrl.params.q.length >= 1"
+								>matching '{{ $ctrl.params.q }}'</span
+							>
+							found.
+						</td>
+					</tr>
+					<tr
+						class="cursor-pointer"
+						ng-if="!$ctrl.isLoadingMore"
+						ng-click="$ctrl.clickOrder(order.order_id)"
+						ng-repeat="order in $ctrl.orders.data track by $index"
+					>
+						<td>{{ order.order_id }}</td>
+						<td>
+							<span
+								ng-class="['badge text-uppercase', {
+								'bg-primary': order.status === 'created',
+								'bg-warning text-dark': order.status === 'pending' || order.status === 'pending-approval',
+								'bg-success': order.status === 'completed',
+								'bg-danger': order.status === 'canceled',
+								}]"
+							>
+								{{ order.status }}
+							</span>
+						</td>
+						<td>{{order.email}}</td>
+						<td>{{order.first_name}} {{order.last_name}}</td>
+						<td class="text-end">
+							{{ order.total_amt | currency }}
+						</td>
+						<td class="text-end">
+							{{ order.order_date | date: 'short' }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<spinner-component ng-if="$ctrl.isLoadingMore"></spinner-component>
+	</div>
+
+	<bs-pagination
+		data="$ctrl.orders"
+		is-loading="$ctrl.isLoading"
+		on-change="$ctrl.changePage(page, rpp)"
+	>
+	</bs-pagination>
+</layout-component>

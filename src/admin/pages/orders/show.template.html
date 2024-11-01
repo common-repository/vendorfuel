@@ -1,0 +1,798 @@
+<breadcrumb-component breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-component>
+<div class="hstack align-items-baseline gap-2">
+	<h1>View order</h1>
+	<button class="components-button is-secondary" ng-click="$ctrl.refresh()">
+		Refresh
+	</button>
+</div>
+
+<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+<div ng-if="!$ctrl.isLoading">
+	<div id="poststuff">
+		<div id="post-body" class="metabox-holder columns-2">
+			<div id="postbox-container-1" class="postbox-container">
+				<div class="meta-box-sortables">
+					<div class="postbox">
+						<h2><span>Totals</span></h2>
+						<div class="inside">
+							<table
+								class="wp-list-table widefat striped table-view-list"
+							>
+								<tbody>
+									<tr>
+										<th scope="row">Subtotal</th>
+										<td class="text-end">
+											{{ $ctrl.order.subtotal | currency
+											}}
+										</td>
+									</tr>
+									<tr ng-if="$ctrl.order.promo_discount">
+										<th scope="row">Discount</th>
+										<td class="text-end">
+											{{ $ctrl.order.promo_discount |
+											currency }}
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">Shipping</th>
+										<td class="text-end">
+											{{ $ctrl.order.shipping | currency
+											}}
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">Tax</th>
+										<td class="text-end">
+											{{ $ctrl.order.tax | currency }}
+										</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th scope="row">Total</th>
+										<td class="text-end">
+											{{ $ctrl.order.total_amt | currency
+											}}
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="postbox-container-2" class="postbox-container">
+				<div class="meta-box-sortables ui-sortable">
+					<div class="vendorfuel-order-data postbox">
+						<h2>Order #{{ $ctrl.id }} Summary</h2>
+						<div class="inside">
+							<dl>
+								<dt>Date Created:</dt>
+								<dd>
+									{{ $ctrl.order.order_date | date : 'short'
+									}}
+								</dd>
+								<dt>Status:</dt>
+								<dd>
+									<span
+										ng-class="['badge text-capitalize', {
+											'text-bg-primary': $ctrl.order.status === 'created',
+											'text-bg-warning': $ctrl.order.status === 'pending' || $ctrl.order.status === 'pending-approval',
+											'text-bg-success': $ctrl.order.status === 'completed',
+											'text-bg-danger': $ctrl.order.status === 'canceled',
+											}]"
+									>
+										{{ $ctrl.order.status }}
+									</span>
+								</dd>
+								<dt>Customer:</dt>
+								<dd>
+									<a
+										href="?page=vendorfuel#!/customers/accounts/{{
+										$ctrl.order.customer.id
+									}}"
+									>
+										{{ $ctrl.order.customer.name }}
+									</a>
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br class="clear" />
+	</div>
+
+	<nav-tab-wrapper
+		active="$ctrl.active"
+		tabs="$ctrl.tabs"
+		handle-change="$ctrl.setActive(id)"
+	></nav-tab-wrapper>
+
+	<section ng-if="$ctrl.active === 'items'">
+		<h2>Line items</h2>
+		<table class="wp-list-table widefat striped table-view-list">
+			<thead>
+				<tr>
+					<th class="col-2">
+						<abbr title="Stock Keeping Unit">SKU</abbr>
+					</th>
+					<th
+						ng-class="{
+							'col-6': !$ctrl.hasPurchaseOrders,
+							'col-3': $ctrl.hasPurchaseOrders,
+						}"
+					>
+						Name
+					</th>
+					<th class="col-1">Quantity</th>
+					<th class="col-1">Price</th>
+					<th class="col-3" ng-if="$ctrl.hasPurchaseOrders">
+						Purchase Order
+					</th>
+					<th class="col-auto"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in $ctrl.order.lineItems track by $index">
+					<td>
+						<a
+							ng-href="?page=vendorfuel#!/catalog/products/{{
+								item.product_id
+							}}"
+							title="Go to {{ item.product.description }}"
+							>{{ item.product.sku }}</a
+						>
+					</td>
+					<td>
+						<a
+							ng-href="?page=vendorfuel#!/catalog/products/{{
+								item.product_id
+							}}"
+							title="Go to {{ item.product.description }}"
+						>
+							{{ item.product.description }}
+						</a>
+					</td>
+					<td>{{ item.qty | number }}</td>
+					<td>{{ item.price | currency }}</td>
+					<td ng-if="$ctrl.hasPurchaseOrders">
+						<div class="text-nowrap">
+							Vendor: {{ item.purchase_order.purchased_items[0]
+							.cost_sheet.sheet.vendor.name }}
+						</div>
+						<div class="text-nowrap">
+							Status:
+							<span
+								ng-class="['badge bg-primary text-uppercase', {
+		'bg-danger': $ctrl.getLineItemStatus(item) === 'reject',
+		'bg-warning text-dark': $ctrl.getLineItemStatus(item) === 'backordered',
+		'bg-success': $ctrl.getLineItemStatus(item) === 'sent',
+	  }]"
+							>
+								{{ $ctrl.getLineItemStatus(item) }}
+							</span>
+						</div>
+						<details
+							title="See invoice details"
+							ng-repeat="invoice in item.purchase_order.invoices track by $index"
+						>
+							<summary>Invoice {{ $index + 1 }}</summary>
+							<dl class="small">
+								<dt>
+									<abbr title="Purchase Order">PO</abbr>
+									ID:
+								</dt>
+								<dd>{{ invoice.purchase_order_id }}</dd>
+								<dt>Payload ID:</dt>
+								<dd class="text-break">
+									{{ invoice.payload_id }}
+								</dd>
+								<dt>Supplier Invoice ID:</dt>
+								<dd>{{ invoice.supplier_invoice_id }}</dd>
+								<dt>Filename:</dt>
+								<dd class="text-break">
+									{{ invoice.file_path }}
+								</dd>
+								<dt ng-if="invoice.export_details">
+									Export Details:
+								</dt>
+								<dd ng-if="invoice.export_details">
+									{{ invoice.export_details }}
+								</dd>
+							</dl>
+						</details>
+					</td>
+
+					<td>
+						<div class="vstack gap-1 align-items-end">
+							<button
+								class="components-button is-secondary"
+								ng-click="$ctrl.openRmaModal(item)"
+								title="Add return merchandise authorization"
+							>
+								Add&nbsp;
+								<abbr title="Return Merchandise Authorization">
+									RMA
+								</abbr>
+							</button>
+							<button
+								ng-if="item.purchase_order"
+								class="components-button is-tertiary"
+								ng-click="$ctrl.downloadPurchaseOrder( item.purchase_order )"
+							>
+								Download&nbsp;
+								<abbr title="Purchase Order">PO</abbr>
+							</button>
+							<button
+								ng-if="item.purchase_order"
+								class="components-button is-tertiary"
+								ng-click="$ctrl.sendPurchaseOrder( item.purchase_order )"
+							>
+								Send&nbsp;
+								<abbr title="Purchase Order">PO</abbr>
+							</button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<section ng-if="$ctrl.active === 'costs'">
+		<h2>Costs</h2>
+		<div ng-if="$ctrl.hasCosts">
+			<table class="wp-list-table widefat striped table-view-list">
+				<thead>
+					<tr>
+						<th>
+							<abbr title="Stock Keeping Unit">SKU</abbr>
+						</th>
+						<th>Price</th>
+						<th>Description</th>
+						<th>Costs</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						ng-repeat="item in $ctrl.order.lineItems track by $index"
+					>
+						<td>{{ item.product.sku }}</td>
+						<td>{{ item.price | currency }}</td>
+						<td>{{ item.product.description }}</td>
+						<td>
+							<select
+								class="form-select"
+								name="mySelect"
+								id="mySelect"
+								ng-options="cost as (cost.cost + ' - ' + cost.sheet.name) for cost in item.costs track by cost.id"
+								ng-model="item.cost_sheet"
+								ng-disabled="item.cost_sheet_locked"
+							></select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="btn-toolbar gap-1 mt-3">
+				<button
+					class="components-button is-secondary"
+					ng-click="$ctrl.lockCosts()"
+				>
+					Lock Costs
+				</button>
+				<button
+					class="components-button is-tertiary"
+					ng-click="$ctrl.generatePurchaseOrders()"
+				>
+					Generate Purchase Orders
+				</button>
+			</div>
+		</div>
+		<p ng-if="!$ctrl.hasCosts">This order has no costs.</p>
+	</section>
+	<section ng-if="$ctrl.active === 'payments'">
+		<h2>Payment details</h2>
+		<table class="wp-list-table widefat striped table-view-list">
+			<tbody>
+				<tr>
+					<th scope="row">Payment Method</th>
+					<td>{{ $ctrl.order.payment_method }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.credit_card">
+					<th scope="row">Credit Card</th>
+					<td>{{ $ctrl.order.credit_card }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.credit_card">
+					<th scope="row">Credit Card Type</th>
+					<td>{{ $ctrl.order.cctype }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<section ng-if="$ctrl.active === 'shipping-billing'">
+		<h2>Shipping & Billing</h2>
+		<div class="row">
+			<div class="col">
+				<h3 class="h4">Shipping Address</h3>
+				<table class="wp-list-table widefat striped table-view-list">
+					<tbody>
+						<tr ng-if="$ctrl.order.shipping_profile">
+							<th scope="row">Profile Name</th>
+							<td>{{ $ctrl.order.shipping_profile }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Name</th>
+							<td>
+								{{ $ctrl.order.first_name }} {{
+								$ctrl.order.last_name }}
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Email</th>
+							<td>
+								<a
+									ng-href="mailto:{{
+										$ctrl.order.email
+									}}"
+									>{{ $ctrl.order.email }}</a
+								>
+							</td>
+						</tr>
+						<tr ng-if="$ctrl.order.phone">
+							<th scope="row">Phone</th>
+							<td>{{ $ctrl.order.phone }}</td>
+						</tr>
+						<tr ng-if="$ctrl.order.attention">
+							<th scope="row">Attention</th>
+							<td>{{ $ctrl.order.attention }}</td>
+						</tr>
+						<tr ng-if="$ctrl.order.organization">
+							<th scope="row">Company/Organization</th>
+							<td>{{ $ctrl.order.organization }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Street Address</th>
+							<td>{{ $ctrl.order.address1 }}</td>
+						</tr>
+						<tr ng-if="$ctrl.order.address2">
+							<th scope="row">Apt., Suite, etc.</th>
+							<td>{{ $ctrl.order.address2 }}</td>
+						</tr>
+						<tr>
+							<th scope="row">City</th>
+							<td>{{ $ctrl.order.city }}</td>
+						</tr>
+						<tr>
+							<th scope="row">State</th>
+							<td>{{ $ctrl.order.state }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Zip Code</th>
+							<td>{{ $ctrl.order.zip }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col">
+				<h3 class="h4">Billing Address</h3>
+				<table class="wp-list-table widefat striped table-view-list">
+					<tbody>
+						<tr ng-if="$ctrl.order.billing_profile">
+							<th scope="row">Profile Name</th>
+							<td>{{ $ctrl.order.billing_profile }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Name</th>
+							<td>
+								{{ $ctrl.order.bill_first_name }} {{
+								$ctrl.order.bill_last_name }}
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">Email</th>
+							<td>
+								<a
+									ng-href="mailto:{{
+										$ctrl.order.bill_email
+									}}"
+									>{{ $ctrl.order.bill_email }}</a
+								>
+							</td>
+						</tr>
+						<tr ng-if="$ctrl.order.bill_phone">
+							<th scope="row">Phone</th>
+							<td>{{ $ctrl.order.bill_phone }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Street Address</th>
+							<td>{{ $ctrl.order.bill_address1 }}</td>
+						</tr>
+						<tr ng-if="$ctrl.order.bill_address2">
+							<th scope="row">Apt., Suite, etc.</th>
+							<td>{{ $ctrl.order.bill_address2 }}</td>
+						</tr>
+						<tr>
+							<th scope="row">City</th>
+							<td>{{ $ctrl.order.bill_city }}</td>
+						</tr>
+						<tr>
+							<th scope="row">State</th>
+							<td>{{ $ctrl.order.bill_state }}</td>
+						</tr>
+						<tr>
+							<th scope="row">Zip Code</th>
+							<td>{{ $ctrl.order.bill_zip }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+	<section ng-if="$ctrl.active === 'info'">
+		<h2>Additional info</h2>
+		<table class="wp-list-table widefat striped table-view-list">
+			<tbody>
+				<tr ng-if="$ctrl.order.approval_date">
+					<th scope="row">Approval date</th>
+					<td>{{ $ctrl.order.approval_date }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.approver">
+					<th scope="row">Approver</th>
+					<td>{{ $ctrl.order.approver }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.approver_id">
+					<th scope="row">Approver ID</th>
+					<td>{{ $ctrl.order.approver_id }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.approver_notes">
+					<th scope="row">Approver notes</th>
+					<td>{{ $ctrl.order.approver_notes }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.cost_center_code">
+					<th scope="row">Cost center code</th>
+					<td>{{ $ctrl.order.cost_center_code }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.cost_center_id">
+					<th scope="row">Cost center ID</th>
+					<td>{{ $ctrl.order.cost_center_id }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.group_id">
+					<th scope="row">Group</th>
+					<td>
+						<a
+							ng-href="?page=vendorfuel#!/customers/groups/{{ $ctrl.order.group_id }}"
+						>
+							{{ $ctrl.order.group.name }}
+						</a>
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.order.gsa_total">
+					<th scope="row">
+						<abbr title="U.S. General Services Administration"
+							>GSA</abbr
+						>
+						total
+					</th>
+					<td>{{ $ctrl.order.gsa_total }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.issuing_office">
+					<th scope="row">Issuing office</th>
+					<td>{{ $ctrl.order.issuing_office }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.notes">
+					<th scope="row">Notes</th>
+					<td>{{ $ctrl.order.notes }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.price_availability">
+					<th scope="row">Price availability</th>
+					<td>
+						{{ $ctrl.order.price_availability | date : 'short' }}
+					</td>
+				</tr>
+				<tr ng-if="$ctrl.order.price_sheet">
+					<th scope="row">Price sheet ID</th>
+					<td>{{ $ctrl.order.price_sheet }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.promo_codes.length">
+					<th scope="row">Promo codes</th>
+					<td>{{ $ctrl.order.promo_codes }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.rr_po_num">
+					<th scope="row">Purchase order</th>
+					<td>{{ $ctrl.order.rr_po_num }}</td>
+				</tr>
+				<tr ng-if="$ctrl.order.tax_rate">
+					<th scope="row">Tax rate</th>
+					<td>{{ $ctrl.order.tax_rate * 100 | number : 2 }}%</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<section ng-if="$ctrl.active === 'notifications'">
+		<h2>Notifications</h2>
+		<table class="wp-list-table widefat striped table-view-list">
+			<thead>
+				<tr>
+					<th scope="row">Status</th>
+					<th scope="row">Type</th>
+					<th scope="row">Date</th>
+					<th scope="row">Recipient</th>
+					<th scope="row" ng-if="$ctrl.hasNotificationDetails">
+						Details
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					ng-repeat="notification in $ctrl.order.order_notifications track by $index"
+				>
+					<td>
+						<span
+							ng-class="['badge text-uppercase', {
+			'bg-success': notification.status === 'success',
+			'bg-warning text-dark': notification.status !== 'success',
+			}]"
+						>
+							{{ notification.status }}
+						</span>
+					</td>
+					<td class="text-capitalize">
+						{{ $ctrl.getNonUnderscored(notification.type) }}
+					</td>
+					<td>
+						<time
+							ng-attr-datetime="{{
+						notification.notification_date
+					}}"
+						>
+							{{ notification.notification_date | date : 'short'
+							}}
+						</time>
+					</td>
+					<td>
+						<a
+							ng-href="mailto:{{
+						notification.recipient
+					}}"
+							>{{ notification.recipient }}</a
+						>
+					</td>
+					<td ng-if="$ctrl.hasNotificationDetails">
+						<dl
+							class="small"
+							ng-if="
+						notification.body ||
+						notification.response
+					"
+						>
+							<dt
+								ng-if="notification.response"
+								class="hstack text-muted"
+							>
+								Response
+								<a
+									class="ms-auto"
+									href="#"
+									ng-click="$ctrl.copyToClipboard( notification.response, 'response', $index, $event )"
+									title="{{
+								$ctrl.isResponseCopied[$index]
+									? 'Copied'
+									: 'Copy'
+							}} to Clipboard"
+								>
+									{{ $ctrl.isResponseCopied[$index] ? 'Copied'
+									: 'Copy' }}
+								</a>
+							</dt>
+							<dd ng-if="notification.response">
+								<code> {{ notification.response }} </code>
+							</dd>
+							<dt
+								ng-if="notification.body"
+								class="hstack text-muted"
+							>
+								Body
+								<a
+									class="ms-auto"
+									href="#"
+									ng-click="$ctrl.copyToClipboard( notification.body, 'body', $index, $event )"
+									title="{{
+								$ctrl.isBodyCopied[$index]
+									? 'Copied'
+									: 'Copy'
+							}} to Clipboard"
+								>
+									{{ $ctrl.isBodyCopied[$index] ? 'Copied' :
+									'Copy' }}
+								</a>
+							</dt>
+							<dd ng-if="notification.body" class="lh-sm">
+								{{ notification.body }}
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<section ng-if="$ctrl.active === 'fraud'">
+		<h2>Fraud details</h2>
+		<dl
+			ng-repeat="order in $ctrl.order.fraudDetails.Orders track by $index"
+		>
+			<dt>Status</dt>
+			<dd>
+				{{ order.Status }}
+				<a
+					class="small"
+					href="https://www2.clear.sale/developers/api#appendix-status-list"
+					target="_blank"
+					>(see ClearSale status list for details)</a
+				>
+			</dd>
+			<dt>Score</dt>
+			<dd>{{ order.Score ? order.Score : '&mdash;' }}</dd>
+		</dl>
+		<dl>
+			<dt>Transaction ID</dt>
+			<dd>{{ $ctrl.order.fraudDetails.TransactionID }}</dd>
+		</dl>
+	</section>
+	<section ng-if="$ctrl.active === 'shipments'">
+		<div class="hstack gap-2 align-items-baseline">
+			<h2>Shipments</h2>
+			<button
+				class="components-button is-secondary"
+				ng-click="$ctrl.openShipmentModal()"
+			>
+				Add Shipment
+			</button>
+		</div>
+		<table class="wp-list-table widefat striped table-view-list">
+			<tbody>
+				<tr>
+					<th class="col-3" scope="row">Order Shipped</th>
+					<td class="col-9">
+						{{ $ctrl.order.order_shipped ? 'Yes' : 'No' }}
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Shipping Method</th>
+					<td class="text-capitalize">
+						{{ $ctrl.order.shipping_method }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="mt-3" ng-if="$ctrl.order.order_shipments.length">
+			<h4 class="h6">Order Shipments</h4>
+			<table
+				class="wp-list-table widefat striped table-view-list"
+				ng-repeat="shipment in $ctrl.order.order_shipments"
+			>
+				<tbody>
+					<tr>
+						<th class="col-3" scope="row">Shipment Date</th>
+						<td class="col-9">
+							<time
+								ng-attr-datetime="{{
+									shipment.shipment_date
+								}}"
+								>{{ shipment.shipment_date | date : 'short'
+								}}</time
+							>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Delivery Date</th>
+						<td>
+							<time
+								ng-attr-datetime="{{
+									shipment.shipment_date
+								}}"
+								>{{ shipment.delivery_date | date : 'short'
+								}}</time
+							>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Carrier</th>
+						<td>{{ shipment.carrier | date : 'short' }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Tracking Code</th>
+						<td>{{ shipment.code }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Items</th>
+						<td class="p-0">
+							<table
+								class="wp-list-table widefat striped table-view-list"
+							>
+								<thead>
+									<tr>
+										<th>Product</th>
+										<th>
+											<abbr title="Stock Keeping Unit"
+												>SKU</abbr
+											>
+										</th>
+										<th>
+											<abbr title="Quantity">QTY</abbr>
+											Shipped
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr
+										ng-repeat="item in shipment.items track by $index"
+									>
+										<td>{{ item.product.description }}</td>
+										<td>{{ item.product.sku }}</td>
+										<td>{{ item.shipped.qty }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<div class="btn-toolbar gap-2 mt-3">
+		<div class="dropdown">
+			<button
+				class="components-button is-primary dropdown-toggle"
+				type="button"
+				data-bs-toggle="dropdown"
+				aria-expanded="false"
+			>
+				Resend to &hellip;
+			</button>
+			<div class="dropdown-menu">
+				<button
+					class="dropdown-item"
+					ng-disabled="$ctrl.isResendingEmail"
+					ng-click="$ctrl.resendEmail()"
+					title="Resend the order receipt to customer via email."
+				>
+					Resend Receipt to Customer
+				</button>
+				<button
+					class="dropdown-item"
+					ng-disabled="$ctrl.isResendingNotification"
+					ng-click="$ctrl.resendNotification()"
+					title="Resend order notification email to recipient(s) in VendorFuel > Email settings."
+				>
+					Resend Admin Order Notification
+				</button>
+				<button
+					ng-disabled="$ctrl.isResendingToGP"
+					class="dropdown-item"
+					ng-click="$ctrl.resendToGP()"
+				>
+					Resend Order to Microsoft Dynamics GP
+				</button>
+				<button
+					ng-disabled="$ctrl.isResending"
+					class="dropdown-item"
+					ng-click="$ctrl.resendToClearSale()"
+				>
+					Resend Order to ClearSale
+				</button>
+			</div>
+		</div>
+
+		<button
+			title="Export to Quickbooks"
+			class="components-button is-secondary"
+			ng-click="$ctrl.exportToQuickbooks()"
+			ng-disabled="$ctrl.isExportingToQuickbooks"
+		>
+			Export to Quickbooks
+		</button>
+	</div>
+</div>

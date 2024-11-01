@@ -1,0 +1,14 @@
+<layout-component>
+	<div class="alert alert-info" role="alert" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<favorites-list favorites="$ctrl.favorites" ng-if="$ctrl.isSignedIn">
+	</favorites-list>
+</layout-component>

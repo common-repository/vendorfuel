@@ -1,0 +1,291 @@
+<div class="row py-3">
+	<div class="col">
+		<h2>Shipping Address</h2>
+	</div>
+	<div class="col-auto" ng-if="!$ctrl.isGuest && $ctrl.isAuthed">
+		<wp-button
+			custom-font-size="small"
+			is-style-outline="true"
+			on-click="$ctrl.toggleShowSavedAddresses()"
+		>
+			{{ $ctrl.isShowingSavedAddresses ? 'Hide' : 'Show' }} Saved Addresses
+		</wp-button>
+	</div>
+</div>
+<div id="saved-shipping-addresses" class="collapse">
+	<checkout-address-book
+		type="shipping"
+		address="$ctrl.shippingAddress"
+		is-address-book-updated="$ctrl.isAddressBookUpdated"
+		is-locked="$ctrl.checkoutCtrl.hasLockedShipping"
+		on-select="$ctrl.onSelectedAddress()"
+	>
+	</checkout-address-book>
+</div>
+<form name="shippingAddressForm" novalidate>
+	<!-- wp:columns -->
+	<div
+		class="wp-block-columns"
+		ng-if="!$ctrl.isGuest && $ctrl.isAuthed"
+		ng-hide="$ctrl.checkoutCtrl.hasLockedShipping && !$ctrl.shippingAddress.profileName"
+	>
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-profile-name"> Saved Address Name </label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-profile-name"
+				name="profileName"
+				ng-model="$ctrl.shippingAddress.profileName"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				ng-attr-placeholder="{{
+					$ctrl.checkoutCtrl.hasLockedShipping ? '' : 'Example: Home or Office'
+				}}"
+			/>
+		</div>
+		<!-- /wp:column -->
+	</div>
+	<!-- /wp:columns -->
+
+	<!-- wp:columns -->
+	<div class="wp-block-columns">
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-first-name">First Name <small>(required)</small></label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-first-name"
+				ng-model="$ctrl.shippingAddress.first_name"
+				name="firstName"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.firstName.$invalid
+				}"
+				autocomplete="given-name"
+				required
+			/>
+			<div class="invalid-feedback">Please enter your First Name.</div>
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-last-name">Last Name <small>(required)</small></label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-last-name"
+				ng-model="$ctrl.shippingAddress.last_name"
+				name="lastName"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.lastName.$invalid
+				}"
+				autocomplete="family-name"
+				required
+			/>
+			<div class="invalid-feedback">Please enter your Last Name.</div>
+		</div>
+		<!-- /wp:column -->
+	</div>
+	<!-- /wp:columns -->
+	<!-- wp:columns -->
+	<div class="wp-block-columns">
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-email">Email Address</label>
+			<input
+				type="email"
+				class="form-control"
+				id="shipping-email"
+				ng-model="$ctrl.shippingAddress.email"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.email.$invalid
+				}"
+				ng-pattern="$ctrl.emailPattern"
+				autocomplete="email"
+				name="email"
+				required
+			/>
+			<div class="invalid-feedback">Please enter a valid email address.</div>
+		</div>
+
+		<!-- /wp:column -->
+
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-phone">Phone</label>
+			<input
+				type="tel"
+				class="form-control"
+				id="shipping-phone"
+				autocomplete="tel"
+				ng-model="$ctrl.shippingAddress.phone"
+				ng-change=""
+				name="phone"
+				ui-mask="(299) 999-9999"
+			/>
+			<div class="form-text text-muted small">
+				Please enter a valid phone number to prevent possible delays in your order.
+			</div>
+		</div>
+		<!-- /wp:column -->
+	</div>
+	<!-- /wp:columns -->
+
+	<!-- wp:paragraph {"align":"center","fontSize":"small"} -->
+	<p class="has-text-align-center has-small-font-size" ng-if="$ctrl.checkoutCtrl.hasLockedShipping">
+		Locked Shipping is enabled for your account. Please select a saved address or contact your
+		administrator.
+	</p>
+	<!-- /wp:paragraph -->
+
+	<!-- wp:columns -->
+	<div class="wp-block-columns">
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-address-1">Address Line 1 <small>(required)</small></label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-address-1"
+				ng-model="$ctrl.shippingAddress.address1"
+				name="address1"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.address1.$invalid
+				}"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				autocomplete="address-line1"
+				required
+			/>
+			<div class="invalid-feedback">Please enter your Street Address.</div>
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-address-2">Address Line 2</label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-address-2"
+				ng-model="$ctrl.shippingAddress.address2"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				name="address2"
+				autocomplete="address-line2"
+			/>
+		</div>
+		<!-- /wp:column -->
+	</div>
+	<!-- /wp:columns -->
+
+	<!-- wp:columns -->
+	<div class="wp-block-columns">
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-city">City <small>(required)</small></label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-city"
+				ng-model="$ctrl.shippingAddress.city"
+				name="city"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.city.$invalid
+				}"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				autocomplete="address-level2"
+				required
+			/>
+			<div class="invalid-feedback">Please enter your City.</div>
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-state">State <small>(required)</small></label>
+			<select
+				class="form-control"
+				id="shipping-state"
+				ng-options="item as item.name for item in $ctrl.stateOptions track by item.id"
+				name="state"
+				ng-model="$ctrl.shippingAddress.state"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.state.$invalid
+				}"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				autocomplete="address-level1"
+				required
+			></select>
+			<div class="invalid-feedback">Please select your State.</div>
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column -->
+		<div class="wp-block-column">
+			<label for="shipping-zip">Postal Code <small>(required)</small></label>
+			<input
+				type="text"
+				class="form-control"
+				id="shipping-zip"
+				ng-model="$ctrl.shippingAddress.zip"
+				name="zip"
+				ng-class="{
+					'is-invalid': shippingAddressForm.$submitted && shippingAddressForm.zip.$invalid
+				}"
+				ng-disabled="$ctrl.checkoutCtrl.hasLockedShipping"
+				pattern="\d{5}(?:[- ]?\d{4})?$"
+				autocomplete="postal-code"
+				required
+				minlength="5"
+				maxlength="10"
+			/>
+			<div class="invalid-feedback">Please enter a valid Postal or Zip Code.</div>
+		</div>
+		<!-- /wp:column -->
+	</div>
+	<!-- /wp:columns -->
+</form>
+<div class="row">
+	<div class="col">
+		<div class="form-group form-check mb-2" ng-if="!$ctrl.checkoutCtrl.hasLockedBilling">
+			<input
+				type="checkbox"
+				class="form-check-input"
+				id="billing-shipping-same"
+				ng-model="$ctrl.isShippingSameAsBilling"
+			/>
+			<label class="form-check-label" for="billing-shipping-same"
+				>Billing is same as shipping address.</label
+			>
+		</div>
+	</div>
+	<div class="col-md has-text-align-right">
+		<div class="d-flex align-items-baseline justify-content-end">
+			<checkout-update-saved-address
+				class="mr-2"
+				address="$ctrl.shippingAddress"
+				is-address-book-updated="$ctrl.isAddressBookUpdated"
+				type="shipping"
+				form="shippingAddressForm"
+				ng-if="shippingAddressForm.$dirty && !$ctrl.checkoutCtrl.hasLockedShipping"
+				handle-change="$ctrl.handleChange()"
+				handle-save="$ctrl.handleSave()"
+			></checkout-update-saved-address>
+			<wp-button
+				custom-font-size="small"
+				ng-if="!$ctrl.isShippingSameAsBilling"
+				on-click="$ctrl.confirmShippingAddress(shippingAddressForm)"
+			>
+				Go to Billing Address
+			</wp-button>
+			<wp-button
+				custom-font-size="small"
+				ng-if="$ctrl.isShippingSameAsBilling"
+				on-click="$ctrl.confirmAddress(shippingAddressForm)"
+			>
+				Go to Delivery Method
+			</wp-button>
+		</div>
+	</div>
+</div>

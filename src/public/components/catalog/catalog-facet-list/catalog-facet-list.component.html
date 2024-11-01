@@ -1,0 +1,154 @@
+<div class="card shadow-sm mb-3">
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<button
+			class="btn btn-link btn-block d-flex align-items-baseline justify-content-between has-text-align-left p-0 text-capitalize"
+			type="button"
+			data-toggle="collapse"
+			data-target="#{{ $ctrl.facetTitle }}"
+			aria-expanded="true"
+			aria-controls="{{ $ctrl.facetTitle }}"
+			ng-click="$ctrl.isCollapsed = !$ctrl.isCollapsed"
+			ng-attr-title="{{
+				$ctrl.isCollapsed
+					? 'Expand ' + $ctrl.facetTitle + ' panel'
+					: 'Collapse ' + $ctrl.facetTitle + ' panel'
+			}}"
+		>
+			{{ $ctrl.facetTitle }}s
+			<i
+				aria-hidden="true"
+				ng-class="[
+					'bi',
+					{
+						'bi-chevron-down': $ctrl.isCollapsed,
+						'bi-chevron-up': !$ctrl.isCollapsed
+					}
+				]"
+			></i>
+		</button>
+	</div>
+	<div class="collapse show" ng-attr-id="{{ $ctrl.facetTitle }}">
+		<div class="card-body pb-0">
+			<div class="input-group input-group-sm mb-2">
+				<input
+					class="form-control"
+					type="text"
+					list="facets"
+					ng-attr-placeholder="Search {{ $ctrl.facetTitle }}s&hellip;"
+					ng-model="$ctrl.query"
+					ng-keyup="$ctrl.searchFacets($event, $ctrl.query)"
+				/>
+				<div class="input-group-append">
+					<button
+						class="btn btn-outline-secondary"
+						title="Search"
+						ng-click="$ctrl.searchFacets($event, $ctrl.query)"
+					>
+						<i class="bi bi-search"></i>
+					</button>
+					<button
+						class="btn btn-outline-secondary"
+						title="Reset"
+						ng-click="$ctrl.resetFacetSearch()"
+						ng-hide="!$ctrl.query.length"
+					>
+						<i class="bi bi-arrow-counterclockwise"></i>
+					</button>
+				</div>
+				<datalist id="facets">
+					<option ng-repeat="item in $ctrl.facets" ng-value="item.key"></option>
+				</datalist>
+			</div>
+		</div>
+		<form class="card-body p-3" name="facetsForm" novalidate>
+			<fieldset ng-hide="$ctrl.isInProgress">
+				<div
+					class="d-flex align-items-baseline justify-content-between"
+					ng-if="$ctrl.isShowingSearchResults"
+				>
+					<small class="card-subtitle mb-2">
+						<ng-pluralize
+							count="$ctrl.facets.length"
+							when="{'0': 'No {{ $ctrl.facetTitle }}s contain &lsquo;{{
+								$ctrl.cachedQuery
+							}}&rsquo;.',
+                          'one': 'Showing one {{ $ctrl.facetTitle }} containing &lsquo;{{
+								$ctrl.cachedQuery
+							}}&rsquo;.',
+                          'other': 'Showing {} {{ $ctrl.facetTitle }}s containing &lsquo;{{
+								$ctrl.cachedQuery
+							}}&rsquo;.'}"
+						>
+						</ng-pluralize>
+						<span ng-if="$ctrl.hasStockOrRecycledApplied"
+							>Turn off any enabled filters to search all {{ $ctrl.facetTitle }}s.</span
+						>
+					</small>
+					<button
+						class="btn btn-link btn-sm"
+						style="word-break: keep-all"
+						ng-click="$ctrl.resetFacetSearch()"
+					>
+						Reset
+					</button>
+				</div>
+				<div
+					class="custom-control custom-checkbox"
+					ng-repeat="facet in $ctrl.facets | limitTo:$ctrl.limit track by $index"
+				>
+					<input
+						class="custom-control-input"
+						type="checkbox"
+						ng-model="facet.isChecked"
+						ng-attr-id="{{ 'attribute-' + $id }}"
+					/>
+					<label
+						class="custom-control-label d-flex justify-content-between align-items-baseline"
+						ng-attr-for="{{ 'attribute-' + $id }}"
+					>
+						{{ facet.value }}
+						<span class="badge badge-pill badge-light" ng-if="facet.results">
+							{{ facet.results }}
+						</span>
+					</label>
+				</div>
+			</fieldset>
+			<div class="has-text-align-center" ng-show="$ctrl.isInProgress">
+				<div class="spinner-border" role="status">
+					<span class="sr-only">Loading...</span>
+				</div>
+			</div>
+			<div class="btn-toolbar justify-content-between" role="toolbar" ng-hide="$ctrl.isInProgress">
+				<button
+					class="btn btn-sm btn-link btn-block px-0 d-flex align-items-baseline justify-content-between has-text-align-left"
+					ng-click="$ctrl.toggleLimit()"
+					ng-if="$ctrl.facets.length > 10"
+					ng-attr-title="{{
+						$ctrl.limit === 10
+							? 'Show all ' + $ctrl.facetTitle + 's'
+							: 'Show fewer ' + $ctrl.facetTitle + 's'
+					}}"
+				>
+					{{ $ctrl.limit === 10 ? 'Show all' : 'Show fewer' }} {{ $ctrl.facetTitle }}s
+					<i
+						aria-hidden="true"
+						ng-class="[
+							'bi',
+							{
+								'bi-chevron-down': $ctrl.limit === 10,
+								'bi-chevron-up': $ctrl.limit > 10
+							}
+						]"
+					></i>
+				</button>
+				<button
+					class="btn btn-sm btn-secondary"
+					ng-if="facetsForm.$dirty"
+					ng-click="$ctrl.onClickApply($ctrl.facetName, facetsForm)"
+				>
+					Apply
+				</button>
+			</div>
+		</form>
+	</div>
+</div>

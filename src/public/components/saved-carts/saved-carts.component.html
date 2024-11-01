@@ -1,0 +1,62 @@
+<layout-component>
+	<div class="alert alert-info" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<bs-spinner ng-if="$ctrl.isLoading && $ctrl.isSignedIn"> </bs-spinner>
+
+	<div ng-if="!$ctrl.isLoading && $ctrl.isSignedIn">
+		<bs-breadcrumb breadcrumb="$ctrl.breadcrumb"> </bs-breadcrumb>
+		<div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+			<!-- wp:heading {"level":1} -->
+			<h1>Your Saved Carts</h1>
+			<!-- /wp:heading -->
+			<button
+				class="btn btn-link btn-sm"
+				data-bs-toggle="collapse"
+				href="#collapseHelp"
+				role="button"
+				aria-expanded="false"
+				aria-controls="collapseHelp"
+				title="See help"
+			>
+				<i class="bi bi-info-circle-fill me-1"></i>Help
+			</button>
+		</div>
+		<div class="collapse" id="collapseHelp">
+			<ul>
+				<li>
+					To view a Saved Cart, click or tap the cart title or the
+					<em>View Cart</em> button.
+				</li>
+				<li>
+					To remove a Saved Cart, click or tap the
+					<em>Remove Cart</em> button. This will remove it from your
+					Saved Carts, but not remove any items from Your Cart.
+				</li>
+			</ul>
+		</div>
+		<p class="has-medium-font-size" ng-if="$ctrl.carts.length === 0">
+			You have not saved any carts yet.
+		</p>
+		<div
+			class="row row-cols-1 row-cols-md-3 row-cols-lg-4"
+			ng-if="$ctrl.carts.length > 0"
+			ng-show="!$ctrl.isLoading"
+		>
+			<vf-saved-carts-list-item
+				class="col mb-3"
+				ng-repeat="cart in $ctrl.carts track by $index"
+				cart="cart"
+				on-delete="$ctrl.deleteCart(cart)"
+			>
+			</vf-saved-carts-list-item>
+		</div>
+	</div>
+</layout-component>

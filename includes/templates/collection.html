@@ -1,0 +1,273 @@
+<vf-collection class="d-block alignwide" collection-id="'ID_OF_CATALOG'">
+</vf-collection>
+
+<!-- VF Collection template -->
+<script type="text/ng-template" id="vfCollection.html">
+	<alert-list></alert-list>
+
+	   <div class="d-flex justify-content-center"
+	       ng-show="$ctrl.isLoading">
+	       <div class="spinner-border" role="status">
+	           <span class="visually-hidden">Loading...</span>
+	       </div>
+	   </div>
+
+	   <div ng-if="!$ctrl.isLoading">
+	       <collection-category-list
+	           categories="$ctrl.categories">
+	       </collection-category-list>
+	       <collection-product-list
+	           products="$ctrl.products">
+	       </collection-product-list>
+		<collection-pagination
+			data="$ctrl.collection.products"
+			on-change="$ctrl.changePage( page )">
+		</collection-pagination>
+	   </div>
+</script>
+
+<!-- Collection Category List template -->
+<script type="text/ng-template" id="collectionCategoryList.html">
+	<section
+		ng-if="$ctrl.categories.length > 0">
+		<div class="d-flex justify-content-between align-items-baseline mb-2">
+			<h5>Collection Categories</h5>
+			<button class="btn btn-secondary" href="#collectionCategories" role="button" aria-expanded="true" aria-controls="collectionCategories"
+				ng-click="$ctrl.onClickToggle($event)">
+				<i ng-class="['bi', {
+					'bi-eye-slash': $ctrl.isShowingCategories,
+					'bi-eye': !$ctrl.isShowingCategories }]"></i>
+				{{ $ctrl.isShowingCategories ? 'Hide' : 'Show' }}
+			</button>
+		</div>
+		<div class="collapse" id="collectionCategories">
+			<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4">
+				<div class="col mb-4"
+					ng-repeat="category in $ctrl.categories track by $index">
+					<collection-category-list-item
+						category="category">
+					</collection-category-list-item>
+				</div>
+			</div>
+		</div>
+	</section>
+</script>
+
+<!-- Collection Category List Item template -->
+<script type="text/ng-template" id="collectionCategoryListItem.html">
+	<div class="card h-100">
+		<a ng-href="/{{$ctrl.categorySlug}}/{{$ctrl.category.slug}}"
+			ng-attr-title="{{$ctrl.category.title}}">
+			<collection-image
+				image-title="$ctrl.category.title"
+				image-src="$ctrl.category['img_url']">
+			</collection-image>
+		</a>
+		<div class="card-body">
+			<h6 class="card-title">
+				<a ng-href="/{{$ctrl.categorySlug}}/{{$ctrl.category.slug}}">
+					{{$ctrl.category.title}}
+				</a>
+			</h6>
+			<p class="card-text small"
+			ng-if="$ctrl.category.description">
+				{{ $ctrl.category.description }}
+			</p>
+		</div>
+	</div>
+</script>
+
+<!-- Collection Image template -->
+<script type="text/ng-template" id="collectionImage.html">
+	<div class="ratio ratio-1x1">
+		<img class="lazy" style="object-fit:cover;" loading="lazy"
+			ng-attr-alt="{{$ctrl.imageTitle}}"
+			ng-src="{{ $ctrl.imageSrc ? $ctrl.imageSrc : $ctrl.imgPlaceholder }}">
+	</div>
+</script>
+
+<!-- Collection Product List template -->
+<script type="text/ng-template" id="collectionProductList.html">
+	<section>
+		<div class="d-flex justify-content-between align-items-baseline mb-2">
+			<h5>Products</h5>
+			<div class="btn-group btn-group-toggle" data-bs-toggle="buttons">
+				<label class="btn btn-secondary active">
+					<input type="radio" name="view" id="view" checked
+						ng-model="$ctrl.viewAs" value="grid">
+	                       <i class="bi bi-grid-fill" aria-hidden="true"></i>
+	                       Grid
+				</label>
+				<label class="btn btn-secondary">
+					<input type="radio" name="view" id="view"
+						ng-model="$ctrl.viewAs" value="list">
+	                       <i class="bi bi-list-ul" aria-hidden="true"></i>
+	                       List
+				</label>
+			</div>
+		</div>
+
+		<div ng-class="$ctrl.viewAs === 'grid' ? 'row row-cols-1 row-cols-md-3 row-cols-lg-4' : 'list-group'">
+			<div ng-class="$ctrl.viewAs === 'grid' ? 'col mb-4' : 'list-group-item p-0'"
+				ng-repeat="product in $ctrl.products track by $index">
+				<collection-product-list-item
+					product="product"
+					view-as="$ctrl.viewAs">
+				</collection-product-list-item>
+			</div>
+		</div>
+	</section>
+</script>
+
+<!-- Collection Product List Item template -->
+<script type="text/ng-template" id="collectionProductListItem.html">
+	<div ng-class="$ctrl.viewAs === 'grid' ? 'card h-100' : 'row g-0 align-items-center'">
+		<div ng-class="$ctrl.viewAs === 'grid' ? '' : 'col-3 col-md-2 col-lg-1'">
+			<a ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}"
+				ng-attr-title="{{ $ctrl.product.description }}">
+				<collection-image
+					image-title="$ctrl.product.description"
+					image-src="$ctrl.product.image['small_url']">
+				</collection-image>
+			</a>
+		</div>
+		<div ng-class="$ctrl.viewAs === 'grid' ? 'h-100' : 'col-9 col-md-10 col-lg-11'">
+			<div ng-class="['card-body h-100', {
+					'd-flex flex-column justify-content-between': $ctrl.viewAs === 'grid',
+					'row align-items-center': $ctrl.viewAs !== 'grid' }]">
+				<div ng-class="{'col-12 col-lg-8': $ctrl.viewAs !== 'grid'}">
+					<h5 class="card-title  mb-0">
+						<a ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}">
+							{{ $ctrl.product.description | limitTo: 50 }}{{ $ctrl.product.description.length >= 50 ? '&hellip;' :
+				''}}
+						</a>
+					</h5>
+					<p class="card-text"
+						ng-hide="$ctrl.viewAs === 'grid'"><!-- Hidden to change placement depending on view. -->
+						<strong>{{$ctrl.product.price | currency}}</strong>
+						<small class="text-nowrap" ng-if="$ctrl.product.uom">/{{$ctrl.product.uom}}</small>
+					</p>
+				</div>
+				<div ng-class="{'col-12 col-lg-4': $ctrl.viewAs !== 'grid'}">
+					<div class="row align-items-center">
+						<div class="col"
+							ng-show="$ctrl.viewAs === 'grid'"><!-- Shown to change placement depending on view. -->
+							<p class="card-text">
+								<strong>{{$ctrl.product.price | currency}}</strong>
+								<small class="text-nowrap" ng-if="$ctrl.product.uom">/{{$ctrl.product.uom}}</small>
+							</p>
+						</div>
+						<div class="col-3 col-md-6 col-lg-3 text-end">
+							<collection-favorite-button
+								product="$ctrl.product">
+							</collection-favorite-button>
+						</div>
+						<div ng-class="$ctrl.viewAs === 'grid' ? 'col-12' : 'col-9 col-md-6 col-lg-9'">
+							<a class="btn btn-primary w-100"
+								ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}"
+								ng-if="$ctrl.product.prop65 ||
+									$ctrl.product.status !== 'active' ||
+									$ctrl.getAvailableQty($ctrl.product) <= 0 ||
+									( !$ctrl.isSignedIn && $ctrl.hasDisabledGuests )">
+								<i class="bi bi-zoom-in"></i>
+								View Product
+							</a>
+							<button class="btn btn-primary w-100"
+								ng-if="!$ctrl.product.prop65 &&
+									$ctrl.product.status === 'active' &&
+									$ctrl.getAvailableQty($ctrl.product) !== 0 &&
+									!( $ctrl.hasDisabledGuests && !$ctrl.isSignedIn)"
+								ng-click="$ctrl.onClickAdd($ctrl.product['product_id'])"										>
+								<i class="bi bi-cart-plus"
+									ng-hide="$ctrl.isAddingToCart"></i>
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+									ng-show="$ctrl.isAddingToCart"></span>
+								{{ $ctrl.isAddingToCart ? 'Adding' : 'Add' }} to Cart
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-footer"
+			ng-show="$ctrl.viewAs === 'grid' && $ctrl.product['cart_qty'] > 0">
+			<small
+				ng-show="$ctrl.product['cart_qty'] > 0">
+				{{$ctrl.product['cart_qty']}} in your cart
+			<small>
+		</div>
+	</div>
+</script>
+
+<!-- Collection Favorite Button template -->
+<script type="text/ng-template" id="collectionFavoriteButton.html">
+	<button class="btn btn-link"
+		ng-if="$ctrl.isLoggedIn"
+		ng-click="$ctrl.onClickFavorite($ctrl.product['product_id'])">
+		<i ng-class="['bi',
+			{'bi-heart': !$ctrl.product.favorite,
+			'bi-heart-fill': $ctrl.product.favorite}]"
+			ng-hide="$ctrl.isInProgress"></i>
+		<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+			ng-show="$ctrl.isInProgress"></span>
+	</button>
+</script>
+
+<script type="text/ng-template" id="collectionPagination.html">
+	<nav aria-label="Collection pagination" class="d-flex justify-content-between align-items-center">
+		<span>Displaying {{ $ctrl.data.from }}&mdash;{{ $ctrl.data.to }} of {{ $ctrl.data.total }} items</span>
+		<ul class="pagination justify-content-end mb-0">
+			<li ng-class="['page-item', {
+					'disabled': $ctrl.data.current_page === 1
+				}]">
+				<a class="page-link" href="#" aria-label="First" title="Go to first page"
+					ng-click="$ctrl.changePage( 1, $event )">
+					<i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+				</a>
+			</li>
+			<li ng-class="['page-item', {
+					'disabled': $ctrl.data.current_page === 1
+				}]">
+				<a class="page-link" href="#" aria-label="Previous" title="Go to previous page"
+					ng-click="$ctrl.changePage( $ctrl.data.current_page - 1, $event )">
+					<i class="bi bi-chevron-left" aria-hidden="true"></i>
+				</a>
+			</li>
+			<li class="page-item"
+				ng-if="$ctrl.data.current_page - 1 > 0">
+				<a class="page-link text-decoration-none" href="#"
+					ng-click="$ctrl.changePage($ctrl.data.current_page - 1, $event)">
+					{{ $ctrl.data.current_page - 1 }}
+				</a>
+			</li>
+			<li class="page-item active" aria-current="page">
+				<span class="page-link">
+					{{ $ctrl.data.current_page }}
+				</span>
+			</li>
+			<li class="page-item"
+				ng-if="$ctrl.data.current_page + 1 <= $ctrl.data.last_page">
+				<a class="page-link text-decoration-none" href="#"
+					ng-click="$ctrl.changePage($ctrl.data.current_page + 1, $event)">
+					{{ $ctrl.data.current_page + 1 }}
+				</a>
+			</li>
+			<li ng-class="['page-item', {
+					'disabled': $ctrl.data.current_page === $ctrl.data.last_page
+				}]">
+				<a class="page-link" href="#" aria-label="Next" title="Go to next page"
+					ng-click="$ctrl.changePage( $ctrl.data.current_page + 1, $event )">
+					<i class="bi bi-chevron-right" aria-hidden="true"></i>
+				</a>
+			</li>
+			<li ng-class="['page-item', {
+					'disabled': $ctrl.data.current_page === $ctrl.data.last_page
+				}]">
+				<a class="page-link" href="#" aria-label="Last" title="Go to last page"
+					ng-click="$ctrl.changePage( $ctrl.data.last_page, $event )">
+					<i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+				</a>
+			</li>
+		</ul>
+	</nav>
+</script>

@@ -1,0 +1,206 @@
+<layout-component heading="Add new category" breadcrumbs="$ctrl.breadcrumbs">
+	<div id="col-container" class="wp-clearfix">
+		<div id="col-left">
+			<div class="col-wrap">
+				<div class="form-wrap">
+					<form ng-submit="$ctrl.handleSubmit()" id="categoryCreate">
+						<fieldset ng-disabled="$ctrl.isBusy">
+							<div class="form-field">
+								<label for="title">Name</label>
+								<input
+									id="title"
+									type="text"
+									ng-model="$ctrl.category.title"
+									required
+								/>
+							</div>
+							<div class="form-field">
+								<label for="description">Description</label>
+								<textarea
+									id="description"
+									ng-model="$ctrl.category.description"
+									rows="3"
+								></textarea>
+							</div>
+							<div class="form-field">
+								<label for="slug">Slug</label>
+								<input
+									class="code"
+									id="slug"
+									ng-model="$ctrl.category.slug"
+									type="text"
+								/>
+								<p class="description">
+									Must be kebob-case (e.g. 'my-new-category').
+									Leave empty to generate automatically when
+									saved.
+								</p>
+							</div>
+							<div class="form-field">
+								<label for="parentCategory">Parent</label>
+								<div
+									class="hstack justify-content-between align-items-baseline gap-2 me-3"
+								>
+									{{
+										$ctrl.category.parentCategoryTitle
+											? $ctrl.category.parentCategoryTitle
+											: ''
+									}}
+									<button
+										type="button"
+										class="components-button is-tertiary"
+										ng-click="$ctrl.openParentCatSearchModal()"
+									>
+										Select
+									</button>
+								</div>
+							</div>
+							<div class="form-field">
+								<label for="avatax">Avatax Code</label>
+								<input
+									type="text"
+									id="avatax"
+									ng-model="$ctrl.category.avatax_tax_code"
+								/>
+							</div>
+							<div class="form-field">
+								<label for="unspsc"
+									><abbr
+										title="United Nations Standard Products and Services Code"
+										>UNSPSC</abbr
+									></label
+								>
+								<input
+									type="text"
+									id="unspsc"
+									ng-model="$ctrl.category.unspsc"
+								/>
+							</div>
+							<div class="form-field">
+								<label>Image URL</label>
+								<div class="hstack gap-2 me-3">
+									<input
+										class="code"
+										type="url"
+										placeholder="None"
+										ng-model="$ctrl.category.img_url"
+									/>
+									<button
+										type="button"
+										class="components-button is-tertiary"
+										ng-click="$ctrl.openMediaFrame('add_img')"
+									>
+										Browse
+									</button>
+								</div>
+							</div>
+							<div class="fieldset mt-3 border-top pt-3">
+								<h2>SEO</h2>
+								<div class="form-field">
+									<label for="meta-title">Meta Title</label>
+									<input
+										id="meta-title"
+										type="text"
+										ng-model="$ctrl.category.meta.title"
+										maxlength="70"
+									/>
+								</div>
+								<div class="form-field">
+									<label for="meta-description"
+										>Meta Description</label
+									>
+									<textarea
+										id="meta-description"
+										ng-model="$ctrl.category.meta.description"
+										maxlength="155"
+										rows="3"
+									></textarea>
+								</div>
+							</div>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="col-right">
+			<div class="col-wrap">
+				<nav-tab-wrapper
+					active="$ctrl.active"
+					tabs="$ctrl.tabs"
+					handle-change="$ctrl.setActive(id)"
+				></nav-tab-wrapper>
+				<section ng-if="$ctrl.active === 'products'">
+					<h2 class="h5 my-3">Products</h2>
+					<table
+						class="wp-list-table widefat striped table-view-list mb-3"
+						ng-if="$ctrl.category.products.length"
+					>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th class="column-primary">Name</th>
+								<th>SKU</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-class="{
+									'is-expanded': $ctrl.isExpanded[$index]
+								}"
+								ng-repeat="product in $ctrl.category.products track by $index"
+							>
+								<th class="align-top" scope="row">
+									{{ product.value.product_id }}
+								</th>
+								<td class="column-primary">
+									<strong>
+										<a
+											class="row-title"
+											ui-sref="catalog.products.edit({ id: product.value.product_id })"
+											target="_blank"
+											ng-attr-title="Edit {{
+												product.value.description
+											}} in a new tab"
+										>
+											{{ product.value.description }}
+										</a>
+									</strong>
+									<button
+										type="button"
+										class="toggle-row"
+										ng-click="$ctrl.isExpanded[$index] = !$ctrl.isExpanded[$index]"
+									>
+										<span class="screen-reader-text"
+											>Show More Details</span
+										>
+									</button>
+								</td>
+								<td data-colname="SKU">
+									{{ product.value.sku }}
+								</td>
+								<td data-colname="Status">
+									{{ product.value.status }}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<button
+						type="button"
+						class="components-button is-secondary"
+						ng-click="$ctrl.openSearchModalAdd()"
+					>
+						Add Products
+					</button>
+				</section>
+			</div>
+		</div>
+	</div>
+	<button
+		class="components-button is-primary"
+		type="submit"
+		form="categoryCreate"
+	>
+		Save
+	</button>
+</layout-component>

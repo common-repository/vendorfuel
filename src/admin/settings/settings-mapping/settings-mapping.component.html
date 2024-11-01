@@ -1,0 +1,147 @@
+<h2 class="h5 my-3">Page link mapping</h2>
+<div class="hstack justify-content-center" ng-if="$ctrl.isLoading">
+	<div class="spinner is-active"></div>
+</div>
+<form name="settingsMappingform" ng-if="!$ctrl.isLoading">
+	<fieldset ng-disabled="$ctrl.isLoading || $ctrl.isUpdating">
+		<p class="description">
+			VendorFuel uses special keys (e.g. account, cart) that are
+			dynamically mapped to pages in WordPress in order to handle various
+			e-commerce functions. If you want to have a key point to another
+			page, you can select a different page to be mapped to that
+			particular key and then click the Update button below.
+		</p>
+		<p class="description">
+			Note: Updating these mapped pages will not affect your permalinks
+			settings. Also, you can update a mapped page's title and slug
+			without affecting the map.
+		</p>
+
+		<table class="form-table" role="presentation">
+			<tbody>
+				<tr ng-repeat="(key, value) in $ctrl.map track by $index">
+					<th scope="row">
+						<label ng-attr-for="{{ key }}">Key</label>
+					</th>
+					<td>
+						<input
+							type="text"
+							class="regular-text code"
+							ng-attr-id="{{ key }}"
+							ng-attr-name="{{ 'key' + $index }}"
+							ng-model="value.template"
+							ng-pattern="$ctrl.pattern"
+							required
+						/>&emsp;
+						<label ng-attr-for="{{ 'template' + $index }}"
+							>Template:
+							<select
+								ng-model="value.url"
+								ng-attr-id="{{ 'template' + $index }}"
+								ng-attr-name="{{ 'template' + $index }}"
+								required
+							>
+								<option
+									ng-repeat="item in $ctrl.pages"
+									ng-value="item.url"
+									ng-if="item.title"
+								>
+									{{ item.title }}
+								</option>
+							</select>
+						</label>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</fieldset>
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-disabled="settingsMappingform.$invalid || $ctrl.isUpdating"
+			ng-click="$ctrl.update($ctrl.map)"
+		>
+			Save Changes
+		</button>
+		<button
+			type="button"
+			class="button"
+			ng-click="$ctrl.isAddingKey = true"
+			ng-hide="$ctrl.isAddingKey"
+		>
+			Add New Key
+		</button>
+	</p>
+</form>
+
+<form name="newKeyForm" ng-if="$ctrl.isAddingKey">
+	<h3 class="h5 my-3">Add new template key</h3>
+	<table class="form-table" role="presentation">
+		<tbody>
+			<tr>
+				<th scope="row">
+					<label for="key">New key</label>
+				</th>
+				<td
+					ng-class="[
+						'form-required',
+						{
+							'form-invalid': newKeyForm.key.$invalid
+						}
+					]"
+				>
+					<input
+						type="text"
+						class="regular-text code"
+						id="key"
+						name="key"
+						ng-model="$ctrl.newKey.key"
+						ng-pattern="$ctrl.pattern"
+						required
+					/>
+					<p class="description">
+						Please enter a key name, using lowercase letters and no
+						spaces or special characters.
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="value">Template</label>
+				</th>
+				<td
+					ng-class="[
+						'form-required',
+						{
+							'form-invalid': newKeyForm.value.$invalid
+						}
+					]"
+				>
+					<select
+						ng-model="$ctrl.newKey.value"
+						id="value"
+						name="value"
+						required
+					>
+						<option
+							ng-repeat="item in $ctrl.pages"
+							ng-value="item.url"
+							ng-if="item.title"
+						>
+							{{ item.title }}
+						</option>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p class="submit">
+		<button
+			class="button button-primary"
+			ng-disabled="newKeyForm.$invalid"
+			ng-click="$ctrl.addKey( $ctrl.newKey.key, $ctrl.newKey.value )"
+		>
+			Save
+		</button>
+	</p>
+</form>

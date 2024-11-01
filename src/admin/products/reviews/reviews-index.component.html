@@ -1,0 +1,286 @@
+<layout-component heading="Product reviews" breadcrumbs="$ctrl.breadcrumbs">
+	<form class="mb-3" ng-submit="$ctrl.submit()">
+		<fieldset class="input-group" ng-disabled="$ctrl.isLoading">
+			<input
+				type="search"
+				class="form-control"
+				ng-model="$ctrl.params.q"
+				ng-change="$ctrl.changeQuery( $ctrl.params.q )"
+			/>
+			<button class="btn btn-outline-primary" type="submit">
+				Search
+			</button>
+		</fieldset>
+		<p class="description">
+			Search by the review's content or status; or the reviewer's name or
+			email address; or for a product ID.
+		</p>
+	</form>
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<table class="table" ng-if="$ctrl.reviews && !$ctrl.isLoading">
+		<colgroup>
+			<col class="col-md-1" />
+			<col class="col-md-1" />
+			<col span="3" />
+		</colgroup>
+		<thead>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.direction || 'desc', {
+					'sortable': $ctrl.params.orderBy !== 'id',
+					'sorted': $ctrl.params.orderBy === 'id',
+				}]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('id', $event)"
+				>
+					<span> ID </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.direction || 'desc', {
+					'sortable': $ctrl.params.orderBy !== 'rating',
+					'sorted': $ctrl.params.orderBy === 'rating',
+				}]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('rating', $event)"
+				>
+					<span> Rating </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th>Product</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.direction || 'desc', {
+					'sortable': $ctrl.params.orderBy !== 'product_id',
+					'sorted': $ctrl.params.orderBy === 'product_id',
+				}]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('product_id', $event)"
+				>
+					<span> Product ID </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+			<th
+				scope="col"
+				ng-class="[ $ctrl.params.direction || 'desc', {
+					'sortable': $ctrl.params.orderBy !== 'status',
+					'sorted': $ctrl.params.orderBy === 'status',
+				}]"
+			>
+				<a
+					href="#"
+					class="text-decoration-none"
+					ng-click="$ctrl.changeSortBy('status', $event)"
+				>
+					<span> Status </span>
+					<span class="sorting-indicator"></span>
+				</a>
+			</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="review in $ctrl.reviews.data track by review.id">
+				<td>{{ review.id }}</td>
+				<td>
+					<ng-pluralize
+						count="review.rating"
+						when="{'one': '1 star', 'other': '{} stars'}"
+					>
+					</ng-pluralize>
+				</td>
+				<td>
+					<strong>
+						<a
+							class="text-decoration-none row-title"
+							ui-sref="reviews.show({ id: review.id })"
+						>
+							{{ review.product.description }}
+						</a>
+					</strong>
+					<div class="hstack gap-2 row-actions visible">
+						<a
+							class="text-decoration-none"
+							ui-sref="reviews.show({ id: review.id })"
+						>
+							Edit
+						</a>
+						|
+						<a
+							class="text-decoration-none text-danger"
+							href="#"
+							ng-click="$ctrl.confirmDelete( $event, $index )"
+							ng-hide="$ctrl.isConfirmingDeletion[$index]"
+						>
+							Delete
+						</a>
+						<span ng-if="$ctrl.isConfirmingDeletion[$index]">
+							<strong class="text-dark">
+								Delete this review?
+							</strong>
+							<a
+								class="text-decoration-none"
+								href="#"
+								ng-click="$ctrl.cancelDelete( $event, $index )"
+							>
+								Cancel
+							</a>
+							|
+							<a
+								class="text-decoration-none text-danger"
+								href="#"
+								ng-click="$ctrl.remove( $event, review.id, $index )"
+							>
+								{{
+									$ctrl.isDeleting[$index]
+										? 'Deleting'
+										: 'Delete'
+								}}
+							</a>
+						</span>
+					</div>
+					<blockquote class="my-2">
+						<strong>{{ review.title }}: </strong
+						>{{ review.content | limitTo : 60 }}
+						<span ng-if="review.content.length > 60">&hellip;</span>
+						&mdash;
+						<cite
+							><a ng-href="{{ 'mailto:' + review.email }}">{{
+								review.display_name
+							}}</a></cite
+						>
+					</blockquote>
+				</td>
+				<td>{{ review.product_id }}</td>
+				<td>{{ review.status }}</td>
+			</tr>
+			<tr>
+				<td colspan="5" ng-if="!$ctrl.reviews.data.length">
+					No reviews found{{
+						$ctrl.cachedQ ? ' for ' + $ctrl.cachedQ : ''
+					}}.
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div
+		class="tablenav"
+		ng-if="$ctrl.reviews && !$ctrl.isLoading && $ctrl.reviews.last_page > 1"
+	>
+		<div class="tablenav-pages">
+			<span class="displaying-num">
+				{{ $ctrl.reviews.total }} items
+			</span>
+			<span class="pagination-links">
+				<a
+					href="#"
+					class="first-page button"
+					ng-click="$ctrl.changePage( $event, 1 )"
+					ng-if="$ctrl.reviews.current_page > 2"
+				>
+					<span class="screen-reader-text"> First page </span>
+					<span aria-hidden="true"> &laquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="$ctrl.reviews.current_page < 3"
+				>
+					&laquo;
+				</span>
+				<a
+					href="#"
+					class="prev-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.reviews.current_page - 1 )"
+					ng-if="$ctrl.reviews.current_page > 1"
+				>
+					<span class="screen-reader-text"> Previous page </span>
+					<span aria-hidden="true"> &lsaquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="$ctrl.reviews.current_page === 1"
+				>
+					&lsaquo;
+				</span>
+				<span class="paging-input">
+					<label
+						for="current-page-selector"
+						class="screen-reader-text"
+					>
+						Current Page
+					</label>
+					<input
+						type="number"
+						class="current-page"
+						min="1"
+						name="paged"
+						size="1"
+						max="{{ $ctrl.reviews.last_page }}"
+						ng-disabled="$ctrl.reviews.last_page === 1"
+						ng-model="$ctrl.params.page"
+					/>
+					<span class="tablenav-paging-text">
+						of
+						<span class="total-pages">
+							{{ $ctrl.reviews.last_page }}
+						</span>
+					</span>
+				</span>
+				<a
+					href="#"
+					class="next-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.reviews.current_page + 1 )"
+					ng-if="$ctrl.reviews.current_page < $ctrl.reviews.last_page"
+				>
+					<span class="screen-reader-text"> Next page </span>
+					<span aria-hidden="true"> &rsaquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="
+						$ctrl.reviews.current_page === $ctrl.reviews.last_page
+					"
+				>
+					&rsaquo;
+				</span>
+				<a
+					href="#"
+					class="last-page button"
+					ng-click="$ctrl.changePage( $event, $ctrl.reviews.last_page )"
+					ng-if="
+						$ctrl.reviews.current_page < $ctrl.reviews.last_page - 1
+					"
+				>
+					<span class="screen-reader-text"> Last page </span>
+					<span aria-hidden="true"> &raquo; </span>
+				</a>
+				<span
+					class="tablenav-pages-navspan button disabled"
+					aria-hidden="true"
+					ng-if="
+						$ctrl.reviews.current_page >=
+						$ctrl.reviews.last_page - 1
+					"
+				>
+					&raquo;
+				</span>
+			</span>
+		</div>
+	</div>
+</layout-component>

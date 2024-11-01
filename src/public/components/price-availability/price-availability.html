@@ -1,0 +1,138 @@
+<h3>Product Availability Change</h3>
+<p>
+	The price and/or availability of some of the products in this order have
+	changed.
+</p>
+<form name="form">
+	<fieldset class="border-0 p-0" ng-disabled="$ctrl.isLoading">
+		<table
+			class="table"
+			ng-repeat="(sku, codes) in $ctrl.priceAvailability track by $index"
+		>
+			<thead>
+				<tr>
+					<th style="width: 20%">Product</th>
+					<th style="width: 40%">Changes</th>
+					<th style="width: 40%">Action Required</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(code, changes) in codes">
+					<th scope="row" style="vertical-align: baseline">
+						<p>{{ $ctrl.products[sku].name }}</p>
+						<p class="small">
+							<abbr title="Stock Keeping Unit">SKU</abbr>: {{ sku
+							}}
+						</p>
+					</th>
+					<td style="vertical-align: baseline">
+						<div ng-if="code === 'PA001'">
+							Price change:
+							<ul>
+								<li>
+									Original price: {{ changes.originalPrice |
+									currency }}
+								</li>
+								<li>
+									New price: {{ changes.newPrice | currency }}
+								</li>
+							</ul>
+						</div>
+						<div ng-if="code === 'PA002'">
+							Unavailable inventory stock for the requested
+							quantity:
+							<ul>
+								<li>
+									Requested Quantity: {{
+									changes.requestedQuantity | number }}
+								</li>
+								<li>
+									Available Quantity: {{
+									changes.availableQuantity | number }}
+								</li>
+							</ul>
+							<p class="small">
+								You can confirm the requested quantity, reduce
+								your requested quantity to the available stock,
+								or remove the product from your cart.
+							</p>
+						</div>
+						<div ng-if="code === 'PA003'">
+							This item has been discontinued and is no longer
+							available for purchase.
+						</div>
+					</td>
+					<td style="vertical-align: baseline">
+						<div ng-if="code === 'PA001'">
+							<input
+								type="radio"
+								value="accepted"
+								required
+								ng-attr-name="{{ sku }}-{{ code }}-actions"
+								ng-attr-id="{{ sku }}-{{ code }}-action-accept"
+								ng-model="$ctrl.response[sku][code].action"
+							/>
+							<label ng-attr-for="{{ item.sku }}-action-accept"
+								>Accept Price Change</label
+							>
+						</div>
+						<div ng-if="code === 'PA002'">
+							<div>
+								<label for="quantity">Quantity</label>
+								<input
+									type="number"
+									id="quantity"
+									min="0"
+									ng-disabled="$ctrl.response[sku][code].action === 'removed'"
+									ng-model="$ctrl.response[sku][code].returned"
+								/>
+							</div>
+							<div>
+								<input
+									type="radio"
+									value="changed"
+									required
+									ng-attr-name="{{ sku }}-{{ code }}-actions"
+									ng-attr-id="{{ sku }}-{{ code }}-action-change"
+									ng-model="$ctrl.response[sku][code].action"
+								/>
+								<label
+									ng-attr-for="{{ item.sku }}-action-accept"
+									ng-class="{'mb-0':$ctrl.response[sku][code].returned > changes.availableQuantity}"
+									>Confirm Quantity
+								</label>
+							</div>
+							<div
+								class="small has-luminous-vivid-orange-color mb-2"
+								ng-if="$ctrl.response[sku][code].returned > changes.availableQuantity"
+							>
+								If your requested quantity exceeds available
+								stock, the exceeding quantity will be
+								backordered.
+							</div>
+						</div>
+						<input
+							type="radio"
+							value="removed"
+							required
+							ng-attr-name="{{ sku }}-{{ code }}-actions"
+							ng-attr-id="{{ sku }}-{{ code }}-action-remove"
+							ng-model="$ctrl.response[sku][code].action"
+						/>
+						<label ng-attr-for="{{ item.sku }}-action-accept"
+							>Remove Item</label
+						>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</fieldset>
+</form>
+
+<button
+	class="btn btn-primary"
+	ng-disabled="form.$invalid || $ctrl.isLoading"
+	ng-click="$ctrl.complete()"
+>
+	{{ $ctrl.isLoading ? 'Confirming' : 'Confirm' }} Changes
+</button>

@@ -1,0 +1,13 @@
+<p class="mb-2">
+	Displaying
+	<span ng-hide="$ctrl.isLoading">
+		<span ng-if="$ctrl.numResults > $ctrl.max">
+			1&mdash;{{ $ctrl.max | number }} of
+		</span>
+		{{ $ctrl.numResults | number }} results
+		<span ng-if="$ctrl.query"
+			>for <q class="fw-bold">{{ $ctrl.query }}</q></span
+		>
+	</span>
+	<span ng-hide="!$ctrl.isLoading">&ensp;&hellip;&ensp;results</span>
+</p>

@@ -1,0 +1,386 @@
+<layout-component>
+	<div class="d-flex justify-content-center py-5" ng-if="$ctrl.isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<div
+		itemtype="http://schema.org/Product"
+		itemscope
+		ng-if="$ctrl.product && !$ctrl.isLoading"
+	>
+		<!-- Metadata -->
+		<meta itemprop="name" content="{{ $ctrl.product.description }}" />
+		<div itemprop="brand" itemtype="http://schema.org/Thing" itemscope>
+			<meta itemprop="name" content="{{ $ctrl.product.brand_name }}" />
+		</div>
+		<meta
+			itemprop="description"
+			content="{{ $ctrl.product.long_description }}"
+		/>
+		<meta itemprop="sku" content="{{ $ctrl.product.sku }}" />
+		<link itemprop="image" href="{{ $ctrl.schemaImg }}" />
+		<div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
+			<link itemprop="url" ng-href="{{ $ctrl.productUrl }}" />
+			<meta
+				ng-if="$ctrl.product.status !== 'backordered'"
+				itemprop="availability"
+				content="https://schema.org/InStock"
+			/>
+			<meta
+				ng-if="
+					$ctrl.product.status === 'backordered' ||
+					$ctrl.product.available_qty === 0
+				"
+				itemprop="availability"
+				content="https://schema.org/OutOfStock"
+			/>
+			<meta itemprop="priceCurrency" content="USD" />
+			<meta itemprop="price" content="{{ $ctrl.product.price }}" />
+		</div>
+		<div
+			itemprop="aggregateRating"
+			itemtype="http://schema.org/AggregateRating"
+			itemscope
+			ng-if="$ctrl.reviewCount"
+		>
+			<meta
+				itemprop="reviewCount"
+				ng-attr-content="{{ $ctrl.reviewCount }}"
+			/>
+			<meta
+				itemprop="ratingValue"
+				ng-attr-content="{{ $ctrl.product.average_rating }}"
+			/>
+		</div>
+		<!-- /Metadata -->
+
+		<div>
+			<!-- Breadcrumbs -->
+			<product-detail-breadcrumb
+				breadcrumb="$ctrl.breadcrumb"
+			></product-detail-breadcrumb>
+
+			<!-- Product Summary -->
+			<div class="row">
+				<div class="col-md-5" ng-if="$ctrl.product.images.length">
+					<product-detail-images
+						images="$ctrl.product.images"
+						description="$ctrl.product.description"
+					>
+					</product-detail-images>
+				</div>
+				<div class="col-md-7">
+					<h1>
+						{{ $ctrl.product.description }}
+					</h1>
+					<p>
+						<span class="fs-5">
+							{{ $ctrl.product.price | currency }}
+						</span>
+						<span
+							ng-if="$ctrl.product.uom"
+						>
+							<span ng-if="!$ctrl.product.uomqty">
+								/
+								{{ $ctrl.product.uom }}</span
+							>
+							<span
+								ng-if="
+									$ctrl.product.uomqty &&
+									!$ctrl.product.uomdesc
+								"
+							>
+								/
+								{{
+									$ctrl.product.uomqty
+										| number
+								}}
+							</span>
+							<span
+								ng-if="
+									$ctrl.product.uomqty &&
+									$ctrl.product.uomdesc
+								"
+								>&nbsp;
+								{{
+									$ctrl.product.uomqty
+										| number
+								}}<span
+									ng-if="
+										$ctrl.product.uomdesc
+									"
+								>
+									/
+									{{
+										$ctrl.product.uomdesc
+									}}</span
+								>
+							</span>
+						</span>
+					</p>
+					<p ng-if="$ctrl.product.status === 'active' && $ctrl.product.available_qty > 10">
+						{{ $ctrl.product.available_qty | number }} in stock.
+					</p>
+					<p class="fw-bold" ng-if="$ctrl.product.status === 'active' && $ctrl.product.available_qty > 0 && $ctrl.product.available_qty <= 10">
+						Low in stock. Order soon.
+					</p>
+					<p ng-if="$ctrl.product.status === 'active' && $ctrl.product.available_qty === 0">
+						Out of stock. Please <a ng-href="{{ $ctrl.pageUrls.contact }}">contact us</a> for expected availability or
+						substitution.
+					</p>
+					<p ng-if="$ctrl.product.status === 'backordered'">
+						This item is backordered. Please <a ng-href="{{ $ctrl.pageUrls.contact }}">contact us</a> for expected availability or
+						substitution.
+					</p>
+					<p ng-if="$ctrl.product.status === 'discontinued'">
+						This item is discontinued. Please <a ng-href="{{ $ctrl.pageUrls.contact }}">contact us</a> for assistance finding a substitution.
+					</p>
+
+					<form name="$ctrl.addToCartForm" novalidate>
+						<label for="addQty" class="visually-hidden"
+							>Quantity</label
+						>
+						<div class="hstack gap-2 mb-3"
+							ng-if="$ctrl.product.status !== 'backordered' && $ctrl.product.status !== 'discontinued' && $ctrl.product.available_qty !== 0">
+							<input
+								class="form-control"
+								id="addQty"
+								name="addQty"
+								type="number"
+								min="0"
+								ng-max="$ctrl.product.available_qty || 1000"
+								ng-attr-max="{{
+									$ctrl.product.available_qty ||
+										1000
+								}}"
+								step="1"
+								required
+								ng-disabled="$ctrl.product.available_qty < 1"
+								ng-model="$ctrl.addQty"
+								ng-keydown="$ctrl.onKeydown( $event )"
+							/>
+							<button
+								id="addToCart"
+								class="btn btn-primary text-nowrap"
+								ng-click="$ctrl.addToCart($ctrl.product, $event)"
+								ng-disabled="$ctrl.addToCartForm.$invalid ||
+										$ctrl.product.available_qty == 0 ||
+										( !$ctrl.isSignedIn && $ctrl.hasDisabledGuests )"
+							>
+								<span
+									ng-if="
+										$ctrl.product.cart_qty === 0 &&
+										$ctrl.product.available_qty !== 0
+									"
+									>Add to Cart</span>
+								<span
+									ng-if="
+										$ctrl.product.cart_qty > 0 &&
+										$ctrl.product.available_qty !== 0
+									"
+									>Add more to cart</span
+								>
+							</button>
+							<product-detail-favorite-button ng-if="$ctrl.isSignedIn"
+								product="$ctrl.product"
+							></product-detail-favorite-button>
+						</div>
+
+
+						<div
+							class="alert alert-info"
+							role="alert"
+							ng-if="!$ctrl.isSignedIn && $ctrl.hasDisabledGuests"
+						>
+							Please
+							<a
+								class="alert-link"
+								ng-href="{{ $ctrl.pageUrls.login }}"
+								>Sign In</a
+							>
+							or
+							<a
+								class="alert-link"
+								ng-href="{{ $ctrl.pageUrls.register }}"
+								>Create an Account</a
+							>
+							to view this page.
+						</div>
+					</form>
+
+					<p
+						class="text-danger"
+						ng-if="$ctrl.hasMaxQty"
+					>
+						Only
+						{{
+							$ctrl.product
+								.available_qty || 1000
+								| number
+						}}
+						available per order.
+					</p>
+
+					<div
+						class="alert alert-warning"
+						ng-if="$ctrl.product.additional_shipping"
+					>
+						This item is subject to additional shipping charges.
+					</div>
+
+					<div
+						class="alert alert-success"
+						ng-if="$ctrl.product.pcrc"
+					>
+						<i
+							class="bi bi-recycle text-success"
+							aria-hidden="true"
+						></i>
+						{{ $ctrl.product.pcrc.percentage }}% post consumer
+						recycled content.
+					</div>
+
+					<product-detail-alternate-list
+						products="$ctrl.product.alternates"
+						ng-if="$ctrl.product.alternates.length > 0"
+					>
+					</product-detail-alternate-list>
+
+					<dl class="row">
+						<dt class="col-4 col-md-3 col-lg-2">
+							<abbr title="Stock keeping unit">SKU:</abbr>
+						</dt>
+						<dd class="mx-0 mb-2 col-8 col-md-9 col-lg-10">{{ $ctrl.product.sku }}</dd>
+						<dt class="col-4 col-md-3 col-lg-2">
+							Brand: </abbr>
+						</dt>
+						<dd class="mx-0 mb-2 col-8 col-md-9 col-lg-10">
+							<a ng-href="{{ $ctrl.brandLink }}">
+								{{ $ctrl.brandName }}
+							</a>
+						</dd>
+					</dl>
+
+					<div ng-if="$ctrl.product.long_description.length">
+						<h2 class="d-lg-none">Description</h2>
+						<div
+							class="product-long-desc"
+							ng-bind-html="$ctrl.product.long_description"
+						></div>
+					</div>
+
+					<div
+						id="product-prop65"
+						class="alert alert-warning"
+						role="alert"
+						ng-if="$ctrl.product.prop65"
+					>
+						<em>California residents:</em><br />
+						<img
+							loading="lazy"
+							style="width: 1rem"
+							ng-src="{{ $ctrl.warningIcon }}"
+							height="16"
+							width="16"
+							alt="Proposition 65 Warning"
+							ng-attr-title="{{ $ctrl.prop65Warning }}"
+						/>
+						<strong>
+							<a
+								rel="noreferrer"
+								href="https://www.p65warnings.ca.gov/"
+								target="_blank"
+								style="color: black"
+								>WARNING:</a
+							>
+						</strong>
+						<span ng-bind-html="$ctrl.prop65Warning"></span>
+					</div>
+				</div>
+			</div>
+
+			<product-related
+				products="$ctrl.product.related"
+				ng-if="
+					$ctrl.product.related.length &&
+					$ctrl.settings.showRelatedAboveSpecs
+				"
+			>
+			</product-related>
+
+			<nav class="mb-3" ng-if="$ctrl.documents.length">
+				<div class="nav nav-tabs" id="nav-tab" role="tablist">
+					<a
+						class="nav-link active"
+						id="nav-specs-tab"
+						data-bs-toggle="tab"
+						href="#nav-specs"
+						role="tab"
+						aria-controls="nav-specs"
+						aria-selected="true"
+					>
+						Specifications
+					</a>
+					<a
+						class="nav-link"
+						id="nav-docs-tab"
+						data-bs-toggle="tab"
+						href="#nav-docs"
+						role="tab"
+						aria-controls="nav-docs"
+						aria-selected="false"
+					>
+						Documents
+					</a>
+				</div>
+			</nav>
+
+			<h2 ng-if="!$ctrl.documents.length">Specifications</h2>
+			<div class="tab-content" id="nav-tabContent">
+				<div
+					class="tab-pane fade show active"
+					id="nav-specs"
+					role="tabpanel"
+					aria-labelledby="nav-specs-tab"
+				>
+					<product-specs
+						product="$ctrl.product"
+						breadcrumb="$ctrl.breadcrumb"
+					>
+					</product-specs>
+				</div>
+				<div
+					class="tab-pane fade"
+					id="nav-docs"
+					role="tabpanel"
+					aria-labelledby="nav-docs-tab"
+					ng-if="$ctrl.documents.length"
+				>
+					<product-documents documents="$ctrl.documents">
+					</product-documents>
+				</div>
+			</div>
+
+			<!-- Related Products below Specifications -->
+			<product-related
+				products="$ctrl.product.related"
+				ng-if="
+					$ctrl.product.related.length &&
+					!$ctrl.settings.showRelatedAboveSpecs
+				"
+			>
+			</product-related>
+
+			<!-- Product Reviews -->
+			<product-detail-reviews
+				average-rating="$ctrl.product.average_rating"
+				get-review-total="$ctrl.getReviewTotal( total )"
+				product-id="$ctrl.productId"
+				ng-if="$ctrl.settings.showReviews"
+			>
+			</product-detail-reviews>
+		</div>
+	</div>
+</layout-component>

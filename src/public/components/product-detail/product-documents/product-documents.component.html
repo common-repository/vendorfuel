@@ -1,0 +1,27 @@
+<div
+	class="wp-block-file"
+	ng-repeat="document in $ctrl.documents track by $index"
+>
+	<i
+		aria-hidden="true"
+		class="bi bi-box-arrow-up-right"
+		ng-if="!document.extension"
+	></i>
+	<i
+		aria-hidden="true"
+		ng-class="['bi', document.extIconClass]"
+		ng-if="document.extension"
+	></i>
+	<a target="_blank" ng-href="{{ document.url }}" rel="noreferrer noopener">{{
+		document.name
+	}}</a>
+	<a
+		class="wp-block-file__button"
+		target="_blank"
+		download
+		ng-href="{{ document.url }}"
+		ng-if="document.extension"
+	>
+		<i class="bi bi-download me-1" aria-hidden="true"></i>Download</a
+	>
+</div>

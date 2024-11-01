@@ -1,0 +1,601 @@
+<layout-component heading="Cost sheets" breadcrumbs="$ctrl.breadcrumbs" nav="$ctrl.nav">
+	<uib-tabset active="activeTab">
+		<uib-tab index="0" select="TabChanged(0)" heading="Cost sheets">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="input-group mb-3">
+					<button class="btn btn-outline-primary dropdown-toggle" type="button"
+						data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{searchParams.searchBy === 'id' ? 'ID' : searchParams.searchBy === 'name' ? 'Name'
+						: searchParams.searchBy || 'Search All'}}
+					</button>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" ng-click="searchParams.searchBy = ''"
+							ng-if="searchParams.searchBy.length >= 1">Search All</a>
+						<a class="dropdown-item" ng-click="searchParams.searchBy = 'id'"
+							ng-if="searchParams.searchBy != 'id'">ID</a>
+						<a class="dropdown-item" ng-click="searchParams.searchBy = 'name'"
+							ng-if="searchParams.searchBy != 'name'">Name</a>
+					</div>
+					<input ng-keypress="$event.keyCode === 13 && Index(1)" ng-model="searchParams.q" type="text"
+						class="form-control" placeholder="Search">
+					<button ng-click="Index()" class="btn btn-outline-primary"
+						type="submit">Search</button>
+				</div>
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th ng-click="SortIndex('id')">ID</th>
+							<th ng-click="SortIndex('name')">Name</th>
+							<th ng-click="SortIndex('cost_margin')">Cost Margin</th>
+						</tr>
+					</thead>
+					<tbody>
+						<spinner-component ng-if="loadingMore"></spinner-component>
+						<tr ng-if="costSheets.data.length <= 0 && !loadingMore">
+							<td colspan="3">
+								No results found<span
+										ng-if="searchParams.q.length >= 1 && searchedBy.length <= 0"> matching
+										'{{searchParams.q}}'</span><span
+										ng-if="searchParams.q.length >= 1 && searchedBy.length >= 1">with the
+										{{searchedBy === 'id' ? 'ID' : searchedBy === 'name' ? 'Name'}}
+										of '{{searchParams.q}}'</span>.
+							</td>
+						</tr>
+						<tr class="cursor-pointer"
+							ng-repeat="sheet in costSheets.data track by $index" ng-if="!loadingMore">
+								<td>{{sheet.id || '&mdash;'}}</td>
+								<td>
+									<strong>
+										<a href="#" ng-click="$event.preventDefault(); costSheet.id = sheet.id; TabChanged(2);">
+											{{sheet.name || '&mdash;'}}
+										</a>
+									</strong>
+								</td>
+								<td>{{sheet.cost_margin * 100 || '&mdash;'}} %</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{costSheets.from || 0}} to {{costSheets.to || 0}} of
+							{{costSheets.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="btn btn-outline-primary" ng-if="costSheets.prev_page_url"
+							ng-click="Index(costSheets.current_page - 1)"><span class="dashicons dashicons-arrow-left-alt2"></span>
+							Prev</button>
+						<button class="btn btn-outline-primary" ng-if="costSheets.current_page - 2 > 0"
+							ng-click="Index(costSheets.current_page - 2)">{{costSheets.current_page -
+							2}}</button>
+						<button class="btn btn-outline-primary" ng-if="costSheets.current_page - 1 > 0"
+							ng-click="Index(costSheets.current_page - 1)">{{costSheets.current_page -
+							1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-disabled="true">{{costSheets.current_page}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="costSheets.current_page + 1 <= costSheets.last_page"
+							ng-click="Index(costSheets.current_page + 1)">{{costSheets.current_page +
+							1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="costSheets.current_page + 2 <= costSheets.last_page"
+							ng-click="Index(costSheets.current_page + 2)">{{costSheets.current_page +
+							2}}</button>
+						<button class="btn btn-outline-primary" ng-if="costSheets.next_page_url"
+							ng-click="Index(costSheets.current_page + 1)">Next <span
+								class="dashicons dashicons-arrow-right-alt2"></span></button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label for="perPage">Number of items per page:</label>
+						<select class="form-select" id="perPage"
+							ng-model="searchParams.perPage" ng-change="Index(1)"
+							ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add new">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="new.costSheet">
+							<div class="needs-validation">
+								<div ng-class="new.costSheet.name.$invalid ? 'has-danger' : 'has-success'">
+									<label for="name" class="form-label">
+										Name
+									</label>
+									<input class="form-control" id="name"
+										ng-class="new.costSheet.name.$invalid ? 'is-invalid' : 'is-valid'"
+										ng-model="addParams.name" name="name" type="search"
+										minlength="1" required>
+									<div class="invalid-feedback">
+										Please set a name for the Cost Sheet.
+									</div>
+								</div>
+								<label class="form-label">Vendor</label>
+								<div class="dropdown mb-3">
+									<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+										<input class="form-control" ng-model="vendor.name" disabled required>
+										<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+											<i class="dashicons dashicons-arrow-down"></i>
+										</button>
+									</div>
+									<ul class="dropdown-menu">
+										<li class="input-group p-1">
+											<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+											<input class="form-control" ng-model="filterVendorVal"
+												placeholder="Filter Vendors">
+										</li>
+										<li class="border-top">
+											<ul class="p-1" style="max-height: 300px; overflow: auto;">
+												<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+													ng-repeat="filterVendor in vendors | toArray | orderBy: 'name' | filter: filterVendorVal as filteredVendors track by $index"
+													ng-click="vendor.name = filterVendor.name; addParams.vendor_id = filterVendor.id;">
+													{{filterVendor.name}}
+												</li>
+												<li class="text-center" ng-if="filteredVendors.length <= 0">
+													No results matching {{filterVal}}.
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+								<label class="form-label">Supplier</label>
+								<div class="dropdown mb-3">
+									<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+										<input class="form-control" ng-model="supplier.name" disabled>
+										<button class="btn btn-outline-primary" ng-click="filterSupVal = ''">
+											<i class="dashicons dashicons-arrow-down"></i>
+										</button>
+									</div>
+									<ul class="dropdown-menu">
+										<li class="input-group p-1">
+											<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+											<input class="form-control" ng-model="filterSupplierVal"
+												placeholder="Filter Suppliers">
+										</li>
+										<li class="border-top">
+											<ul class="p-1" style="max-height: 300px; overflow: auto;">
+												<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+													ng-repeat="filterSupplier in suppliers | toArray | orderBy: 'name' | filter: filterSupplierVal as filterSuppliers track by $index"
+													ng-click="supplier.name = filterSupplier.name; addParams.supplier_id = filterSupplier.id;">
+													{{filterSupplier.name}}
+												</li>
+												<li class="text-center" ng-if="filterSuppliers.length <= 0">
+													No results matching {{filterSupVal}}.
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="add_cost_margin">Cost Margin %</label>
+									<input class="form-control" type="number" min="0" id="add_cost_margin" name="add_cost_margin"
+										ng-model="addParams.cost_margin" />
+								</div>
+								<label class="form-label">Transmitting Document Profile</label>
+								<div class="dropdown mb-3">
+									<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+										<input class="form-control" ng-model="transmitting_document_profile.name" disabled>
+										<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+											<i class="dashicons dashicons-arrow-down"></i>
+										</button>
+									</div>
+									<ul class="dropdown-menu">
+										<li class="input-group p-1">
+											<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+											<input class="form-control" ng-model="filterTransmittingDocProfileVal"
+												placeholder="Filter Document Profiles">
+										</li>
+										<li class="border-top">
+											<ul class="p-1" style="max-height: 300px; overflow: auto;">
+												<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+													ng-repeat="filterTransmittingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterTransmittingDocProfileVal as filteredTransmittingDocProfile track by $index"
+													ng-click="transmitting_document_profile.name = filterTransmittingDocProfile.name; addParams.transmitting_document_profile_id = filterTransmittingDocProfile.id;">
+													{{filterTransmittingDocProfile.name}}
+												</li>
+												<li class="text-center" ng-if="filteredTransmittingDocProfile.length <= 0">
+													No results matching {{filterTransmittingDocProfileVal}}.
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+								<label class="form-label">Receiving Document Profile</label>
+								<div class="dropdown mb-3">
+									<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+										<input class="form-control" ng-model="receiving_document_profile.name" disabled>
+										<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+											<i class="dashicons dashicons-arrow-down"></i>
+										</button>
+									</div>
+									<ul class="dropdown-menu">
+										<li class="input-group p-1">
+											<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+											<input class="form-control" ng-model="filterReceivingDocProfileVal"
+												placeholder="Filter Document Profiles">
+										</li>
+										<li class="border-top">
+											<ul class="p-1" style="max-height: 300px; overflow: auto;">
+												<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+													ng-repeat="filterReceivingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterReceivingDocProfileVal as filterReceivingDocProfile track by $index"
+													ng-click="receiving_document_profile.name = filterReceivingDocProfile.name; addParams.receiving_document_profile_id = filterReceivingDocProfile.id;">
+													{{filterReceivingDocProfile.name}}
+												</li>
+												<li class="text-center" ng-if="filterReceivingDocProfile.length <= 0">
+													No results matching {{filterReceivingDocProfileVal}}.
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+								<button class="btn btn-primary mb-2" type="button"
+									ng-click="Store()" ng-disabled="new.costSheet.$invalid">Save</button>
+							</div>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="TabChanged(2)" ng-show="costSheet.id" heading="Edit cost sheet">
+			<spinner-component ng-if="loading"></spinner-component>
+			<form ng-if="!loading" name="view.costSheetForm">
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="mb-3">
+							<label for="edit-name" class="form-label">Name</label>
+							<input id="edit-name" class="form-control" ng-class="{'is-invalid':view.costSheetForm.name.$invalid}"
+								name="name" ng-model="costSheet.name" required />
+						</div>
+						<hr class="col p-0">
+						<label class="form-label">Vendor</label>
+						<div class="dropdown">
+							<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+								<input class="form-control" ng-model="costSheet.vendor.name" disabled>
+								<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+									<i class="dashicons dashicons-arrow-down"></i>
+								</button>
+							</div>
+							<ul class="dropdown-menu">
+								<li class="input-group p-1">
+									<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+									<input class="form-control" ng-model="filterVendorVal"
+										placeholder="Filter Vendors">
+								</li>
+								<li class="border-top">
+									<ul class="p-1" style="max-height: 300px; overflow: auto;">
+										<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+											ng-repeat="filterVendor in vendors | toArray | orderBy: 'name' | filter: filterVendorVal as filteredVendors track by $index"
+											ng-click="costSheet.vendor.name = filterVendor.name; costSheet.vendor_id = filterVendor.id;">
+											{{filterVendor.name}}
+										</li>
+										<li class="text-center" ng-if="filteredVendors.length <= 0">
+											No results matching {{filterVal}}.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<label class="form-label">Supplier</label>
+						<div class="dropdown">
+							<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+								<input class="form-control" ng-model="costSheet.supplier.name" disabled>
+								<button class="btn btn-outline-primary" ng-click="filterSupVal = ''">
+									<i class="dashicons dashicons-arrow-down"></i>
+								</button>
+							</div>
+							<ul class="dropdown-menu">
+								<li class="input-group p-1">
+									<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+									<input class="form-control" ng-model="filterSupplierVal"
+										placeholder="Filter Suppliers">
+								</li>
+								<li class="border-top">
+									<ul class="p-1" style="max-height: 300px; overflow: auto;">
+										<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+											ng-repeat="filterSupplier in suppliers | toArray | orderBy: 'name' | filter: filterSupplierVal as filterSuppliers track by $index"
+											ng-click="costSheet.supplier.name = filterSupplier.name; costSheet.supplier_id = filterSupplier.id;">
+											{{filterSupplier.name}}
+										</li>
+										<li class="text-center" ng-if="filterSuppliers.length <= 0">
+											No results matching {{filterSupVal}}.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="view_cost_margin">Cost Margin %</label>
+							<input class="form-control" type="number" min="0" id="add_cost_margin" name="view_cost_margin"
+								ng-model="costSheet.cost_margin" />
+						</div>
+						<label class="form-label">Transmitting Document Profile</label>
+						<div class="dropdown">
+							<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+								<input class="form-control" ng-model="costSheet.transmitting_document_profile.name"
+									disabled required>
+								<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+									<i class="dashicons dashicons-arrow-down"></i>
+								</button>
+							</div>
+							<ul class="dropdown-menu">
+								<li class="input-group p-1">
+									<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+									<input class="form-control" ng-model="filterTransmittingDocProfileVal"
+										placeholder="Filter Document Profiles">
+								</li>
+								<li class="border-top">
+									<ul class="p-1" style="max-height: 300px; overflow: auto;">
+										<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+											ng-repeat="filterTransmittingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterTransmittingDocProfileVal as filteredTransmittingDocProfile track by $index"
+											ng-click="costSheet.transmitting_document_profile.name = filterTransmittingDocProfile.name; costSheet.transmitting_document_profile_id = filterTransmittingDocProfile.id;">
+											{{filterTransmittingDocProfile.name}}
+										</li>
+										<li class="text-center" ng-if="filteredTransmittingDocProfile.length <= 0">
+											No results matching {{filterTransmittingDocProfileVal}}.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<label class="form-label">Receiving Document Profile</label>
+						<div class="dropdown">
+							<div class="input-group" data-bs-toggle="dropdown" data-bs-display="static">
+								<input class="form-control" ng-model="costSheet.receiving_document_profile.name"
+									disabled required>
+								<button class="btn btn-outline-primary" ng-click="filterVal = ''">
+									<i class="dashicons dashicons-arrow-down"></i>
+								</button>
+							</div>
+							<ul class="dropdown-menu">
+								<li class="input-group p-1">
+									<span class="input-group-text"><i class="dashicons dashicons-search"></i></span>
+									<input class="form-control" ng-model="filterReceivingDocProfileVal"
+										placeholder="Filter Document Profiles">
+								</li>
+								<li class="border-top">
+									<ul class="p-1" style="max-height: 300px; overflow: auto;">
+										<li class="vf-list-item p-3" ng-class="{'border-bottom':!$last}"
+											ng-repeat="filterReceivingDocProfile in document_profiles | toArray | orderBy: 'name' | filter: filterReceivingDocProfileVal as filterReceivingDocProfile track by $index"
+											ng-click="costSheet.receiving_document_profile.name = filterReceivingDocProfile.name; costSheet.receiving_document_profile_id = filterReceivingDocProfile.id;">
+											{{filterReceivingDocProfile.name}}
+										</li>
+										<li class="text-center" ng-if="filterReceivingDocProfile.length <= 0">
+											No results matching {{filterReceivingDocProfileVal}}.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="hstack gap-3 mt-3">
+							<button class="components-button is-primary"
+								type="button" ng-click="Update(costSheet.id)"
+								ng-disabled="view.costSheetForm.$invalid">Update</button>
+							<button class="components-button is-tertiary is-destructive"
+								ng-click="Delete(costSheet.id)">Delete</button>
+						</div>
+					</div>
+					<div class="col-lg-8">
+						<div ng-show="!showChanges">
+							<div class="row mb-3" ui-keypress="{13:'Show(costSheet.id)'}">
+								<label class="screen-reader-text" for="searchProducts">Search:</label>
+								<div class="input-group" ng-form>
+									<input class="form-control" type="text" id="searchProducts"
+										placeholder="Search 'Labels'" ng-model="searchParams.q">
+									<button class="btn btn-outline-primary"
+										ng-click="Show(costSheet.id)">Search</button>
+								</div>
+							</div>
+							<spinner-component ng-if="productsLoading"></spinner-component>
+							<div ng-if="!productsLoading">
+								<table class="wp-list-table widefat striped table-view-list">
+									<thead>
+										<tr>
+											<th>SKU</th>
+											<th>Name</th>
+											<th>Cost</th>
+											<th>
+												<span class="text-nowrap">
+													Unit of Measure
+												</span>
+											</th>
+											<th>
+												<span class="text-nowrap">
+													Vendor SKU
+												</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="no-items" ng-if="!costSheet.costs.data.length">
+											<td colspan="5">No products found.</td>
+										</tr>
+										<tr ng-repeat="item in costSheet.costs.data track by $index">
+											<td>{{ item.sku }}</td>
+											<td class="column-primary">
+												<strong>
+													<a ng-href="?page=vendorfuel#!/catalog/products/{{ item.product.product_id }}" class="row-title">
+														{{ item.product.description }}
+													</a>
+												</strong>
+											</td>
+											<td ng-class="['form-required', { 'form-invalid':view.costSheetForm[ 'cost' + $index ].$invalid || !item.cost }]">
+												<span class="text-nowrap">$
+													<input
+													class="small-text"
+													name="cost{{$index}}"
+													ng-change="editParams(item)" ng-model="item.cost"
+													ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" step="0.01" type="number"
+													required />
+												</span>
+											</td>
+											<td ng-class="['form-required', {
+												'form-invalid':
+													view.costSheetForm['uomqty'+$index].$invalid ||
+														!item.uomqty ||
+														view.costSheetForm['uomid'+$index].$invalid ||
+														!item.uomid
+													}]">
+												<span class="text-nowrap">
+													<input class="small-text"
+														name="uomqty{{$index}}" ng-change="editParams(item)"
+														ng-model="item.uomqty" step="0.01" type="number" required />
+													/
+													<input class="small-text" placeholder="EA"
+														name="uomid{{$index}}" ng-change="editParams(item)"
+														ng-model="item.uomid" type="text" required />
+
+												</span>
+											</td>
+											<td ng-class="['form-required', { 'form-invalid':view.costSheetForm['vendorSku'+$index].$invalid || !item.vendor_sku }]">
+												<input type="text"
+												name="vendorSku{{$index}}" ng-change="editParams(item)"
+												ng-model="item.vendor_sku" required /></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="row mb-3" ng-hide="productsLoading">
+								<div class="col-sm-4">
+									<span>Showing {{costSheet.costs.from || 0}} to
+										{{costSheet.costs.to || 0}} of
+										{{costSheet.costs.total || 0}} entries</span>
+								</div>
+								<div class="col text-center mb-3">
+									<button class="btn btn-outline-primary" ng-if="costSheet.costs.prev_page_url"
+										ng-click="searchParams.page = costSheet.costs.current_page - 1; Show(costSheet.id);"><span
+											class="dashicons dashicons-arrow-left-alt2"></span> Prev</button>
+									<button class="btn btn-outline-primary"
+										ng-if="costSheet.costs.current_page - 2 > 0"
+										ng-click="searchParams.page = costSheet.costs.current_page - 2; Show(costSheet.id);">{{costSheet.costs.current_page
+										- 2}}</button>
+									<button class="btn btn-outline-primary"
+										ng-if="costSheet.costs.current_page - 1 > 0"
+										ng-click="searchParams.page = costSheet.costs.current_page - 1; Show(costSheet.id);">{{costSheet.costs.current_page
+										- 1}}</button>
+									<button class="btn btn-outline-primary" disabled="true">{{costSheet.costs.current_page}}</button>
+									<button class="btn btn-outline-primary"
+										ng-if="costSheet.costs.current_page + 1 <= costSheet.costs.last_page"
+										ng-click="searchParams.page = costSheet.costs.current_page + 1; Show(costSheet.id);">{{costSheet.costs.current_page
+										+ 1}}</button>
+									<button class="btn btn-outline-primary"
+										ng-if="costSheet.costs.current_page + 2 <= costSheet.costs.last_page"
+										ng-click="searchParams.page = costSheet.costs.current_page + 2; Show(costSheet.id);">{{costSheet.costs.current_page
+										+ 2}}</button>
+									<button class="btn btn-outline-primary" ng-if="costSheet.costs.next_page_url"
+										ng-click="searchParams.page = costSheet.costs.current_page + 1; Show(costSheet.id);">Next
+										<span class="dashicons dashicons-arrow-right-alt2"></span></button>
+								</div>
+								<div class="col-sm-4  justify-content-end">
+									<label for="perPage">Number of items per page:</label>
+									<select class="form-select" id="perPage"
+										ng-model="searchParams.perPage"
+										ng-change="searchParams.page = 1;Show(costSheet.id);"
+										ng-options="value for value in rppValues">
+									</select>
+								</div>
+							</div>
+						</div>
+						<div ng-show="showChanges">
+							<div class="input-group mb-3" ng-hide="productsLoading">
+								<input class="form-control" type="text" id="filterChanges"
+									ng-model="filterEdited" placeholder="Filter Changes">
+							</div>
+							<spinner-component ng-if="productsLoading"></spinner-component>
+							<div ng-if="!productsLoading">
+								<table class="wp-list-table widefat striped table-view-list caption-top">
+									<caption>Pending changes</caption>
+									<thead>
+										<tr>
+											<th>SKU</th>
+											<th>Name</th>
+											<th>Cost</th>
+											<th>
+												<span class="text-nowrap">
+													Unit of Measure
+												</span>
+											</th>
+											<th>
+												<span class="text-nowrap">
+													Vendor SKU
+												</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="no-items" ng-if="results.length === 0">
+											<td colspan="5">No products found matching <q>{{ filterEdited }}</q>.</td>
+										</tr>
+										<tr ng-repeat="item in updatedCosts | filter: filterEdited as results track by $index">
+											<td>{{ item.value.sku }}</td>
+											<td class="column-primary">
+												<strong>
+													<a ng-href="?page=vendorfuel#!/catalog/products/{{ item.value.product.product_id }}" class="row-title">
+														{{ item.value.product.description }}
+													</a>
+												</strong>
+											</td>
+											<td ng-class="['form-required', { 'form-invalid':view.costSheetForm[ 'newCost' + $index ].$invalid || !item.value.cost }]">
+												<span class="text-nowrap">$
+													<input
+													class="small-text"
+													name="newCost{{ $index }}"
+													ng-disabled="item.action == 'edited' || item.action == 'remove'"
+													ng-model="item.value.cost"
+													ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/" step="0.01" type="number"
+													required />
+												</span>
+											</td>
+											<td ng-class="['form-required', {
+												'form-invalid':
+													view.costSheetForm['newUomqty'+$index].$invalid ||
+														!item.value.uomqty ||
+														view.costSheetForm['newUomqty'+$index].$invalid ||
+														!item.value.uomid
+													}]">
+												<span class="text-nowrap">
+													<input class="small-text"
+														name="newUomqty{{ $index }}"
+														ng-disabled="item.action == 'edited' || item.action == 'remove'"
+														ng-model="item.value.uomqty" step="0.01" type="number" required />
+													/
+													<input class="small-text" placeholder="EA"
+														name="newUomid{{$index}}"
+														ng-disabled="item.action == 'edited' || item.action == 'remove'"
+														ng-model="item.value.uomid" type="text" required />
+
+												</span>
+											</td>
+											<td ng-class="['form-required', { 'form-invalid':view.costSheetForm['newVendorSku'+$index].$invalid || !item.value.vendor_sku }]">
+												<input type="text"
+												name="newVendorSku{{ $index }}"
+												ng-disabled="item.action == 'edited' || item.action == 'remove'"
+												ng-model="item.value.vendor_sku" required /></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="hstack gap-3 mt-3">
+							<button class="components-button is-secondary"
+								ng-click="OpenSearchModalUpdate()">
+								{{ costSheet.costs.data.length ? 'Add or Remove' : 'Add' }} Products
+							</button>
+							<button class="components-button is-tertiary" type="button" ng-if="updatedCosts.length"
+								ng-click="ShowChanges()">
+								<span ng-if="showChanges">Show Current Products</span>
+								<span ng-if="!showChanges">Show ({{updatedCosts.length}}) Pending Changes</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>
+

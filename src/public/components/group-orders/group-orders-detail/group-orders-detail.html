@@ -1,0 +1,810 @@
+<h2>{{ $ctrl.isPending ? 'Pending ' : '' }}Order Details</h2>
+<a href="#" ng-click="$ctrl.goToIndex( $event )"> Go back to Group Orders </a>
+
+<price-availability
+	ng-if="$ctrl.priceAvailability && !$ctrl.isLoading"
+	price-availability="$ctrl.priceAvailability"
+	on-complete="$ctrl.completePriceAvailability( data )"
+	order="$ctrl.order"
+>
+</price-availability>
+
+<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+	<div class="spinner-border" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+</div>
+
+<div ng-if="!$ctrl.isLoading && !$ctrl.priceAvailability">
+	<div>
+		<h3>Summary</h3>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Order ID</th>
+					<th>Date</th>
+					<th ng-if="$ctrl.isPending">Requestor</th>
+					<th ng-if="!$ctrl.isPending">Status</th>
+					<th class="text-end">Subtotal</th>
+					<th class="text-end">Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ $ctrl.order.order_id }}</td>
+					<td>{{ $ctrl.order.order_date_time | date:'short' }}</td>
+					<td ng-if="$ctrl.isPending">
+						<a ng-href="mailto:{{ $ctrl.order.requestor }}">
+							{{ $ctrl.order.requestor }}
+						</a>
+					</td>
+					<td ng-if="!$ctrl.isPending">
+						<strong>
+							<span
+								ng-class="{
+									'has-very-dark-gray-color': $ctrl.order.status === 'created',
+									'has-vivid-red-color': $ctrl.order.status === 'cancelled',
+									'has-luminous-vivid-orange-color': $ctrl.order.status.includes('pending'),
+									'text-success': $ctrl.order.status === 'completed',
+								}"
+							>
+								{{ $ctrl.order.status | uppercase }}
+							</span>
+						</strong>
+					</td>
+					<td class="text-end">
+						{{ $ctrl.order.subtotal | currency }}
+					</td>
+					<td class="text-end">
+						{{ $ctrl.order.total_amt | currency }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="btn-toolbar justify-content-center">
+			<button
+				class="btn btn-secondary"
+				ng-click="$ctrl.sendOrderEmail( $ctrl.order.order_id )"
+				ng-disabled="$ctrl.isSendingEmail"
+			>
+				{{ $ctrl.isSendingEmail ? 'Sending' : 'Send'}} Order Email
+			</button>
+			<a
+				class="btn btn-secondary"
+				ng-if="$ctrl.order.approver && !$ctrl.isPending"
+				ng-href="mailto:{{ $ctrl.order.approver }}"
+			>
+				Email Approver
+			</a>
+		</div>
+	</div>
+
+	<div class="card my-3">
+		<h3 class="card-header h5">
+			{{ $ctrl.isPending ? 'Pending ' : '' }}Items
+		</h3>
+		<ul class="list-group list-group-flush">
+			<li
+				class="list-group-item p-1 p-md-2 p-lg-3"
+				ng-repeat="item in $ctrl.order.items track by $index"
+			>
+				<order-details-list-item
+					item="item"
+					is-pending="$ctrl.isPending"
+					status="$ctrl.order.status"
+					remove-item="$ctrl.removeItem( productId )"
+				>
+				</order-details-list-item>
+			</li>
+		</ul>
+	</div>
+
+	<div class="btn-toolbar justify-content-center">
+		<button
+			class="btn btn-primary"
+			ng-if="$ctrl.isPending"
+			ng-click="$ctrl.editPendingOrder()"
+			ng-disabled="!$ctrl.requestorId || $ctrl.isEditingItems"
+		>
+			{{ $ctrl.isEditingItems ? 'Adding' : 'Add' }} Items to Order
+		</button>
+	</div>
+
+	<form name="form" ng-if="$ctrl.isPending">
+		<div>
+			<fieldset ng-disabled="form.$submitted">
+				<div class="row align-items-end">
+					<div class="col">
+						<!-- wp:heading {"level":3} -->
+						<h3>Shipping Address</h3>
+						<!-- /wp:heading -->
+						<!-- wp:heading {"level":4} -->
+						<h4 ng-if="$ctrl.order.shipping_name">
+							{{ $ctrl.order.shipping_name }}
+						</h4>
+						<!-- /wp:heading -->
+					</div>
+					<div class="col text-end">
+						<p class="small" ng-if="$ctrl.order.lock_shipping">
+							Customer has Locked Shipping enabled.
+						</p>
+						<div
+							class="text-end"
+							ng-if="$ctrl.shippingAddresses.length"
+						>
+							<label
+								for="selected-shipping-address"
+								class="form-label"
+							>
+								Select Saved Address
+								<select
+									class="form-select"
+									name="selectedShippingAddress"
+									id="selected-shipping-address"
+									ng-model="$ctrl.selectedShippingAddress"
+									ng-change="$ctrl.changeAddress('shipping', $ctrl.selectedShippingAddress)"
+								>
+									<optgroup
+										ng-repeat="item in $ctrl.shippingAddresses track by $index"
+										ng-if="item.shipping_name"
+										ng-attr-label="{{ item.shipping_name }}"
+									>
+										<option ng-value="item">
+											{{ item.address1 }}, {{ item.city }}
+											{{ item.state }}
+										</option>
+									</optgroup>
+									<optgroup label="Other Addresses">
+										<option
+											ng-repeat="item in $ctrl.shippingAddresses track by $index"
+											ng-if="!item.shipping_name"
+											ng-value="item"
+										>
+											{{ item.address1 }}, {{ item.city }}
+											{{ item.state }}
+										</option>
+									</optgroup>
+								</select>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<label for="shipping-first-name" class="form-label">
+							First Name
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="shipping-first-name"
+							required
+							ng-model="$ctrl.order.shipping.first_name"
+						/>
+					</div>
+					<div class="col">
+						<label for="shipping-last-name" class="form-label">
+							Last Name
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="shipping-last-name"
+							required
+							ng-model="$ctrl.order.shipping.last_name"
+						/>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<label for="shipping-email" class="form-label">
+							Email
+						</label>
+						<input
+							type="email"
+							class="form-control"
+							id="shipping-email"
+							required
+							ng-model="$ctrl.order.shipping.email"
+						/>
+					</div>
+					<div class="col">
+						<label for="shipping-phone" class="form-label">
+							Phone
+						</label>
+						<input
+							type="tel"
+							class="form-control"
+							id="shipping-phone"
+							maxlength="14"
+							ng-model="$ctrl.order.shipping.phone"
+							ui-mask="(299) 999-9999"
+						/>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset
+				ng-disabled="form.$submitted || $ctrl.order.lock_shipping"
+			>
+				<div class="mb-3">
+					<label for="shipping-address1" class="form-label">
+						Street Address
+					</label>
+					<input
+						type="text"
+						class="form-control"
+						id="shipping-address1"
+						required
+						ng-model="$ctrl.order.shipping.address1"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="shipping-address2" class="form-label">
+						Apartment/Suite/Building
+					</label>
+					<input
+						type="text"
+						class="form-control"
+						id="shipping-address2"
+						ng-model="$ctrl.order.shipping.address2"
+					/>
+				</div>
+				<div class="row">
+					<div class="col">
+						<label for="shipping-city" class="form-label">
+							City
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="shipping-city"
+							required
+							ng-model="$ctrl.order.shipping.city"
+						/>
+					</div>
+					<div class="col">
+						<label for="shipping-state" class="form-label"
+							>State</label
+						>
+						<select
+							class="form-control"
+							id="shipping-state"
+							autocomplete="address-level1"
+							required
+							name="state"
+							ng-model="$ctrl.order.shipping.state"
+						>
+							<option
+								ng-repeat="state in $ctrl.stateOptions track by state.id"
+								ng-value="state.id"
+							>
+								{{ state.name }}
+							</option>
+						</select>
+					</div>
+					<div class="col">
+						<label for="shipping-zip" class="form-label">
+							Zip
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="shipping-zip"
+							ng-model="$ctrl.order.shipping.zip"
+						/>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+
+		<div>
+			<fieldset ng-disabled="form.$submitted">
+				<div class="row align-items-end">
+					<div class="col">
+						<h3>Billing Address</h3>
+						<h4 ng-if="$ctrl.order.billing_name">
+							{{ $ctrl.order.billing_name }}
+						</h4>
+					</div>
+					<div class="col" ng-if="$ctrl.order.lock_billing">
+						<p class="text-end small">
+							Customer has Locked Billing enabled.
+						</p>
+						<div
+							class="text-end"
+							ng-if="$ctrl.billingAddresses.length"
+						>
+							<label
+								for="selected-billing-address"
+								class="form-label"
+							>
+								Select Saved Address
+								<select
+									class="form-select"
+									name="selectedBillingAddress"
+									id="selected-billing-address"
+									ng-model="$ctrl.selectedBillingAddress"
+									ng-change="$ctrl.changeAddress('billing', $ctrl.selectedBillingAddress)"
+								>
+									<optgroup
+										ng-repeat="item in $ctrl.billingAddresses track by $index"
+										ng-if="item.billing_name"
+										ng-attr-label="{{ item.billing_name }}"
+									>
+										<option ng-value="item">
+											{{ item.address1 }}, {{ item.city }}
+											{{ item.state }}
+										</option>
+									</optgroup>
+									<optgroup label="Other Addresses">
+										<option
+											ng-repeat="item in $ctrl.billingAddresses track by $index"
+											ng-if="!item.billing_name"
+											ng-value="item"
+										>
+											{{ item.address1 }}, {{ item.city }}
+											{{ item.state }}
+										</option>
+									</optgroup>
+								</select>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<label for="billing-first-name" class="form-label">
+							First Name
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="billing-first-name"
+							required
+							ng-model="$ctrl.order.billing.first_name"
+						/>
+					</div>
+					<div class="col">
+						<label for="billing-last-name" class="form-label">
+							Last Name
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="billing-last-name"
+							required
+							ng-model="$ctrl.order.billing.last_name"
+						/>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<label for="billing-email" class="form-label">
+							Email
+						</label>
+						<input
+							type="email"
+							class="form-control"
+							id="billing-email"
+							required
+							ng-model="$ctrl.order.billing.email"
+						/>
+					</div>
+					<div class="col">
+						<label for="billing-phone" class="form-label">
+							Phone
+						</label>
+						<input
+							type="tel"
+							class="form-control"
+							id="billing-phone"
+							maxlength="14"
+							ng-model="$ctrl.order.billing.phone"
+							ui-mask="(299) 999-9999"
+						/>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset ng-disabled="form.$submitted || $ctrl.order.lock_billing">
+				<div class="mb-3">
+					<label for="billing-address1" class="form-label">
+						Street Address
+					</label>
+					<input
+						type="text"
+						class="form-control"
+						id="billing-address1"
+						required
+						ng-model="$ctrl.order.billing.address1"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="billing-address2" class="form-label">
+						Apartment/Suite/Building
+					</label>
+					<input
+						type="text"
+						class="form-control"
+						id="billing-address2"
+						ng-model="$ctrl.order.billing.address2"
+					/>
+				</div>
+				<div class="row mb-3">
+					<div class="col">
+						<label for="billing-city" class="form-label">
+							City
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="billing-city"
+							required
+							ng-model="$ctrl.order.billing.city"
+						/>
+					</div>
+					<div class="col">
+						<label for="billing-state" class="form-label"
+							>State</label
+						>
+						<select
+							class="form-control"
+							id="billing-state"
+							autocomplete="address-level1"
+							required
+							name="state"
+							ng-model="$ctrl.order.billing.state"
+						>
+							<option
+								ng-repeat="state in $ctrl.stateOptions track by state.id"
+								ng-value="state.id"
+							>
+								{{ state.name }}
+							</option>
+						</select>
+					</div>
+					<div class="col">
+						<label for="billing-zip" class="form-label">
+							Zip
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="billing-zip"
+							ng-model="$ctrl.order.billing.zip"
+						/>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+
+		<div>
+			<h3>Additional Information</h3>
+			<fieldset ng-disabled="form.$submitted">
+				<div class="row mb-3">
+					<div class="col">
+						<label for="notes" class="form-label"
+							>Requestor Notes</label
+						>
+						<textarea
+							name="notes"
+							id="notes"
+							ng-model="$ctrl.order.notes"
+							disabled
+						>
+						</textarea>
+					</div>
+					<div class="col">
+						<label for="approver-notes" class="form-label"
+							>Approver Notes</label
+						>
+						<textarea
+							name="approverNotes"
+							id="approver-notes"
+							ng-model="$ctrl.order.approver_notes"
+						></textarea>
+					</div>
+				</div>
+				<table class="table">
+					<tbody>
+						<tr
+							ng-repeat="item in $ctrl.additionalInfo track by $index"
+						>
+							<th scope="row" class="text-end">
+								<label
+									ng-attr-for="field-{{ $id }}"
+									class="form-label"
+								>
+									{{ item.name }}
+								</label>
+							</th>
+							<td>
+								<input
+									type="text"
+									ng-attr-name="field{{ $id }}"
+									ng-attr-id="field-{{ $id }}"
+									ng-model="item.value"
+									ng-if="!item.options || !item.options[0]"
+								/>
+								<select
+									ng-if="item.options && item.options[0]"
+									ng-attr-name="field{{ $id }}"
+									ng-attr-id="field-{{ $id }}"
+									ng-model="item.value"
+								>
+									<option
+										ng-repeat="option in item.options track by $index"
+										ng-value="option"
+									>
+										{{ option }}
+									</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>
+		</div>
+
+		<div class="btn-toolbar mb-3" ng-if="$ctrl.isPending">
+			<button
+				class="btn btn-danger me-1"
+				ng-click="$ctrl.onClickCancelOrder()"
+				ng-disabled="$ctrl.isApprovingOrder || $ctrl.isApproved"
+			>
+				<i
+					class="bi bi-cart-x-fill"
+					ng-hide="$ctrl.isCancellingOrder"
+				></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isCancellingOrder"
+				></span>
+				{{ $ctrl.isCancellingOrder ? 'Cancelling' : 'Cancel'}} Order
+			</button>
+			<button
+				class="btn btn-primary me-1"
+				ng-click="$ctrl.onClickSaveChanges( form )"
+				ng-show="form.$dirty && !$ctrl.isApproved"
+			>
+				<i class="bi bi-save" ng-hide="$ctrl.isSavingChanges"></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isSavingChanges"
+				></span>
+				{{ $ctrl.isSavingChanges ? 'Saving' : 'Save'}} Changes
+			</button>
+			<button
+				class="btn btn-primary me-1"
+				ng-click="$ctrl.onClickApproveOrder( form )"
+				ng-disabled="$ctrl.isApprovingOrder || $ctrl.isApproved"
+				ng-hide="form.$dirty"
+			>
+				<i
+					class="bi bi-cart-check-fill"
+					ng-hide="$ctrl.isApprovingOrder"
+				></i>
+				<span
+					class="spinner-border spinner-border-sm"
+					role="status"
+					aria-hidden="true"
+					ng-show="$ctrl.isApprovingOrder"
+				></span>
+				{{ $ctrl.isApprovingOrder ? 'Approving' : 'Approve'}} Order
+			</button>
+		</div>
+	</form>
+
+	<div
+		class="card mb-3"
+		ng-if="$ctrl.order.shipments.length"
+		ng-if="!$ctrl.isPending"
+	>
+		<h3 class="card-header h5">Tracking</h3>
+		<div class="card-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Carrier</th>
+						<th scope="col">Tracking #</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						ng-repeat="shipment in $ctrl.order.shipments track by $index"
+					>
+						<td>{{shipment.carrier || 'N/A'}}</td>
+						<td>
+							<span ng-if="shipment.code">
+								<a
+									ng-if="shipment.tracking_url"
+									target="_blank"
+									href="{{shipment.tracking_url}}"
+									>{{shipment.code}}</a
+								>
+								<a
+									ng-if="!shipment.tracking_url"
+									target="_blank"
+									href="https://google.com/search?q={{shipment.code}}"
+									>{{shipment.code}}</a
+								>
+							</span>
+							<span ng-if="!shipment.code"> N/A </span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div ng-if="!$ctrl.isPending">
+		<div class="row mb-3">
+			<div class="col">
+				<h3>Shipping</h3>
+				<h4 ng-if="$ctrl.order.shipping_name">
+					{{ $ctrl.order.shipping_name }}
+				</h4>
+				<p>
+					{{ $ctrl.order.shipping.first_name }} {{
+					$ctrl.order.shipping.last_name }}<br />
+					{{ $ctrl.order.shipping.email }}<br
+						ng-if="$ctrl.order.shipping.phone"
+					/>
+					{{ $ctrl.order.shipping.phone | tel }}<br />
+					{{ $ctrl.order.shipping.address1 }}<br
+						ng-if="$ctrl.order.shipping.address2"
+					/>
+					{{ $ctrl.order.shipping.address2 }}<br />
+					{{ $ctrl.order.shipping.city }}, {{
+					$ctrl.order.shipping.state }} {{ $ctrl.order.shipping.zip }}
+				</p>
+			</div>
+			<div class="col">
+				<h3>Billing</h3>
+				<h4 ng-if="$ctrl.order.billing_name">
+					{{ $ctrl.order.billing_name }}
+				</h4>
+				<p>
+					{{ $ctrl.order.billing.first_name }} {{
+					$ctrl.order.billing.last_name }}<br />
+					{{ $ctrl.order.billing.email }}<br
+						ng-if="$ctrl.order.billing.phone"
+					/>
+					{{ $ctrl.order.billing.phone | tel }}<br />
+					{{ $ctrl.order.billing.address1 }}<br
+						ng-if="$ctrl.order.billing.address2"
+					/>
+					{{ $ctrl.order.billing.address2 }}<br />
+					{{ $ctrl.order.billing.city }}, {{ $ctrl.order.billing.state
+					}} {{ $ctrl.order.billing.zip }}
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div ng-if="$ctrl.hasAdditionalInfo && !$ctrl.isPending">
+		<h3>Additional Information</h3>
+		<table class="table">
+			<tbody>
+				<tr
+					ng-if="item.value || item.value === 0"
+					ng-repeat="item in $ctrl.additionalInfo track by $index"
+				>
+					<th scope="row">{{ item.name }}</th>
+					<td>{{ item.value }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="alert alert-success" ng-if="$ctrl.isApproved">
+		<h3>Checkout complete for Order {{ $ctrl.orderId }}</h3>
+		<p>
+			Your order has been submitted. You may view the order from the
+			Orders page or return home.
+			<span ng-if="$ctrl.nextOrderUrl"
+				>You can also click Next Order to approve the next pending
+				order.</span
+			>
+		</p>
+		<div class="btn-toolbar">
+			<a class="btn btn-primary" href="/">Go Home</a>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-href="{{ $ctrl.groupOrdersUrl }}?id={{ $ctrl.orderId }}"
+			>
+				View order
+			</a>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-href="{{ $ctrl.nextOrderUrl }}"
+				ng-if="$ctrl.nextOrderUrl"
+			>
+				View next pending order
+			</a>
+		</div>
+	</div>
+
+	<!-- Payment -->
+	<div class="card mb-3">
+		<h3 class="card-header h5">Payment</h3>
+		<div class="card-body">
+			<p class="card-text" ng-if="$ctrl.order.credit_line">
+				This order was placed with a credit line.
+			</p>
+			<p class="card-text" ng-if="$ctrl.order.credit_card.length > 0">
+				This order was placed with a credit card ending in: {{
+				$ctrl.order.credit_card }}
+			</p>
+			<div ng-if="$ctrl.order.promo_codes && !$ctrl.isPending">
+				Promo Code(s) Applied:
+				<span
+					ng-repeat="promo in $ctrl.order.promo_codes track by $index"
+					>{{promo.code}} ({{promo.discount | percentage: 0}})</span
+				>
+			</div>
+			<dl class="row">
+				<dt class="col-sm-3" ng-if="$ctrl.order.shipping_carrier">
+					Shipping Carrier
+				</dt>
+				<dd class="col-sm-9" ng-if="$ctrl.order.shipping_carrier">
+					{{ $ctrl.order.shipping_carrier }}
+				</dd>
+				<dt class="col-sm-3" ng-if="$ctrl.order.tracking_code">
+					Tracking Code
+				</dt>
+				<dd class="col-sm-9" ng-if="$ctrl.order.tracking_code">
+					{{ $ctrl.order.tracking_code }}
+				</dd>
+			</dl>
+
+			<table class="table">
+				<tbody>
+					<tr ng-if="$ctrl.order.subtotal">
+						<th scope="row">Subtotal</th>
+						<td class="text-end">
+							{{ $ctrl.order.subtotal | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.promo_discount">
+						<th scope="row">Discount</th>
+						<td class="text-end">
+							{{ $ctrl.order.promo_discount | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.shipping_total">
+						<th scope="row">Shipping</th>
+						<td class="text-end">
+							{{ $ctrl.order.shipping_total | currency }}
+						</td>
+					</tr>
+					<tr ng-if="$ctrl.order.tax">
+						<th scope="row">Tax</th>
+						<td class="text-end">
+							{{ $ctrl.order.tax | currency }}
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr ng-if="$ctrl.order.total_amt">
+						<th scope="row">Total Amount</th>
+						<td class="text-end">
+							{{ $ctrl.order.total_amt | currency }}
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+	<order-change-logs
+		ng-if="$ctrl.order.logs.length"
+		logs="$ctrl.order.logs"
+	></order-change-logs>
+</div>

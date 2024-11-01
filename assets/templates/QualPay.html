@@ -1,0 +1,58 @@
+<div
+	ng-controller="PaymentProcessorController"
+	ng-init="processorIndex = 'qualpay';attributeIndex1 = 'apikey';attributeCount = 1;"
+>
+	<form name="qualpay">
+		<div class="form-check mb-3">
+			<input
+				class="form-check-input"
+				type="checkbox"
+				id="enabled"
+				ng-model="enabled"
+				ng-true-value="1"
+				ng-false-value="0"
+			/>
+			<label for="enabled" class="form-check-label">
+				Enable as primary payment card processor
+			</label>
+		</div>
+		<div class="mb-3">
+			<label for="att1" class="form-label">API Key</label>
+			<input
+				class="form-control"
+				ng-class="{'is-invalid': qualpay.att1.$invalid}"
+				name="att1"
+				id="att1"
+				type="text"
+				ng-model="attribute1"
+				required
+			/>
+			<p class="description">
+				Once you sign up for a sandbox account, you will be able to
+				generate an API Key that you can then use with QualPay's testing
+				tool, or in developing your own solution.
+			</p>
+		</div>
+		<input
+			class="btn btn-primary"
+			type="button"
+			ng-click="updateGateway()"
+			title="{{qualpay.$invalid ? 'Please fill out the form completely.' : ''}}"
+			ng-disabled="qualpay.$invalid"
+			value="Update"
+		/>
+		<input
+			class="btn btn-danger"
+			type="button"
+			ng-click="disableGateway()"
+			value="Disable"
+		/>
+		<p>
+			<a
+				href="https://www.qualpay.com/get-started/vendorfuel-apply?lead-source=AZ09-_"
+				target="_blank"
+				>Learn more about QualPay</a
+			>
+		</p>
+	</form>
+</div>

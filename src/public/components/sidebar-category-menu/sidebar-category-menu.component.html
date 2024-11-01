@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+	<div class="spinner-border" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+</div>
+<nav class="flex-column" ng-hide="$ctrl.isLoading">
+	<a
+		href="#"
+		class="dropdown-item small"
+		title="Go back"
+		ng-click="$ctrl.onClickBack($event)"
+		ng-show="$ctrl.level"
+	>
+		<i class="bi bi-chevron-left"></i>
+		Back
+	</a>
+	<div class="px-4 py-2">
+		<a
+			class="btn btn-primary w-100"
+			ng-href="{{
+				$ctrl.currCat[$ctrl.level]
+					? '/' +
+					  $ctrl.catSlug +
+					  '/' +
+					  $ctrl.currCat[$ctrl.level].slug
+					: $ctrl.catalogUrl
+			}}"
+			ng-attr-title="Shop {{
+				$ctrl.currCat[$ctrl.level]
+					? $ctrl.currCat[$ctrl.level].title
+					: 'Catalog'
+			}}"
+		>
+			Shop
+			{{
+				$ctrl.currCat[$ctrl.level]
+					? $ctrl.currCat[$ctrl.level].title
+					: 'Catalog'
+			}}
+		</a>
+	</div>
+	<a
+		href="#"
+		class="dropdown-item d-flex justify-content-between align-items-center text-wrap"
+		ng-repeat="category in $ctrl.categories[$ctrl.level] | orderBy: 'title' track by $index"
+		ng-click="$ctrl.onClickCategory(category, $event)"
+		ng-href="{{ $ctrl.getCategoryUrl(category) }}"
+		ng-attr-title="{{
+			category.subcategories.length
+				? 'View ' +
+				  category.subcategories.length +
+				  ' categories in ' +
+				  category.title
+				: 'Shop ' + category.title
+		}}"
+	>
+		{{ category.title }}
+		<i class="bi bi-chevron-right" ng-if="category.subcategories.length">
+		</i>
+	</a>
+</nav>
+<hr class="dropdown-divider" />

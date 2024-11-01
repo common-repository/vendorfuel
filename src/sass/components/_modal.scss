@@ -1,0 +1,5 @@
+@use "../../../node_modules/@wordpress/base-styles/variables";
+
+.modal-body p {
+	font-size: variables.$default-font-size;
+}

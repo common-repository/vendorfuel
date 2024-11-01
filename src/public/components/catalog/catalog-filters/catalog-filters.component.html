@@ -1,0 +1,155 @@
+<div class="d-flex flex-column d-sm-none fixed-bottom">
+  <button
+    class="btn btn-primary mx-auto mb-3 shadow px-4 rounded-pill"
+    type="button"
+    data-toggle="collapse"
+    data-target=".multi-collapse"
+    aria-expanded="false"
+    aria-controls="catalogFilters catalogProductList"
+    ng-click="$ctrl.onClickCollapse()"
+  >
+    Show {{ $ctrl.isCollapsingFilters ? "Results" : "Categories & Filters" }}
+  </button>
+</div>
+
+<div class="collapse multi-collapse d-sm-block" id="collapseFilters">
+  <div class="card shadow-sm mb-3" ng-if="$ctrl.hasAnyFilters">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <button
+        class="btn btn-link btn-block d-flex align-items-baseline justify-content-between has-text-align-left p-0"
+        type="button"
+        data-toggle="collapse"
+        data-target="#filters"
+        aria-expanded="true"
+        aria-controls="filters"
+        ng-click="$ctrl.isCollapsed = !$ctrl.isCollapsed"
+        ng-attr-title="{{
+          $ctrl.isCollapsed ? 'Expand Filters panel' : 'Collapse Filters panel'
+        }}"
+      >
+        Filters
+        <i
+          aria-hidden="true"
+          ng-class="[
+            'bi',
+            {
+              'bi-chevron-down': $ctrl.isCollapsed,
+              'bi-chevron-up': !$ctrl.isCollapsed
+            }
+          ]"
+        ></i>
+      </button>
+    </div>
+    <div class="collapse show" ng-attr-id="filters">
+      <div class="card-body pb-0">
+        <fieldset class="form-group p-0">
+          <legend class="sr-only">Filters</legend>
+          <div class="custom-control custom-switch" ng-if="$ctrl.hasInventory">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="isShowingOnlyStock"
+              ng-model="$ctrl.isShowingOnlyStock"
+              ng-change="$ctrl.toggleFilter('isShowingOnlyStock')"
+              ng-disabled="$ctrl.isLoading"
+            />
+            <label class="custom-control-label" for="isShowingOnlyStock">
+              Exclude sold-out items
+            </label>
+          </div>
+
+          <div
+            class="custom-control custom-switch"
+            ng-if="$ctrl.settings.enableAbilityOne"
+          >
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="isShowingAbilityOne"
+              ng-model="$ctrl.isShowingAbilityOne"
+              ng-change="$ctrl.toggleFilter('isShowingAbilityOne')"
+              ng-disabled="$ctrl.isLoading"
+            />
+            <label class="custom-control-label" for="isShowingAbilityOne">
+              Only AbilityOne
+            </label>
+          </div>
+          <div
+            class="custom-control custom-switch"
+            ng-if="$ctrl.settings.enableCoreList"
+          >
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="isShowingCoreList"
+              ng-model="$ctrl.isShowingCoreList"
+              ng-change="$ctrl.toggleFilter('isShowingCoreList')"
+              ng-disabled="$ctrl.isLoading"
+            />
+            <label class="custom-control-label" for="isShowingCoreList">
+              Only Core List
+            </label>
+          </div>
+          <div
+            class="custom-control custom-switch"
+            ng-if="$ctrl.settings.enableGSA"
+          >
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="isShowingGSA"
+              ng-model="$ctrl.isShowingGSA"
+              ng-change="$ctrl.toggleFilter('isShowingGSA')"
+              ng-disabled="$ctrl.isLoading"
+            />
+            <label class="custom-control-label" for="isShowingGSA">
+              Only <abbr title="U.S. General Services Administration">GSA</abbr>
+            </label>
+          </div>
+          <div
+            class="custom-control custom-switch"
+            ng-if="$ctrl.settings.enableRecyclable"
+          >
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="isShowingRecycled"
+              ng-model="$ctrl.isShowingRecycled"
+              ng-change="$ctrl.toggleFilter('isShowingRecycled')"
+              ng-disabled="$ctrl.isLoading"
+            />
+            <label class="custom-control-label" for="isShowingRecycled">
+              Only Recycled
+              <span class="has-vivid-green-cyan-color" aria-hidden="true"
+                >&#9850;</span
+              >
+              <div class="small">
+                Items containing any or all
+                <abbr title="Post Consumer Recycled Content">PCRC</abbr>.
+              </div>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <catalog-categories-list></catalog-categories-list>
+    <catalog-facet-list
+      facet-title="brand"
+      facet-name="brand_name"
+      ng-if="!$ctrl.settings.disableFacets"
+    >
+    </catalog-facet-list>
+    <catalog-facet-list
+      facet-title="manufacturer"
+      facet-name="manufacturer"
+      ng-if="!$ctrl.settings.disableFacets"
+    >
+    </catalog-facet-list>
+    <catalog-attributes-list
+      ng-if="!$ctrl.settings.disableFacets"
+    ></catalog-attributes-list>
+  </aside>
+</div>

@@ -1,0 +1,20 @@
+<form
+	role="search"
+	ng-hide="$ctrl.isPunchoutOnly"
+	ng-submit="$ctrl.handleSubmit( $ctrl.q )"
+>
+	<div class="input-group mb-3" id="search-bar" data-bs-toggle="popover">
+		<input
+			type="search"
+			class="form-control"
+			placeholder="Search products"
+			aria-label="Search products"
+			ng-blur="$ctrl.handleBlur( $event )"
+			ng-change="$ctrl.handleChange( $ctrl.q )"
+			ng-focus="$ctrl.handleFocus()"
+			ng-model="$ctrl.q"
+			ng-model-options="{ debounce: 500 }"
+		/>
+		<button class="btn btn-primary" type="submit">Search</button>
+	</div>
+</form>

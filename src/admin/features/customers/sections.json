@@ -1,0 +1,64 @@
+[
+	{
+		"title": "Accounts",
+		"to": "accounts",
+		"links": [
+			{
+				"text": "All Account",
+				"to": "accounts"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/customers/accounts/create"
+			},
+			{
+				"text": "Upload accounts",
+				"to": "accounts/uploads/create"
+			},
+			{
+				"text": "Manage account uploads",
+				"to": "accounts/uploads"
+			},
+			{
+				"text": "Settings",
+				"link": "?page=vendorfuel#!/customers/accounts/settings"
+			}
+		]
+	},
+	{
+		"title": "Groups",
+		"to": "groups",
+		"links": [
+			{
+				"text": "All Groups",
+				"to": "groups"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/customers/groups/create"
+			},
+			{
+				"text": "Upload groups",
+				"to": "groups/uploads/create"
+			},
+			{
+				"text": "Manage group uploads",
+				"to": "groups/uploads"
+			}
+		]
+	},
+	{
+		"title": "Roles",
+		"to": "roles",
+		"links": [
+			{
+				"text": "All Roles",
+				"to": "roles"
+			},
+			{
+				"text": "Add New",
+				"link": "?page=vendorfuel#!/customers/roles/create"
+			}
+		]
+	}
+]

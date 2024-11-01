@@ -1,0 +1,266 @@
+<layout-component heading="Banner areas" breadcrumbs="$ctrl.breadcrumbs">
+	<uib-tabset active="activeTab">
+		<uib-tab index="0" select="TabChanged(0)" heading="Banner areas">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<bs-search-box-legacy
+					q="searchParams.q"
+					on-submit="SearchBannerAreas(1, query)"
+					is-loading="loadingMore">
+				</bs-search-box-legacy>
+
+				<table class="table">
+					<thead>
+						<tr>
+							<th class="col-1">
+								ID
+							</th>
+							<th class="col-4">
+								Name
+							</th>
+							<th class="col-7">
+								Description
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-if="!bannerAreas.data.length && !loadingMore">
+							<td colspan="3">
+								No banner areas found<span ng-if="searchTerm.length >= 1"> matching '{{searchTerm}}'</span>.
+							</td>
+						</tr>
+						<tr
+							ng-repeat="bannerArea in bannerAreas.data track by $index" ng-if="!loadingMore">
+							<td>{{bannerArea.area_id}}</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="ChangeTab( 3, $index, $event )">{{bannerArea.name}}</a>
+								</strong>
+							</td>
+							<td>{{bannerArea.description}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<spinner-component ng-if="loadingMore"></spinner-component>
+
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{bannerAreas.from || 0}} to {{bannerAreas.to || 0}} of
+							{{bannerAreas.total || 0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="btn btn-outline-primary" ng-if="bannerAreas.prev_page_url"
+							ng-click="SearchBannerAreas(bannerAreas.current_page - 1)">&lsaquo; Prev</button>
+						<button class="btn btn-outline-primary" ng-if="bannerAreas.current_page - 2 > 0"
+							ng-click="SearchBannerAreas(bannerAreas.current_page - 2)">{{bannerAreas.current_page
+							- 2}}</button>
+						<button class="btn btn-outline-primary" ng-if="bannerAreas.current_page - 1 > 0"
+							ng-click="SearchBannerAreas(bannerAreas.current_page - 1)">{{bannerAreas.current_page
+							- 1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-disabled="true">{{bannerAreas.current_page}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="bannerAreas.current_page + 1 <= bannerAreas.last_page"
+							ng-click="SearchBannerAreas(bannerAreas.current_page + 1)">{{bannerAreas.current_page
+							+ 1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="bannerAreas.current_page + 2 <= bannerAreas.last_page"
+							ng-click="SearchBannerAreas(bannerAreas.current_page + 2)">{{bannerAreas.current_page
+							+ 2}}</button>
+						<button class="btn btn-outline-primary" ng-if="bannerAreas.next_page_url"
+							ng-click="SearchBannerAreas(bannerAreas.current_page + 1)">Next &rsaquo;</button>
+					</div>
+					<div class="col-sm-4 justify-content-end">
+						<label for="rpp" class="form-label">Number of items per page:</label>
+						<select class="form-select" id="rpp"
+							ng-model="searchParams.rpp" ng-change="SearchBannerAreas(1)"
+							ng-options="value for value in rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="TabChanged(1)" heading="Add New">
+			<spinner-component ng-if="loading"></spinner-component>
+
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="addBannerAreaForm">
+							<div class="mb-3">
+								<label for="create-name" class="form-label">Name</label>
+								<input id="create-name" class="form-control" ng-class="{'is-invalid':addBannerAreaForm.name.$invalid}"
+									type="text" name="name" ng-model="newBannerArea.name"
+									required>
+							</div>
+							<div class="mb-3">
+								<label for="create-description" class="form-label">Description</label>
+								<input id="create-description" class="form-control"
+									ng-class="{'is-invalid':addBannerAreaForm.description.$invalid}" type="text"
+									name="description" ng-model="newBannerArea.description"
+									required>
+							</div>
+							<button class="btn btn-primary" ng-click="AddBannerArea()"
+								ng-disabled="addBannerAreaForm.$invalid">Save</button>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="TabChanged(2)" ng-show="newBanner.area_id" heading="Add Banner">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<form name="addBannerForm">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="mb-3">
+								<label for="create-banner-description" class="form-label">Name</label>
+								<input id="create-banner-description" class="form-control" ng-class="{'is-invalid':addBannerForm.name.$invalid}"
+									type="text" name="name" ng-model="newBanner.description"
+									required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Banner Area ID</label>
+								<input class="form-control" ng-class="{'is-invalid':addBannerForm.area_id.$invalid}"
+									name="area_id" ng-model="newBanner.area_id" required
+									disabled>
+							</div>
+							<div class="d-flex align-items-center"
+								ng-if="addingBanner">
+								<strong>Adding, please wait...</strong>
+							</div>
+
+							<div ng-if="!addingBanner">
+								<button class="btn btn-primary" ng-click="AddBanner()"
+									ng-disabled="addBannerForm.$invalid">Save</button>
+							</div>
+						</div>
+						<div class="col-lg-8">
+							<div class="mb-3">
+								<label for="create-content" class="form-label">Content</label>
+								<div class="border">
+									<textarea id="create-content"
+										name="content" ui-tinymce="$ctrl.tinymceOptions"
+										ng-model="newBanner.content"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</uib-tab>
+		<uib-tab index="3" select="TabChanged(3)" ng-show="selectedBannerArea" heading="Edit banner area">
+			<spinner-component ng-if="loading"></spinner-component>
+			<div ng-if="!loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="viewBannerAreaForm">
+							<div class="mb-3">
+								<label class="form-label">Name</label>
+								<input class="form-control" ng-class="{'is-invalid':viewBannerAreaForm.name.$invalid}"
+									type="text" name="name" ng-model="selectedBannerArea.name"
+									required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Description</label>
+								<input class="form-control" type="text" name="description" 								ng-model="selectedBannerArea.description" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">ID</label>
+								<input class="form-control" type="text" name="id" ng-model="selectedBannerArea.area_id"
+									disabled>
+							</div>
+						</form>
+					</div>
+					<div class="col-lg-8">
+						<table class="table table-sm caption-top">
+							<caption>Banners</caption>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Name</th>
+									<th>Price Sheet</th>
+									<th>Group</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-if="selectedBannerArea && !object.keys(selectedBannerArea.banners).length">
+									<td colspan="4">
+										No banners found.
+									</td>
+								</tr>
+								<tr class="cursor-pointer"
+									ng-click="ChangeBannerTab(4, $index)"
+									ng-repeat="banner in selectedBannerArea.banners track by $index">
+									<td>{{banner.banner_id}}</td>
+									<td>{{banner.description}}</td>
+									<td>{{banner.price_sheet_id === 0 ? '&mdash;' :
+										banner.pricesheet.sheet}}</td>
+									<td>{{banner.group_id === 0 ? '&mdash;' : banner.group.name}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<button class="button mt-3" ng-click="TabChanged(2)" ng-disabled="updatingArea">Add New Banner</button>
+					</div>
+				</div>
+				<button class="btn btn-primary" ng-click="UpdateBannerArea()"
+				ng-disabled="viewBannerAreaForm.$invalid || updatingArea">Update</button>
+				<button class="btn btn-danger"
+				ng-click="RemoveBannerArea()" ng-disabled=" updatingArea">Delete</button>
+			</div>
+		</uib-tab>
+		<uib-tab index="4" select="TabChanged(4)" ng-show="selectedBanner" heading="Edit banner">
+			<form name="viewBannerForm">
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="mb-3">
+							<label class="form-label">Name</label>
+							<input class="form-control" type="text" name="description"
+								ng-model="selectedBanner.description" required>
+						</div>
+						<div class="mb-3">
+							<label for="price-sheet-id" class="form-label">Price Sheet</label>
+							<select id="price-sheet-id" name="price-sheet-id" ng-model="selectedBanner.price_sheet_id" class="form-select">
+								<option ng-repeat="pricesheet in $ctrl.pricesheets track by $index" ng-value="pricesheet.value">{{ pricesheet.label }}</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label for="group-id" class="form-label">Group</label>
+							<select id="group-id" name="group-id" ng-model="selectedBanner.group_id" class="form-select">
+								<option ng-repeat="group in $ctrl.groups track by $index" ng-value="group.value">{{ group.label }}</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Banner ID</label>
+							<input class="form-control" type="text" name="id" ng-model="selectedBanner.banner_id"
+								disabled>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Banner Area ID</label>
+							<input class="form-control" type="text" name="area_id" ng-model="selectedBanner.area_id"
+								disabled>
+						</div>
+					</div>
+					<div class="col-lg-8">
+						<div class="mb-3">
+							<label for="edit-content" class="form-label">Content</label>
+							<div class="border">
+								<textarea id="edit-content"
+									name="content" ui-tinymce="$ctrl.tinymceOptions"
+									ng-model="selectedBanner.content"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<button class="btn btn-primary" type="button"
+				ng-click="UpdateBannerContent()" ng-disabled="updatingBanner">Update</button>
+				<button class="btn btn-danger" type="button"
+				ng-click="RemoveBanner()" ng-disabled="updatingBanner">Delete</button>
+			</form>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>
+
+
+

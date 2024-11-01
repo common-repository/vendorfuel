@@ -1,0 +1,63 @@
+<h2>
+	Settings
+	<button
+		class="button"
+		ng-click="$ctrl.resetTutorial()"
+		ng-disabled="$ctrl.isResettingTutorial"
+	>
+		{{ $ctrl.isResettingTutorial ? "Resetting" : "Reset" }} Tutorial
+	</button>
+</h2>
+<wp-notice-list></wp-notice-list>
+
+<div
+	class="notice notice-warning is-dismissible"
+	ng-if="!$ctrl.isAuthed && $ctrl.hasAPIKey"
+>
+	<p>
+		You must be signed in to VendorFuel to view all the store settings.
+		<a href="#!/login">Sign In</a>
+	</p>
+</div>
+
+<div class="notice notice-warning is-dismissible" ng-if="!$ctrl.hasAPIKey">
+	<p>
+		Please enter your provided VendorFuel API key below. For help, please
+		contact
+		<a href="mailto:support@vendorfuel.com">support@vendorfuel.com</a>.
+	</p>
+</div>
+
+<uib-tabset>
+	<uib-tab heading="Plugin" select="$ctrl.setActiveTab(0)">
+		<settings-plugin ng-if="$ctrl.activeTab === 0"></settings-plugin>
+	</uib-tab>
+	<uib-tab
+		heading="Store"
+		select="$ctrl.setActiveTab(1)"
+		ng-if="$ctrl.isAuthed"
+	>
+		<settings-store ng-if="$ctrl.activeTab === 1"></settings-store>
+	</uib-tab>
+	<uib-tab
+		heading="Options"
+		select="$ctrl.setActiveTab(2)"
+		ng-if="$ctrl.isAuthed"
+	>
+		<settings-options ng-if="$ctrl.activeTab === 2"></settings-options>
+	</uib-tab>
+	<uib-tab
+		select="$ctrl.setActiveTab(3)"
+		heading="Analytics"
+		ng-if="$ctrl.isAuthed"
+	>
+		<settings-analytics ng-if="$ctrl.activeTab === 3"> </settings-analytics>
+	</uib-tab>
+	<uib-tab
+		select="$ctrl.setActiveTab(4)"
+		heading="Page Mapping"
+		ng-if="$ctrl.isAuthed"
+	>
+		<settings-mapping ng-if="$ctrl.activeTab === 4"></settings-mapping>
+	</uib-tab>
+</uib-tabset>

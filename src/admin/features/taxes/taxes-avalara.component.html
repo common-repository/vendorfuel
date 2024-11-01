@@ -1,0 +1,219 @@
+<h2 class="h5 my-3">Avalara</h2>
+<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+<div ng-if="!$ctrl.isLoading">
+	<div class="row">
+		<div class="col-lg-4">
+			<form name="settingsForm">
+				<div class="mb-3">
+					<label for="accountNumber" class="form-label">
+						Account Number
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="accountNumber"
+						name="accountNumber"
+						type="text"
+						class="form-control"
+						required
+						ng-model="$ctrl.form.account"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="licenseKey" class="form-label">
+						License Key
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="licenseKey"
+						name="licenseKey"
+						type="text"
+						class="form-control"
+						required
+						ng-model="$ctrl.form.license_key"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="environment" class="form-label"
+						>Environment</label
+					>
+					<select
+						class="form-select"
+						id="environment"
+						name="environment"
+						ng-model="$ctrl.form.service_url"
+					>
+						<option selected disabled>Select Environment</option>
+						<option value="https://rest.avatax.com">
+							Production
+						</option>
+						<option value="https://sandbox-rest.avatax.com">
+							Sandbox
+						</option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<label for="companyCode" class="form-label"
+						>Company Code</label
+					>
+					<input
+						id="companyCode"
+						name="companyCode"
+						type="text"
+						class="form-control"
+						ng-model="$ctrl.form.company_code"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="shippingCode" class="form-label">
+						Shipping Code
+					</label>
+					<input
+						id="shippingCode"
+						name="shippingCode"
+						type="text"
+						class="form-control"
+						ng-model="$ctrl.form.shipping_code"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="addressLine1" class="form-label">
+						Address Line 1
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="addressLine1"
+						name="addressLine1"
+						type="text"
+						class="form-control"
+						required
+						ng-model="$ctrl.form.street1"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="addressLine2" class="form-label">
+						Address Line 2
+					</label>
+					<input
+						id="addressLine2"
+						name="addressLine2"
+						type="text"
+						class="form-control"
+						ng-model="$ctrl.form.street2"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="city" class="form-label">
+						City
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="city"
+						name="city"
+						type="text"
+						class="form-control"
+						required
+						ng-model="$ctrl.form.city"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="state" class="form-label">
+						State
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="state"
+						name="state"
+						type="text"
+						class="form-control"
+						required
+						ng-model="$ctrl.form.state"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="zip" class="form-label">
+						Zip
+						<span class="description">(required)</span>
+					</label>
+					<input
+						id="zip"
+						name="zip"
+						type="text"
+						class="form-control"
+						ng-model="$ctrl.form.zip"
+						required
+					/>
+				</div>
+				<div class="form-check">
+					<input
+						id="avataxCalculation"
+						class="form-check-input"
+						name="avataxCalculation"
+						type="checkbox"
+						ng-model="$ctrl.form.tax_enabled"
+					/>
+					<label for="avataxCalculation" class="form-check-label">
+						AvaTax Calculation
+					</label>
+				</div>
+				<div class="form-check">
+					<input
+						id="addressValidation"
+						class="form-check-input"
+						name="addressValidation"
+						type="checkbox"
+						ng-model="$ctrl.form.address_validation"
+					/>
+					<label class="form-check-label" for="addressValidation">
+						Validate Shipping Addresses Using Avalara
+					</label>
+				</div>
+				<div class="form-check">
+					<input
+						id="documentCommitting"
+						class="form-check-input"
+						name="documentCommitting"
+						type="checkbox"
+						ng-model="$ctrl.form.document_committing"
+					/>
+					<label for="documentCommitting" class="form-check-label">
+						Document Committing
+					</label>
+				</div>
+				<div class="form-check">
+					<input
+						id="logging"
+						class="form-check-input"
+						name="logging"
+						type="checkbox"
+						ng-model="$ctrl.form.logging"
+					/>
+					<label class="form-check-label" for="documentCommitting"
+						>Logging</label
+					>
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-8"></div>
+	</div>
+	<button
+		class="btn btn-primary"
+		ng-click="$ctrl.update()"
+		ng-disabled="$ctrl.isUpdating || settingsForm.$invalid"
+	>
+		{{ $ctrl.isUpdating ? 'Updating' : 'Update' }}
+	</button>
+	<button class="btn btn-outline-primary" ng-click="$ctrl.test()">
+		Test
+	</button>
+	<button class="btn btn-outline-primary" ng-click="$ctrl.viewLog()">
+		{{ $ctrl.isGettingLog ? 'Getting' : 'View' }} Log
+	</button>
+	<button
+		class="btn btn-danger"
+		ng-click="$ctrl.delete()"
+		ng-disabled="$ctrl.isDeleting"
+	>
+		{{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }} Data
+	</button>
+</div>

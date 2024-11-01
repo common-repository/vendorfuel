@@ -1,0 +1,42 @@
+[
+	{
+		"name": "shipping",
+		"url": "/shipping",
+		"abstract": true
+	},
+	{
+		"name": "shipping.page",
+		"url": "",
+		"component": "shippingPage"
+	},
+	{
+		"name": "shipping.flat-rates",
+		"url": "/flat-rates",
+		"abstract": true
+	},
+	{
+		"name": "shipping.flat-rates.index",
+		"url": "/:activeTab",
+		"component": "flatRatesPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	},
+	{
+		"name": "shipping.parcels",
+		"url": "/parcels",
+		"abstract": true
+	},
+	{
+		"name": "shipping.parcels.index",
+		"url": "/:activeTab",
+		"component": "parcelsPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	}
+]

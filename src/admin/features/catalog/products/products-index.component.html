@@ -1,0 +1,1128 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<h2 class="wp-heading-inline">Products <a href="#!/catalog/products/uploads/new" class="button">Upload products</a><a href="#!/catalog/products/uploads" class="button">Manage batch uploads</a></h2>
+<wp-notice-list></wp-notice-list>
+<vf-check-auth></vf-check-auth>
+
+<div class="container-fluid p-0">
+    <div ng-if="isAuthed" class="col p-0">
+        <uib-tabset active="activeTab" resize>
+            <uib-tab index="0" select="$ctrl.tabChanged(0)" heading="Search Products">
+                <wp-spinner
+                    type="2x"
+                    ng-if="loading">
+                </wp-spinner>            
+
+                <div ng-if="!loading">
+                    <bs-search-box-legacy
+                        q="$ctrl.searchParams.q"
+                        on-submit="$ctrl.setQuery(query, searchBy)"
+                        is-loading="loadingMore"
+                        search-options="$ctrl.searchOptions">
+                    </bs-search-box-legacy>   
+
+                    <table class="wp-list-table widefat fixed striped table-view-list">
+                        <thead>
+                            <tr>
+                                <th class="col-1">
+                                    <a href="#" class="text-decoration-none" title="Sort by Product ID"
+                                        ng-click="$ctrl.changeSortBy('product_id', $event)">
+                                        ID
+                                        <i ng-class="['bi', {
+                                            'bi-sort-numeric-down': $ctrl.sortAscending,
+                                            'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+                                        }]"
+                                            ng-if="$ctrl.searchParams.sortBy === 'product_id'">
+                                        </i>							
+                                    </a>
+                                </th>                                
+                                <th class="col-5">
+                                    <a href="#" class="text-decoration-none" title="Sort by Name"
+                                        ng-click="$ctrl.changeSortBy('description', $event)">
+                                        Name
+                                        <i ng-class="['bi', {
+                                            'bi-sort-alpha-down': $ctrl.sortAscending,
+                                            'bi-sort-alpha-down-alt': !$ctrl.sortAscending,
+                                        }]"
+                                            ng-if="$ctrl.searchParams.sortBy === 'description'">
+                                        </i>							
+                                    </a>
+                                </th>
+                                <th class="col-2">
+                                    <a href="#" class="text-decoration-none" title="Sort by SKU"
+                                        ng-click="$ctrl.changeSortBy('sku', $event)">
+                                        <abbr title="Stock Keeping Unit">SKU</abbr>
+                                        <i ng-class="['bi', {
+                                            'bi-sort-down-alt': $ctrl.sortAscending,
+                                            'bi-sort-down': !$ctrl.sortAscending,
+                                        }]"
+                                            ng-if="$ctrl.searchParams.sortBy === 'sku'">
+                                        </i>							
+                                    </a>
+                                </th>
+                                <th class="col-2">
+                                    <a href="#" class="text-decoration-none" title="Sort by Manufacturer Part Number"
+                                        ng-click="$ctrl.changeSortBy('mfg_part_num', $event)">
+                                        <abbr title="Manufacturer">Mfr.</abbr> Part #
+                                        <i ng-class="['bi', {
+                                            'bi-sort-numeric-down': $ctrl.sortAscending,
+                                            'bi-sort-numeric-down-alt': !$ctrl.sortAscending,
+                                        }]"
+                                            ng-if="$ctrl.searchParams.sortBy === 'mfg_part_num'">
+                                        </i>							
+                                    </a>
+                                </th>
+                                <th class="col-2 text-end">
+                                    <a href="#" class="text-decoration-none" title="Sort by Status"
+                                        ng-click="$ctrl.changeSortBy('status', $event)">
+                                        Status
+                                        <i ng-class="['bi', {
+                                            'bi-sort-down-alt': $ctrl.sortAscending,
+                                            'bi-sort-down': !$ctrl.sortAscending,
+                                        }]"
+                                            ng-if="$ctrl.searchParams.sortBy === 'status'">
+                                        </i>							
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-if="!products.data.length && !loadingMore">
+                                <td colspan="5">
+                                    No products found<span ng-if="searchTerm.length >= 1"> matching '{{searchTerm}}'</span>.
+                                    </td>
+                            </tr>
+                            <tr ng-class="['cursor-pointer',{
+                                'table-warning': product.status === 'backordered',
+                                'table-danger': product.status === 'discontinued',
+                                'table-secondary': product.status === 'inactive',
+                            }]"
+                                ng-if="!loadingMore" 
+                                ng-repeat="product in products.data track by $index">
+                                <td>
+                                    {{ product.product_id }}
+                                </td>
+                                <td class="py-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-2" style="width:2rem">
+                                            <div class="ratio ratio-1x1">
+                                                <img class="img-fluid rounded border object-fit-cover"
+                                                    ng-src="{{ product.image.thumb_url || $ctrl.placeholderImg }}"
+                                                >
+                                            </div>						
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="text-truncate" style="max-width: 40ch;">
+                                                <strong>
+                                                    <a href="#" class="text-decoration-none"
+                                                        ng-click="$ctrl.editProduct( $index, $event )">
+                                                        {{ product.description }}
+                                                    </a>
+                                                </strong>
+                                                <div class="hstack gap-2 small">
+                                                    <a href="#" class="text-decoration-none"
+                                                        ng-click="$ctrl.editProduct( $index, $event )"
+                                                        ng-attr-title="{{ 'Edit ' + product.description }}">
+                                                        Edit
+                                                    </a>
+                                                    <div class="vr"></div>
+                                                    <a class="text-decoration-none" target="_blank"
+                                                        ng-href="{{ window.location.hostname }}/{{ $ctrl.productSlug }}/{{ product.slug }}"
+                                                        ng-attr-title="{{ 'View ' + product.description + ' in a new tab'}}">
+                                                        View
+                                                    </a>
+                                                </div>                                                
+                                            </div>						
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {{product.sku}}
+                                </td>
+                                <td>{{product.mfg_part_num}}</td>
+                                <td class="text-end">
+                                    <span ng-class="['badge text-capitalize', {
+                                        'bg-primary': product.status === 'active',
+                                        'bg-secondary': product.status === 'inactive',
+                                        'bg-warning': product.status === 'backordered',
+                                        'bg-danger': product.status === 'discontinued',
+                                        }]">
+                                        {{ product.status }}
+                                    </span>
+                                </td>
+                            </tr>                            
+
+                        </tbody>
+                    </table>
+                    
+                    <wp-spinner
+                        type="2x"
+                        ng-show="loadingMore">
+                    </wp-spinner>                
+                    <div class="row  mb-3">
+                        <div class="col-sm-4">
+                            <span>Showing {{products.from || 0}} to {{products.to || 0}} of {{products.total || 0}}
+                                entries<span>
+                        </div>
+                        <div class="col-sm-4 text-center mt-2">
+                            <button type="button" class="button" ng-if="products.prev_page_url"
+                                ng-click="$ctrl.setPage(products.current_page - 1)">&lsaquo; Prev</button>
+                            <button type="button" class="button" ng-if="products.current_page - 2 > 0"
+                                ng-click="$ctrl.setPage(products.current_page - 2)">{{products.current_page -
+                                2}}</button>
+                            <button type="button" class="button" ng-if="products.current_page - 1 > 0"
+                                ng-click="$ctrl.setPage(products.current_page - 1)">{{products.current_page -
+                                1}}</button>
+                            <button type="button" class="button" ng-disabled="true">{{products.current_page}}</button>
+                            <button type="button" class="button" ng-if="products.current_page + 1 <= products.last_page"
+                                ng-click="$ctrl.setPage(products.current_page + 1)">{{products.current_page +
+                                1}}</button>
+                            <button type="button" class="button" ng-if="products.current_page + 2 <= products.last_page"
+                                ng-click="$ctrl.setPage(products.current_page + 2)">{{products.current_page +
+                                2}}</button>
+                            <button type="button" class="button" ng-if="products.next_page_url"
+                                ng-click="$ctrl.setPage(products.current_page + 1)">Next &rsaquo;</button>
+                        </div>
+                        <div class="col-sm-4  justify-content-end">
+                            <label class="form-label" for="rpp">Per Page: </label>
+                            <select class="form-control" style="display: inline-block;" id="rpp"
+                                ng-model="$ctrl.searchParams.rpp" ng-change="$ctrl.setRpp( $ctrl.searchParams.rpp )"
+                                ng-options="value for value in rppValues">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <uib-tab index="1" select="$ctrl.tabChanged(1)" heading="Add Product">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <form class="row" name="productAddForm">
+                        <div class="productForm col-md-5">
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Product Name</span>
+                                <input class="form-control" ng-class="{'is-invalid': productAddForm.prod_name.$invalid}"
+                                    placeholder="'Paper Towels'" type="text" name="prod_name"
+                                    ng-model="$ctrl.product.description" minlength="3" required />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25"><abbr title="Stock Keeping Unit">SKU</abbr></span>
+                                <input class="form-control" ng-class="{'is-invalid':productAddForm.sku.$invalid}"
+                                    type="text" name="sku" placeholder="'SKU12345'" ng-model="$ctrl.product.sku"
+                                    required />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Slug</span>
+                                <input class="form-control" placeholder="'paper-towels'" type="text" name="slug"
+                                    ng-model="$ctrl.product.slug" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">UPC</span>
+                                <input class="form-control" placeholder="Universal Product Code" type="text" name="upc"
+                                    ng-model="$ctrl.product.upc" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Mfg Part #</span>
+                                <input class="form-control" type="text" name="mfg_part_num"
+                                    ng-model="$ctrl.product.mfg_part_num" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Stock Qty</span>
+                                <input class="form-control" type="number" name="qty"
+                                    placeholder="Current Quantity Available" ng-model="$ctrl.product.qty" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Ignore Inventory Stock</span>
+                                <div class="py-2 px-3 checkbox-addon">
+                                    <input class="form-control" type="checkbox" id="ignore_inventory"
+                                        ng-model="$ctrl.product.ignore_inventory" ng-true-value="1" ng-false-value="0">
+                                </div>
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">U<sub>o</sub>M ID</span>
+                                <input class="form-control" type="text" name="uomid" placeholder="'EA'"
+                                    ng-model="$ctrl.product.uomid" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">U<sub>o</sub>M Qty</span>
+                                <input class="form-control" type="text" name="uomqty" placeholder="1"
+                                    ng-model="$ctrl.product.uomqty" />
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">U<sub>o</sub>M Description</span>
+                                <input class="form-control" type="text" name="uomdesc" placeholder="'EACH'"
+                                    ng-model="$ctrl.product.uomdesc" />
+                            </div>
+                            <div class="my-2">
+                                <div class="input-group">
+                                    <span class="input-group-text min-w-25">Category</span>
+                                    <input class="form-control" type="text" name="category" placeholder="Select a Category"
+                                        ng-model="$ctrl.product.category.title" disabled />
+                                    <button type="button" ng-click="$ctrl.openCatSearch()" class="button ms-0">Select</button>
+                                </div>
+                                <div class="form-text" ng-if="$ctrl.product.category.title && ( !$ctrl.product.pricesheets.length && $ctrl.product.status !== 'inactive' )">This product will not appear in the catalog under {{ $ctrl.product.category.title }} until assigned a price.</div>
+                            </div>
+                            <div class="input-group my-2">
+                                <span class="input-group-text min-w-25">Status</span>
+                                <select class="form-control" type="text" name="status"
+                                    ng-options="key as val for (key, val) in productsFactory.getStatuses()"
+                                    ng-model="$ctrl.product.status">
+                                </select>
+                            </div>
+                            <div class="mb-3" ng-if="!isXS && !isSM">
+                                <button class="button button-primary" type="submit"
+                                    title="{{productAddForm.$invalid ? 'Please make sure you have filled out all of the required fields.' : ''}}"
+                                    ng-disabled="productAddForm.$invalid" ng-click="$ctrl.addProduct()">
+                                    Add Product</button>
+                                <button type="button" class="button" ng-click="$ctrl.openMediaFrame()">Upload Image</button>
+                            </div>
+                        </div>
+
+                        <uib-tabset class="col-md-7">
+                            <uib-tab index="0" heading="Pricing">
+                                <fieldset>
+                                    <legend>Pricing</legend>
+                                    <div class="form-text mb-2" ng-if="!$ctrl.product.pricesheets.length && $ctrl.product.status !== 'inactive'">Add a price to make this product visible on the catalog.</div>
+                                    <div class="productForm" ng-if="!ps.deleted"
+                                        ng-repeat="ps in $ctrl.product.pricesheets track by $index">
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text">{{ps.pricesheetindex.sheet}}</span>
+                                            <input class="form-control"
+                                                ng-class="{'is-invalid':productAddForm['price'+$index].$invalid || !ps.price}"
+                                                name="price{{$index}}" format="currency" type="text" maxlength="10"
+                                                ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                ng-model="ps.price" placeholder="Enter Price Here." />
+    
+                                            <div class="py-2 px-3 checkbox-addon">
+                                                <span class="input-group-text">Punchout</span>
+                                                <input class="form-control" type="checkbox" id="punchout_only"
+                                                    ng-model="ps.punchout_only" ng-true-value="1"
+                                                    ng-false-value="0">
+                                            </div>
+    
+                                            <button type="button" ng-click="$ctrl.removePricesheet($index)"
+                                                class="button button-delete">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="button" ng-click="$ctrl.openPsSearch()">Add Price</button>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="1" heading="Details">
+                                <fieldset>
+                                    <legend>Details</legend>
+                                    <div class="productForm">
+                                        <div class="col">
+                                            <slick ng-if="!removingImage" settings="slickConfig" data="$ctrl.product.images">
+                                                <div class="row text-center" style="min-height: 200px;"
+                                                    ng-repeat="(id, img) in $ctrl.product.images track by $index"
+                                                    ng-if="!img.deleted">
+                                                    <div class="col-12">
+                                                        <img ng-src="{{img.sizes.thumbnail.url}}"
+                                                            style="max-height: 150px; width: auto; display: inline-block;">
+                                                    </div>
+                                                    <div class="col-12 mt-2">
+                                                        <button type="button" class="button button-delete"
+                                                            ng-click="$ctrl.removeImage(id)">
+                                                            Remove Image
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </slick>
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Recycled Content</span>
+                                            <select class="form-control" name="green_content"
+                                                ng-model="$ctrl.product.green"
+                                                ng-options="bool.key as bool.value for bool in regValues">
+                                                <option value="" hidden disabled>Select</option>
+                                            </select>
+                                            <input class="form-control" type="text" name="green_attributes"
+                                                placeholder="Percentage" ng-model="$ctrl.product.green_attributes" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Manufacturer</span>
+                                            <input class="form-control" placeholder="N/A" type="text" name="manufacturer"
+                                                ng-model="$ctrl.product.manufacturer" disabled />
+                                            <button type="button" ng-click="$ctrl.openMfgSearch()"
+                                                class="button">Edit</button>
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Brand</span>
+                                            <input class="form-control" maxlength="30" placeholder="'Samsung'" type="text"
+                                                name="brand_name" ng-model="$ctrl.product.brand_name" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Keywords</span>
+                                            <input class="form-control" type="text" name="keywords"
+                                                placeholder="'Apple, Apples, Green Apple'" ng-model="$ctrl.product.keywords" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="long-description">Description</label>
+                                            <div class="border">
+                                                <textarea id="long-description"
+                                                    name="long_description" ui-tinymce="$ctrl.tinymceOptions"
+                                                    ng-model="$ctrl.product.long_description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="2">
+                                <uib-tab-heading>
+                                    <abbr title="Attributes">
+                                        Attrs
+                                    </abbr>
+                                </uib-tab-heading>
+                                <fieldset>
+                                    <legend>Attributes</legend>
+                                    <button type="button" ng-show="numAttributes.length < maxAttributes"
+                                        class="button" ng-click="$ctrl.addAttribute()">
+                                        Add New Attribute
+                                    </button>
+                                    <div class="min-scroll" ng-if="numAttributes.length >= 1">
+                                        <div ng-repeat="n in numAttributes track by $index">
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text">Attr. ({{n}})</span>
+                                                <input class="form-control" type="text" name="att{{n}}n"
+                                                    placeholder="Name" ng-model="$ctrl.product['att' + n + 'n']" />
+                                                <input class="form-control" type="text" name="att{{n}}d"
+                                                    placeholder="Data" ng-model="$ctrl.product['att' + n + 'd']" />
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="button" class="button button-delete"
+                                                    ng-class="{'col':isXS || isSM}" ng-click="$ctrl.removeAttribute(n)">
+                                                    Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="3">
+                                <uib-tab-heading>
+                                    <abbr title="Documents">
+                                        Docs
+                                    </abbr>
+                                </uib-tab-heading>
+                                <fieldset>
+                                    <legend>Documents</legend>
+                                    <button type="button" class="button"
+                                        ng-click="AddDocument($ctrl.product.documents)">
+                                        Add New Document
+                                    </button>
+                                    <div class="min-scroll">
+                                        <div ng-repeat="document in $ctrl.product.documents track by $index">
+                                            <div class="input-group my-2">
+                                                <input class="form-control" type="text" name="doc_{{$index}}_name"
+                                                    placeholder="Name" ng-model="document.name" />
+                                                <input class="form-control" type="text" name="doc_{{$index}}_url"
+                                                    placeholder="URL" ng-model="document.url" />
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="button" class="button button-delete"
+                                                    ng-click="RemoveDocument($ctrl.product,$index)">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="4" heading="Parcels">
+                                <fieldset class="mb-3">
+                                    <legend>Shipping</legend>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="truck_only" ng-model="$ctrl.product.truck_only" ng-true-value="1" ng-false-value="0">
+                                        <label class="form-check-label" for="truck_only">
+                                            Truck only
+                                        </label>
+                                        <div class="form-text">Product can only be delivered via freight truck.</div>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="additional_shipping" ng-model="$ctrl.product.additional_shipping" >
+                                        <label class="form-check-label" for="additional_shipping">
+                                            Additional shipping
+                                        </label>
+                                        <div class="form-text">Checking this will make this product not available for free shipping and subject to additional charge.</div>
+                                    </div>                                    
+                                </fieldset>
+                                <fieldset>                                    
+                                    <legend>Parcels</legend>
+                                    <div class="productForm">
+                                        <div class="productForm"
+                                            ng-class="{'min-scroll':Object.keys($ctrl.product.parcels).length >= 3}"
+                                            ng-repeat="parcel in $ctrl.product.parcels track by $index">
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text">Parcel {{$index + 1}}</span>
+                                                <input class="form-control" type="text" name="parcel$index"
+                                                    ng-model="$ctrl.product.parcels[$index].title" disabled />
+                                            </div>
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text">Weight {{$index + 1}}</span>
+                                                <input class="form-control" type="text" name="weight$index"
+                                                    ng-model="$ctrl.product.parcels[$index].pivot.weight" />
+                                                <select class="form-control"
+                                                    ng-options="key as val for (key, val) in parcelWeightUnits"
+                                                    ng-model="$ctrl.product.parcels[$index].pivot.mass_unit"></select>
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="button" class="button button-delete"
+                                                    ng-click="$ctrl.removeParcel($index)">
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" ng-click="$ctrl.openParcelSearch()" class="button">
+                                            Add Parcels
+                                        </button>
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="5" heading="Misc.">
+                                <fieldset>
+                                    <legend>Miscellaneous</legend>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Tax Code</span>
+                                        <input class="form-control" type="text" name="avatax_tax_code"
+                                            ng-model="$ctrl.product.avatax_tax_code" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Recyclable</span>
+                                        <select class="form-control" type="text" name="green"
+                                            ng-model="$ctrl.product.green"
+                                            ng-options="bool.key as bool.value for bool in regValues">
+                                            <option value="" disabled hidden>Select</option>
+                                        </select>
+                                        <input class="form-control" type="text" name="green_attributes"
+                                            placeholder="Percentage" ng-model="$ctrl.product.green_attributes" />
+                                    </div>
+                                    <div class="my-2">
+                                        <div class="input-group">
+                                            <span class="input-group-text min-w-25">Alternate(s)</span>
+                                            <input class="form-control" type="text" name="alternates"
+                                                ng-model="$ctrl.product.alternates" />
+                                        </div>
+                                        <div class="form-text">Add comma-separated SKUs to display alternate products in a dropdown menu.</div>                                        
+                                    </div>
+                                    <div class="my-2">
+                                        <div class="input-group">
+                                            <span class="input-group-text min-w-25">Related</span>
+                                            <input class="form-control" type="text" name="related"
+                                                ng-model="$ctrl.product.related" />
+                                        </div>
+                                        <div class="form-text">Add comma-separated SKUs to display related products.</div>
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Model</span>
+                                        <input class="form-control" type="text" name="model"
+                                            ng-model="$ctrl.product.model" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Ability One SKU</span>
+                                        <input class="form-control" type="text" name="ability_one_sku"
+                                            ng-model="$ctrl.product.ability_one_sku" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Hazmat</span>
+                                        <input class="form-control" type="text" name="hazmat"
+                                            ng-model="$ctrl.product.hazmat" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Includes</span>
+                                        <input class="form-control" type="text" name="includes"
+                                            ng-model="$ctrl.product.includes" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Rebate</span>
+                                        <select class="form-control" type="text" name="rebate"
+                                            ng-model="$ctrl.product.rebate"
+                                            ng-options="bool.key as bool.value for bool in regValues">
+                                        </select>
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Country</span>
+                                        <input class="form-control" placeholder="Country" type="text" name="country"
+                                            ng-model="$ctrl.product.country" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Device</span>
+                                        <input class="form-control" type="text" name="device"
+                                            ng-model="$ctrl.product.device" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Family</span>
+                                        <input class="form-control" type="text" name="family"
+                                            ng-model="$ctrl.product.family" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Prop 65</span>
+                                        <select class="form-control" type="text" name="prop65"
+                                            ng-model="$ctrl.product.prop65"
+                                            ng-options="bool.key as bool.value for bool in regValues">
+                                            <option value="" hidden disabled>Select One</option>
+                                        </select>
+                                        <input class="form-control" type="text" name="prop65_warning"
+                                            placeholder="Warning Message" title="{{$ctrl.product.prop65_warning}}"
+                                            ng-model="$ctrl.product.prop65_warning" />
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Ignore Inventory Stock</span>
+                                        <div class="py-2 px-3 checkbox-addon">
+                                            <input class="form-control" type="checkbox" id="ignore_inventory"
+                                                ng-model="$ctrl.product.ignore_inventory" ng-true-value="1"
+                                                ng-false-value="0">
+                                        </div>
+                                    </div>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Site ID</span>
+                                        <input class="form-control" type="text" name="site_id"
+                                            ng-model="$ctrl.product.site_id" />
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                            <uib-tab index="6" heading="Meta">
+                                <fieldset>
+                                    <legend>Meta</legend>
+                                    <div class="input-group my-2">
+                                        <span class="input-group-text min-w-25">Title</span>
+                                        <input class="form-control" type="text" name="meta_title"
+                                            placeholder="Meta Title" ng-model="$ctrl.product.meta.title" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <textarea class="form-control" style="width: 100%;" type="text"
+                                            placeholder="Meta Description"
+                                            ng-model="$ctrl.product.meta.description"></textarea>
+                                    </div>
+                                </fieldset>
+                            </uib-tab>
+                        </uib-tabset>
+                        <div class="mb-3 col" ng-if="isXS || isSM">
+                            <button class="button button-primary" type="submit"
+                                title="{{productAddForm.$invalid ? 'Please make sure you have filled out all of the required fields.' : ''}}"
+                                ng-disabled="productAddForm.$invalid" ng-click="$ctrl.addProduct()">
+                                Add New Product
+                            </button>
+                            <button type="button" class="button" ng-click="$ctrl.openMediaFrame()">
+                                Upload Image
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </uib-tab>
+            <uib-tab index="2" select="$ctrl.tabChanged(2)" ng-show="selectedProduct" heading="Edit Product">
+                <wp-spinner
+                    type="2x"
+                    ng-show="loading">
+                </wp-spinner>
+                <div ng-if="!loading">
+                    <form name="productViewForm">
+                        <div class="row mb-3">
+                            <div class="productForm col-md-5">
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Product Name</span>
+                                    <input class="form-control"
+                                        ng-class="{'is-invalid': productViewForm.prod_name.$invalid}"
+                                        placeholder="'Paper Towels'" type="text" name="prod_name"
+                                        title="{{selectedProduct.description}}" ng-model="selectedProduct.description"
+                                        minlength="3" required />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25"><abbr title="Stock Keeping Unit">SKU</abbr></span>
+                                    <input class="form-control" ng-class="{'is-invalid':productViewForm.sku.$invalid}"
+                                        type="text" name="sku" placeholder="'12345'" ng-model="selectedProduct.sku"
+                                        required />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Slug</span>
+                                    <input class="form-control" placeholder="'paper-towels'" type="text" name="slug"
+                                        ng-model="selectedProduct.slug" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">UPC</span>
+                                    <input class="form-control" placeholder="Universal Product Code" type="text" name="upc"
+                                        ng-model="selectedProduct.upc" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Mfg Part #</span>
+                                    <input class="form-control" type="text" name="mfg_part_num"
+                                        ng-model="selectedProduct.mfg_part_num" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Stock Qty</span>
+                                    <input class="form-control" type="number" name="qty"
+                                        placeholder="Current Quantity Available" ng-model="selectedProduct.qty" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Ignore Inventory Stock</span>
+                                    <div class="py-2 px-3 checkbox-addon">
+                                        <input class="form-control" type="checkbox" id="ignore_inventory"
+                                            ng-model="selectedProduct.ignore_inventory" ng-true-value="1"
+                                            ng-false-value="0">
+                                    </div>
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">U<sub>o</sub>M ID</span>
+                                    <input class="form-control" type="text" name="uomid" placeholder="'EA'"
+                                        ng-model="selectedProduct.uomid" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">U<sub>o</sub>M Qty</span>
+                                    <input class="form-control" type="text" name="uomqty" placeholder="1"
+                                        ng-model="selectedProduct.uomqty" />
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">U<sub>o</sub>M Description</span>
+                                    <input class="form-control" type="text" name="uomdesc" placeholder="'EACH'"
+                                        ng-model="selectedProduct.uomdesc" />
+                                </div>
+                                <div class="my-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text min-w-25">Category</span>
+                                        <input class="form-control" type="text" name="category" placeholder="Select a Category"
+                                            ng-model="selectedProduct.category.title" disabled />
+                                        <button type="button" ng-click="$ctrl.openCatSearch()" class="button ms-0">Select</button>
+                                    </div>
+                                    <div class="form-text" ng-if="selectedProduct.category.title && ( !selectedProduct.pricesheets.length && selectedProduct.status !== 'inactive' )">This product will not appear in the catalog under {{ selectedProduct.category.title }} until assigned a price.</div>
+                                </div>
+                                <div class="input-group my-2">
+                                    <span class="input-group-text min-w-25">Status</span>
+                                    <select class="form-control" type="text" name="status"
+                                        ng-options="key as val for (key, val) in productsFactory.getStatuses()"
+                                        ng-model="selectedProduct.status">
+                                    </select>
+                                </div>
+                            </div>
+                            <uib-tabset class="col-md-7">
+                                <uib-tab index="0" heading="Pricing">
+                                    <fieldset>
+                                        <legend>Pricing</legend>
+                                        <div class="form-text mb-2" ng-if="!selectedProduct.pricesheets.length && selectedProduct.status !== 'inactive'">Add a price to make this product visible on the catalog.</div>
+                                        <div class="productForm" ng-if="!ps.deleted"
+                                            ng-repeat="ps in selectedProduct.pricesheets track by $index">
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text">{{ps.pricesheetindex.sheet}}</span>
+                                                <input class="form-control"
+                                                    ng-class="{'is-invalid':productViewForm['price'+$index].$invalid || !ps.price}"
+                                                    name="price{{$index}}" format="currency" type="text" maxlength="10"
+                                                    ng-pattern="/(?=.*[1-9])^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/"
+                                                    ng-model="ps.price" placeholder="Enter Price Here." />
+                                                <div class="py-2 px-3 checkbox-addon">
+                                                    <span class="input-group-text">Punchout</span>
+                                                    <input class="form-control" type="checkbox" id="punchout_only"
+                                                        ng-model="ps.punchout_only" ng-true-value="1"
+                                                        ng-false-value="0">
+                                                </div>
+                                                <button type="button" ng-click="$ctrl.removePricesheet($index)"
+                                                    class="button button-delete">Remove</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="button" ng-click="$ctrl.openPsSearch()">Add Price</button>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="1" heading="Details">
+                                    <fieldset>
+                                        <legend>Details</legend>
+                                        <div class="productForm">
+                                            <div class="col">
+                                                <slick ng-if="!removingImage" settings="slickConfig"
+                                                    data="selectedProduct.images">
+                                                    <div class="row text-center" style="min-height: 200px;"
+                                                        ng-repeat="(id, img) in selectedProduct.images track by $index"
+                                                        ng-if="!img.deleted">
+                                                        <div class="col-12">
+                                                            <img ng-src="{{img.small_url || img.thumb_url || img.url}}"
+                                                                style="max-height: 150px; width: auto; display: inline-block;">
+                                                        </div>
+                                                        <div class="col-12 mt-2">
+                                                            <button type="button" type="button"
+                                                                class="button button-delete"
+                                                                ng-click="$ctrl.removeImage(id)">
+                                                                Remove Image
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </slick>
+                                            </div>
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text min-w-25">Recycled Content</span>
+                                                <select class="form-control" name="green_content"
+                                                    ng-model="selectedProduct.green"
+                                                    ng-options="bool.key as bool.value for bool in regValues">
+                                                    <option value="" hidden disabled>Select</option>
+                                                </select>
+                                                <input class="form-control" type="text" name="green_attributes"
+                                                    placeholder="Percentage" ng-model="selectedProduct.green_attributes" />
+                                            </div>
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text min-w-25">Manufacturer</span>
+                                                <input class="form-control" placeholder="N/A" type="text" name="manufacturer"
+                                                    ng-model="selectedProduct.manufacturer.manufacturer" disabled />
+                                                <button type="button" ng-click="$ctrl.openMfgSearch()"
+                                                    class="button">Edit</button>
+                                            </div>
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text min-w-25">Brand</span>
+                                                <input class="form-control" maxlength="30" placeholder="'Samsung'" type="text"
+                                                    name="brand_name" ng-model="selectedProduct.brand_name" />
+                                            </div>
+                                            <div class="input-group my-2">
+                                                <span class="input-group-text min-w-25">Keywords</span>
+                                                <input class="form-control" type="text" name="keywords"
+                                                    placeholder="'Apple, Apples, Green Apple'"
+                                                    ng-model="selectedProduct.keywords" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="long-description">
+                                                    Description
+                                                </label>
+                                                <div class="border">
+                                                    <textarea id="long-description" ui-tinymce="$ctrl.tinymceOptions"
+                                                        ng-model="selectedProduct.long_description"></textarea>
+    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="2">
+                                    <uib-tab-heading>
+                                        <abbr title="Attributes">
+                                            Attrs
+                                        </abbr>
+                                    </uib-tab-heading>
+                                    <fieldset>
+                                        <legend>Attributes</legend>
+                                        <button type="button" ng-show="numAttributes.length < maxAttributes"
+                                            class="button" ng-click="$ctrl.addAttribute()">Add Attribute</button>
+                                        <div class="min-scroll">
+                                            <div ng-repeat="n in numAttributes track by $index">
+                                                <div class="input-group my-2">
+                                                    <span class="input-group-text">Attr. ({{n}})</span>
+                                                    <input class="form-control" type="text" name="att{{n}}n"
+                                                        placeholder="Name" ng-model="selectedProduct['att' + n + 'n']" />
+                                                    <input class="form-control" type="text" name="att{{n}}d"
+                                                        placeholder="Data" ng-model="selectedProduct['att' + n + 'd']" />
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="button button-delete"
+                                                        ng-class="{'col':isXS || isSM}" ng-click="$ctrl.removeAttribute(n)">Remove
+                                                        Attribute</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="3">
+                                    <uib-tab-heading>
+                                        <abbr title="Documents">
+                                            Docs
+                                        </abbr>
+                                    </uib-tab-heading>
+                                    <fieldset>
+                                        <legend>Documents</legend>
+                                        <button type="button" class="button"
+                                            ng-click="AddDocument(selectedProduct.documents)">Add
+                                            Document</button>
+                                        <div class="min-scroll">
+                                            <div ng-repeat="document in selectedProduct.documents track by $index">
+                                                <div class="input-group my-2">
+                                                    <input class="form-control" type="text" name="doc_{{$index}}_name"
+                                                        placeholder="Name" ng-model="document.name" />
+                                                    <input class="form-control" type="text" name="doc_{{$index}}_url"
+                                                        placeholder="URL" ng-model="document.url" ng-required="true" />
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="button button-delete"
+                                                        ng-class="{'col':isXS || isSM}"
+                                                        ng-click="RemoveDocument(selectedProduct.documents, $index)">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="4" heading="Parcels">
+                                    <fieldset class="mb-3">
+                                        <legend>Shipping</legend>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="truck_only" ng-model="selectedProduct.truck_only" ng-true-value="1" ng-false-value="0">
+                                            <label class="form-check-label" for="truck_only">
+                                                Truck only
+                                            </label>
+                                            <div class="form-text">Product can only be delivered via freight truck.</div>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="additional_shipping" ng-model="selectedProduct.additional_shipping" >
+                                            <label class="form-check-label" for="additional_shipping">
+                                                Additional shipping
+                                            </label>
+                                            <div class="form-text">Checking this will make this product not available for free shipping and subject to additional charge.</div>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Parcels</legend>
+                                        <div class="productForm">
+                                            <div class="productForm"
+                                                ng-class="{'min-scroll':Object.keys(selectedProduct.parcels).length >= 3}"
+                                                ng-repeat="parcel in selectedProduct.parcels track by $index">
+                                                <div class="input-group my-2">
+                                                    <span class="input-group-text">Parcel {{$index + 1}}</span>
+                                                    <input class="form-control" type="text" name="parcel$index"
+                                                        ng-model="selectedProduct.parcels[$index].title" disabled />
+                                                </div>
+                                                <div class="input-group my-2">
+                                                    <span class="input-group-text">Weight {{$index + 1}}</span>
+                                                    <input class="form-control" type="text" name="weight$index"
+                                                        ng-model="selectedProduct.parcels[$index].pivot.weight" />
+                                                    <select class="form-control"
+                                                        ng-options="key as val for (key, val) in parcelWeightUnits"
+                                                        ng-model="selectedProduct.parcels[$index].pivot.mass_unit"></select>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="button button-delete"
+                                                        ng-click="$ctrl.removeParcel($index)">Remove</button>
+                                                </div>
+                                            </div>
+                                            <button type="button" ng-click="$ctrl.openParcelSearch()" class="button">
+                                                Add Parcels
+                                            </button>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="5" heading="Misc">
+                                    <fieldset>
+                                        <legend>Miscellaneous</legend>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Tax Code</span>
+                                            <input class="form-control" type="text" name="avatax_tax_code"
+                                                ng-model="selectedProduct.avatax_tax_code" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Recyclable</span>
+                                            <select class="form-control" type="text" name="green"
+                                                ng-model="selectedProduct.green"
+                                                ng-options="bool.key as bool.value for bool in regValues">
+                                            </select>
+                                            <input class="form-control" type="text" name="green_attributes"
+                                                placeholder="Percentage" ng-model="selectedProduct.green_attributes" />
+                                        </div>
+                                        <div class="my-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text min-w-25">Alternate(s)</span>
+                                                <input class="form-control" type="text" name="alternates"
+                                                    ng-model="selectedProduct.alternates" />
+                                            </div>
+                                            <div class="form-text">Add comma-separated SKUs to display alternate products in a dropdown menu.</div>                                        
+                                        </div>
+                                        <div class="my-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text min-w-25">Related</span>
+                                                <input class="form-control" type="text" name="related"
+                                                    ng-model="selectedProduct.related" />
+                                            </div>
+                                            <div class="form-text">Add comma-separated SKUs to display related products.</div>
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Model</span>
+                                            <input class="form-control" type="text" name="model"
+                                                ng-model="selectedProduct.model" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Ability One SKU</span>
+                                            <input class="form-control" type="text" name="ability_one_sku"
+                                                ng-model="selectedProduct.ability_one_sku" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Hazmat</span>
+                                            <input class="form-control" type="text" name="hazmat"
+                                                ng-model="selectedProduct.hazmat" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Includes</span>
+                                            <input class="form-control" type="text" name="includes"
+                                                placeholder="'six packs'" ng-model="selectedProduct.includes" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Rebate</span>
+                                            <select class="form-control" type="text" name="rebate"
+                                                ng-model="selectedProduct.rebate"
+                                                ng-options="bool.key as bool.value for bool in regValues">
+                                            </select>
+                                        </div>
+                                        <div class="input-group my-2" title="Country of Origin">
+                                            <span class="input-group-text min-w-25">Country</span>
+                                            <input class="form-control" placeholder="Country of Origin" type="text"
+                                                name="country" ng-model="selectedProduct.country" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Device</span>
+                                            <input class="form-control" type="text" name="device"
+                                                ng-model="selectedProduct.device" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Family</span>
+                                            <input class="form-control" type="text" name="family"
+                                                ng-model="selectedProduct.family" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Prop 65</span>
+                                            <select class="form-control" type="text" name="prop65"
+                                                ng-model="selectedProduct.prop65"
+                                                ng-options="bool.key as bool.value for bool in regValues">
+                                                <option value="" disabled hidden>Select One</option>
+                                            </select>
+                                            <input class="form-control" type="text" name="prop65_warning"
+                                                title="{{selectedProduct.prop65_warning}}" placeholder="Warning Message"
+                                                ng-model="selectedProduct.prop65_warning" />
+                                        </div>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Site ID</span>
+                                            <input class="form-control" type="text" name="site_id"
+                                                ng-model="selectedProduct.site_id" />
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="6" heading="Notes">
+                                    <fieldset>
+                                        <legend>Notes</legend>
+                                        <wp-spinner
+                                            type="2x"
+                                            ng-show="savingNote">
+                                        </wp-spinner>
+                                        <div class="row p-3" ng-if="!savingNote">
+                                            <div class="col-12">
+                                                <div class="input-group">
+                                                    <textarea class="form-control" maxlength="65535" type="text"
+                                                        placeholder="Add a Note" ng-model="noteParams.note"></textarea>
+                                                    <button class="button" ng-click="$ctrl.saveNote()">Save
+                                                        Note</button>
+                                                </div>
+                                            </div>
+                                            <div class="col min-scroll"
+                                                ng-if="productNotes.length >= 1">
+                                                <div class="col-12 mb-3" ng-repeat="note in productNotes">
+                                                    <textarea maxlength="65535" class="form-control"
+                                                        ng-disabled="true">{{note.note}}</textarea>
+                                                    <p>
+                                                        {{note.admin.name}} {{note.datetime}}
+                                                        <button class="button button-delete float-end"
+                                                            ng-click="$ctrl.deleteNote(note.note_id)">
+                                                            Delete
+                                                        </button>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                                <uib-tab index="7" heading="Meta">
+                                    <fieldset>
+                                        <legend>Meta</legend>
+                                        <div class="input-group my-2">
+                                            <span class="input-group-text min-w-25">Title</span>
+                                            <input class="form-control" type="text" name="meta_title"
+                                                placeholder="Meta Title" ng-model="selectedProduct.meta.title" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <textarea class="form-control" style="width: 100%;" type="text"
+                                                placeholder="Meta Description"
+                                                ng-model="selectedProduct.meta.description"></textarea>
+                                        </div>
+                                    </fieldset>
+                                </uib-tab>
+                            </uib-tabset>                            
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="btn-toolbar justify-content-between">
+                                    <span>
+                                        <button class="button button-primary" type="submit"
+                                            title="{{productViewForm.$invalid ? 'Please make sure you have filled out all of the required fields.' : ''}}"
+                                            ng-disabled="productViewForm.$invalid"
+                                            ng-click="$ctrl.updateProduct()">
+                                            Update
+                                        </button>
+                                        <button type="button" class="button" ng-click="$ctrl.openMediaFrame()">
+                                            Upload Image
+                                        </button>
+                                        <button type="button" class="button"
+                                            ng-click="$ctrl.copyProduct( selectedProduct )">
+                                            Copy to New Product
+                                        </button>
+                                    </span>
+                                    <div>
+                                        <a class="button" target="_blank"
+                                            ng-href="{{ window.location.hostname }}/{{ $ctrl.productSlug }}/{{ selectedProduct.slug }}"
+                                            ng-attr-title="{{ 'View ' + selectedProduct.description + ' in a new tab'}}"
+                                            ng-if="selectedProduct.pricesheets.length">
+                                            View Product
+                                        </a>                                    
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </uib-tab>
+            <uib-tab index="6" select="$ctrl.tabChanged(6)" heading="Utilities">
+                <div class="pb-3">
+                    <button type="button" ng-click="$ctrl.syncProductWPPosts()" class="button" type="submit">Sync
+                        Products to WP Posts</button>
+                    <button type="button" ng-click="$ctrl.generateSlugs()" class="button" type="submit">Generate
+                        missing Slugs for Active Products</button>
+                </div>
+                <h5 class="px-3" ng-if="!isSM && !isMD">CSV Inventory Upload
+                </h5>
+                <span ng-if="isSM || isMD"><b>CSV Inventory Upload</b> </span>
+                <form class="row p-3" enctype="multipart/form-data" name="productUploadForm">
+                    <div class="col-md-5">
+                        <div class="input-group my-2">
+                            <span class="input-group-text w-104">File</span>
+                            <input class="form-control" ng-class="{'is-invalid':productUploadForm.psName.$invalid}"
+                                name="inventory" ng-model="theFile.name" placeholder="Upload a File" disabled required>
+                            <label class="button m-0">
+                                Browse <input class="custom-file" type="file" name="file" id="uploadInput"
+                                    onchange="angular.element(this).scope().setFile(this), angular.element(this).scope().SetUploading()"
+                                    hidden />
+                            </label>
+                        </div>
+
+                        <div class="d-flex align-items-center" ng-if="uploading">
+                            <strong>Generating your Product Sheet, please wait...</strong>
+                            <div class="spinner is-active ml-auto" role="status" aria-hidden="true"></div>
+                        </div>
+
+                    </div>
+                    <div class="col-12 my-3">
+                        <div ng-if="prodSheetUpload && !uploading" class="min-scroll-table">
+                            <table class="table table-striped table-fixed">
+                                <tbody ng-repeat="product in prodSheetUpload  | limitTo: 6 track by $index">
+                                    <tr>
+                                        Displaying {{(prodSheetUpload.length > 5)?5:prodSheetUpload.length}} results of
+                                        total {{prodSheetUpload.length | number}}
+                                    </tr>
+                                    <tr>
+                                        <td ng-repeat="attribute in product track by $index ">
+                                            <span ng-if="attribute.length >= 1" title="{{attribute}}">{{attribute |
+                                                limitTo: 25}}{{attribute.length >= 25 ? '...' : ''}}</span>
+                                            <span ng-if="attribute.length <= 0">----</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12" ng-class="{'text-end':prodSheetUpload}">
+                        <button type="button" class="button button-primary" ng-class="{'col': isXS || isSM}"
+                            ng-disabled="productUploadForm.$invalid" ng-click="$ctrl.uploadInventory()"
+                            ng-if="prodSheetUpload">Upload Inventory</button>
+                    </div>
+                </form>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

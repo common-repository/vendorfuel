@@ -1,0 +1,54 @@
+<p ng-if="$ctrl.cartCount > 0" class="has-medium-font-size d-none d-lg-block">
+	<ng-pluralize
+		count="$ctrl.cartCount"
+		when="{'0': 'No items in your cart.',
+				'one': '1 item in your cart.',
+				'other': '{} items in your cart.'}"
+	>
+	</ng-pluralize>
+</p>
+<div class="row d-md-none" ng-if="$ctrl.cartCount > 0">
+	<div class="col-md-8">
+		<div class="row">
+			<div class="col-auto">
+				<ng-pluralize
+					count="$ctrl.cartCount"
+					when="{'0': 'No items.',
+							'one': '1 item.',
+							'other': '{} items.'}"
+				>
+				</ng-pluralize>
+			</div>
+			<div class="col text-end">
+				<small>Estimated Total:</small>
+				{{ $ctrl.totalAmount | currency }}
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<form
+			ng-if="$ctrl.cart.punchout"
+			method="POST"
+			style="display: inline"
+			action="{{ $ctrl.cart.punchout.return_url }}"
+		>
+			<input
+				type="hidden"
+				name="cxml-urlencoded"
+				id="cxml-urlencoded"
+				value="{{ $ctrl.cart.punchout.cxml }}"
+			/><input
+				type="submit"
+				value="Checkout"
+				id="btnCheckoutPO"
+				class="btn btn-primary w-100 btn-lg my-2"
+			/>
+		</form>
+		<a
+			ng-if="!$ctrl.cart.punchout"
+			class="btn btn-primary w-100 my-3"
+			ng-href="{{ $ctrl.pageUrls.checkout }}"
+			>Checkout<i class="bi bi-chevron-right"></i
+		></a>
+	</div>
+</div>

@@ -1,0 +1,240 @@
+<layout-component>
+	<bs-spinner ng-if="$ctrl.isLoading"> </bs-spinner>
+
+	<div
+		class="alert alert-info text-center"
+		ng-hide="$ctrl.isLoading"
+		ng-if="!$ctrl.order"
+	>
+		<h3>Your shopping cart is empty.</h3>
+		<p>
+			Please go to the
+			<a class="alert-link" ng-href="{{ $ctrl.pageUrls.catalog }}"
+				>Catalog</a
+			>
+			to continue shopping or
+			<span ng-if="!$ctrl.isSignedIn">
+				<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}"
+					>Sign In</a
+				>
+				to access any previously Saved Carts.
+			</span>
+			<span ng-if="$ctrl.isSignedIn">
+				go to your previously
+				<a class="alert-link" ng-href="{{ $ctrl.pageUrls.savedCarts }}"
+					>Saved Carts</a
+				>.
+			</span>
+		</p>
+		<div class="btn-toolbar justify-content-center">
+			<a class="btn btn-primary" ng-href="{{ $ctrl.pageUrls.catalog }}"
+				>Go to Catalog</a
+			>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-href="{{ $ctrl.pageUrls.login }}"
+				ng-if="!$ctrl.isSignedIn"
+			>
+				Sign In
+			</a>
+			<a
+				class="btn btn-secondary ms-2"
+				ng-href="{{ $ctrl.pageUrls.savedCarts }}"
+				ng-if="$ctrl.isSignedIn"
+			>
+				Saved Carts
+			</a>
+		</div>
+	</div>
+
+	<div ng-if="$ctrl.order">
+		<ul
+			class="nav nav-pills mb-3 justify-content-center"
+			id="pills-tab"
+			role="tablist"
+			aria-owns="checkout-shipping-tab checkout-billing-tab checkout-delivery-tab checkout-additional-tab checkout-review-tab"
+		>
+			<li class="nav-item">
+				<a
+					class="nav-link active px-1 px-sm-3"
+					id="checkout-shipping-tab"
+					data-bs-toggle="pill"
+					href="#checkout-shipping"
+					role="tab"
+					aria-controls="checkout-shipping"
+					aria-selected="true"
+				>
+					<i
+						ng-if="$ctrl.isShippingComplete"
+						class="bi bi-check-circle-fill text-success"
+					></i>
+					Shipping
+				</a>
+			</li>
+			<li class="nav-item" ng-hide="$ctrl.isShippingSameAsBilling">
+				<a
+					class="nav-link px-1 px-sm-3"
+					id="checkout-billing-tab"
+					data-bs-toggle="pill"
+					ng-class="{ disabled: !$ctrl.isShippingComplete }"
+					href="#checkout-billing"
+					role="tab"
+					aria-controls="checkout-billing"
+					aria-selected="false"
+				>
+					<i
+						ng-if="$ctrl.isBillingComplete"
+						class="bi bi-check-circle-fill text-success"
+					></i>
+					Billing
+				</a>
+			</li>
+			<li class="nav-item">
+				<a
+					class="nav-link px-1 px-sm-3"
+					id="checkout-delivery-tab"
+					data-bs-toggle="pill"
+					ng-class="{ disabled: !$ctrl.isBillingComplete }"
+					href="#checkout-delivery"
+					role="tab"
+					aria-controls="checkout-delivery"
+					aria-selected="false"
+				>
+					<i
+						ng-if="$ctrl.isDeliveryComplete"
+						class="bi bi-check-circle-fill text-success"
+					></i>
+					Delivery
+				</a>
+			</li>
+			<li class="nav-item" ng-show="$ctrl.hasAdditionalInfo">
+				<a
+					class="nav-link px-1 px-sm-3"
+					id="checkout-additional-tab"
+					data-bs-toggle="pill"
+					ng-class="{ disabled: !$ctrl.isBillingComplete }"
+					href="#checkout-additional"
+					role="tab"
+					aria-controls="checkout-additional"
+					aria-selected="false"
+				>
+					<i
+						ng-if="$ctrl.isExtraFieldsComplete"
+						class="bi bi-check-circle-fill text-success"
+					></i>
+					Additional Info
+				</a>
+			</li>
+			<li class="nav-item">
+				<a
+					class="nav-link px-1 px-sm-3"
+					id="checkout-review-tab"
+					data-bs-toggle="pill"
+					ng-class="{ disabled: !$ctrl.isDeliveryComplete }"
+					href="#checkout-review"
+					role="tab"
+					aria-controls="checkout-review"
+					aria-selected="false"
+				>
+					Review
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="has-text-align-center" ng-if="$ctrl.order && !$ctrl.isSignedIn">
+		<p>
+			Log in or create an account now and enjoy an easier and faster
+			checkout process.
+		</p>
+		<p>
+			<a
+				class="btn btn-link"
+				ng-href="{{ $ctrl.pageUrls.register }}?referrer=checkout"
+				>Register</a
+			>
+			|
+			<a
+				class="btn btn-link"
+				ng-href="{{ $ctrl.pageUrls.login }}?referrer=checkout"
+				>Login</a
+			>
+		</p>
+	</div>
+
+	<div class="mb-5" ng-if="$ctrl.order">
+		<div class="tab-content" id="pills-tabContent">
+			<div
+				class="tab-pane fade show active"
+				id="checkout-shipping"
+				role="tabpanel"
+				aria-labelledby="checkout-shipping-tab"
+			>
+				<checkout-shipping-address
+					billing-address="$ctrl.billingAddress"
+					is-billing-complete="$ctrl.isBillingComplete"
+					is-shipping-complete="$ctrl.isShippingComplete"
+					is-shipping-same-as-billing="$ctrl.isShippingSameAsBilling"
+					shipping-address="$ctrl.shippingAddress"
+				></checkout-shipping-address>
+			</div>
+			<div
+				class="tab-pane fade"
+				id="checkout-billing"
+				role="tabpanel"
+				aria-labelledby="checkout-billing-tab"
+			>
+				<checkout-billing-address
+					billing-address="$ctrl.billingAddress"
+					is-billing-complete="$ctrl.isBillingComplete"
+					shipping-address="$ctrl.shippingAddress"
+				></checkout-billing-address>
+			</div>
+			<div
+				class="tab-pane fade"
+				id="checkout-delivery"
+				role="tabpanel"
+				aria-labelledby="checkout-delivery-tab"
+			>
+				<checkout-shipping-method
+					has-additional-info="$ctrl.hasAdditionalInfo"
+					order-id="$ctrl.order.order_id"
+					zipcode="$ctrl.shippingAddress.zip"
+					is-billing-complete="$ctrl.isBillingComplete"
+					is-shipping-complete="$ctrl.isShippingComplete"
+					is-delivery-complete="$ctrl.isDeliveryComplete"
+					is-ready-to-confirm="$ctrl.isReadyToConfirm"
+					is-shipping-same-as-billing="$ctrl.isShippingSameAsBilling"
+					selected-shipping-method="$ctrl.selectedShippingMethod"
+				>
+				</checkout-shipping-method>
+			</div>
+			<div
+				class="tab-pane fade"
+				id="checkout-additional"
+				role="tabpanel"
+				aria-labelledby="checkout-additional-tab"
+			>
+				<checkout-additional-fields extra-fields="$ctrl.extraFields">
+				</checkout-additional-fields>
+			</div>
+			<div
+				class="tab-pane fade"
+				id="checkout-review"
+				role="tabpanel"
+				aria-labelledby="checkout-review-tab"
+			>
+				<checkout-finalize-order
+					accepted-payment-types="$ctrl.acceptedPaymentTypes"
+					billing-address="$ctrl.billingAddress"
+					extra-fields="$ctrl.extraFields"
+					order="$ctrl.order"
+					is-ready-to-confirm="$ctrl.isReadyToConfirm"
+					is-shipping-same-as-billing="$ctrl.isShippingSameAsBilling"
+					shipping-address="$ctrl.shippingAddress"
+					selected-shipping-method="$ctrl.selectedShippingMethod"
+				></checkout-finalize-order>
+			</div>
+		</div>
+	</div>
+</layout-component>

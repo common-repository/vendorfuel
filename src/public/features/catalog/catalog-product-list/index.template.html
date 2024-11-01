@@ -1,0 +1,68 @@
+<div id="toasts" class="toasts" aria-live="polite" aria-atomic="true"></div>
+<div class="btn-toolbar mb-3" role="toolbar" aria-label="Change view and sorting">
+    <catalog-view-toggle
+        view-as="$ctrl.viewAs"
+        on-toggle="$ctrl.toggleView(view)">
+    </catalog-view-toggle>
+    <catalog-sort-by></catalog-sort-by>
+</div>
+<div class="d-flex justify-content-center py-5"
+    ng-show="$ctrl.isLoading">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div
+    class="alert alert-secondary"
+    ng-if="$ctrl.hits.length === 0 && !$ctrl.isLoading">
+        <h2 class="h4">No results found
+            <span ng-if="$ctrl.query">
+                for <q>{{$ctrl.query}}</q>
+            <span>
+            <span ng-if="$ctrl.category">
+                in {{ $ctrl.category.title }}
+            </span>
+        </h2>
+        <div ng-if="$ctrl.query || $ctrl.hasActiveFilters || $ctrl.isCategory">
+            <p>Tips:</p>
+            <ul>
+                <li ng-if="$ctrl.query && $ctrl.isCategory">
+                    If you are searching for a product name or <abbr title="Stock Keeping Unit">SKU</abbr>, try <a href="{{ $ctrl.pageUrls.catalog + '?q=' + $ctrl.query }}">searching the entire catalog</a>.
+                </li>
+                <li ng-if="$ctrl.query">
+                    Double check the spelling.
+                </li>
+                <li ng-if="$ctrl.query">
+                    Use different keywords.
+                </li>
+                <li ng-if="$ctrl.hasActiveFilters">
+                    Uncheck any filters you may have selected.
+                </li>
+                <li ng-if="$ctrl.isCategory">
+                    Try browsing by category and then subcategories.
+                </li>
+            </ul>
+        </div>
+        <p ng-if="!$ctrl.query && !$ctrl.hasActiveFilters && !$ctrl.isCategory">
+            Please try again later.
+        </p>
+        <div class="btn-toolbar">
+            <a class="btn btn-primary"
+                ng-href="{{ $ctrl.pageUrls.catalog }}">
+                Search catalog
+            </a>
+        </div>
+</div>
+
+<div ng-class="$ctrl.viewAs === 'grid' ? 'row g-3 row-cols-2 row-cols-lg-3 row-cols-xl-4' : 'list-group'"
+    ng-hide="$ctrl.isLoading">
+    <div ng-class="$ctrl.viewAs === 'grid' ? 'col' : 'list-group-item p-0'"
+        ng-repeat="product in $ctrl.hits">
+        <product-list-item
+            view-as="$ctrl.viewAs"
+            product="product">
+        </product-list-item>
+    </div>
+</div>
+<catalog-pagination></catalog-pagination>

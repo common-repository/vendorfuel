@@ -1,0 +1,59 @@
+<section ng-if="$ctrl.shipments.length">
+	<h3>Shipments</h3>
+
+	<table
+		class="table mb-3"
+		ng-repeat="shipment in $ctrl.shipments track by $index"
+	>
+		<tbody>
+			<tr>
+				<th class="text-nowrap" scope="row">Shipment Date</th>
+				<td>
+					<time ng-attr-datetime="{{ shipment.shipment_date }}">
+						{{ shipment.shipment_date | date: 'short' }}
+					</time>
+				</td>
+			</tr>
+			<tr>
+				<th class="text-nowrap" scope="row">Carrier</th>
+				<td>
+					{{ shipment.carrier }}
+				</td>
+			</tr>
+			<tr>
+				<th class="text-nowrap" scope="row">Tracking Code</th>
+				<td>
+					{{ shipment.code }}
+				</td>
+			</tr>
+			<tr>
+				<th class="text-nowrap" scope="row">Items</th>
+				<td class="pe-0">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>
+									<abbr title="Stock Keeping Unit">SKU</abbr>
+								</th>
+								<th>
+									<abbr title="Quantity">QTY</abbr>
+									Shipped
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								ng-repeat="item in shipment.items track by $index"
+							>
+								<td>{{ item.product.description }}</td>
+								<td>{{ item.product.sku }}</td>
+								<td>{{ item.shipped.qty }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</section>

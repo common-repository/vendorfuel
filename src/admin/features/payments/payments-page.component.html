@@ -1,0 +1,27 @@
+<layout-component heading="Payments">
+	<spinner-component ng-if="loading"></spinner-component>
+
+	<div ng-if="!loading">
+		<div class="row">
+			<div class="col-lg-4">
+				<div class="mb-3">
+					<label class="form-label" for="template"
+						>Select Gateway to Configure</label
+					>
+					<select
+						id="template"
+						class="form-select"
+						ng-model="template"
+						ng-options="t.name for t in templates"
+					>
+						<option value="" hidden disabled>
+							Select a Gateway
+						</option>
+					</select>
+				</div>
+				<div ng-include="template.url"></div>
+			</div>
+			<div class="col-lg-8"></div>
+		</div>
+	</div>
+</layout-component>

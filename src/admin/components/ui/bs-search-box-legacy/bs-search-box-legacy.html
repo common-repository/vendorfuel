@@ -1,0 +1,42 @@
+<form ng-submit="$ctrl.submit()">
+	<fieldset class="input-group mb-3" ng-disabled="$ctrl.isLoading">
+		<button
+			class="btn btn-outline-primary dropdown-toggle"
+			type="button"
+			data-bs-toggle="dropdown"
+			aria-expanded="false"
+			ng-if="$ctrl.searchOptions"
+		>
+			Search by {{ $ctrl.searchOptions[$ctrl.searchBy] }}
+		</button>
+		<ul class="dropdown-menu" ng-if="$ctrl.searchOptions">
+			<li>
+				<a
+					class="dropdown-item"
+					href="#"
+					ng-click="$ctrl.changeSearchBy('', $event)"
+				>
+					All
+				</a>
+			</li>
+			<li><hr class="dropdown-divider" /></li>
+			<li ng-repeat="(key, value) in $ctrl.searchOptions track by $index">
+				<a
+					class="dropdown-item"
+					href="#"
+					ng-click="$ctrl.changeSearchBy(key, $event)"
+				>
+					{{ value }}
+				</a>
+			</li>
+		</ul>
+		<input
+			type="search"
+			class="form-control"
+			aria-label="Search"
+			ng-model="$ctrl.q"
+			ng-change="$ctrl.changeQuery( $ctrl.q );"
+		/>
+		<button class="btn btn-outline-primary" type="submit">Search</button>
+	</fieldset>
+</form>

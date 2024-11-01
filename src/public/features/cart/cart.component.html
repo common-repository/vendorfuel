@@ -1,0 +1,70 @@
+<layout-component>
+	<div class="alert alert-info text-center" ng-if="!$ctrl.isAuthed">
+		<h3>Your shopping cart is empty.</h3>
+		<p class="mb-0">
+			Please
+			<a class="alert-link" ng-href="{{ $ctrl.pageUrls.catalog }}"
+				>continue shopping</a
+			>
+			or
+			<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}"
+				>sign in</a
+			>
+			to view your current cart or any saved carts.
+		</p>
+	</div>
+
+	<div
+		class="d-flex justify-content-center"
+		ng-if="$ctrl.isAuthed && $ctrl.isLoading"
+	>
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<div
+		class="alert alert-info"
+		ng-if="
+			$ctrl.showFreeShipping &&
+			$ctrl.totalAmount &&
+			$ctrl.minOrderAmount &&
+			$ctrl.minOrderAmount > $ctrl.totalAmount
+		"
+	>
+		Add {{ $ctrl.minOrderAmount - $ctrl.totalAmount | currency }} to your
+		cart to qualify for free shipping.
+	</div>
+
+	<div class="row" ng-if="$ctrl.isAuthed">
+		<div class="col">
+			<cart-summary
+				total-amount="$ctrl.totalAmount"
+				cart-count="$ctrl.cartCount"
+				cart="$ctrl.cart"
+			>
+			</cart-summary>
+			<cart-items
+				cart="$ctrl.cart"
+				is-loading="$ctrl.isLoading"
+				ng-show="!$ctrl.isLoading"
+			>
+			</cart-items>
+		</div>
+		<div class="col-sm-3" ng-if="$ctrl.cart && $ctrl.cart.items">
+			<cart-promo-code
+				promo-codes="$ctrl.promoCodes"
+				promo-discount="$ctrl.promoDiscount"
+				total-amount="$ctrl.totalAmount"
+			></cart-promo-code>
+			<cart-order-details
+				cart="$ctrl.cart"
+				total-amount="$ctrl.totalAmount"
+				subtotal="$ctrl.subtotal"
+				cart-count="$ctrl.cartCount"
+				promo-discount="$ctrl.promoDiscount"
+			>
+			</cart-order-details>
+		</div>
+	</div>
+</layout-component>

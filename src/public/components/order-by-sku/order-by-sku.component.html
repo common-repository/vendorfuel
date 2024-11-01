@@ -1,0 +1,71 @@
+<layout-component>
+	<div class="alert alert-info" role="alert" ng-if="!$ctrl.isSignedIn">
+		Please
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.login }}">Sign In</a>
+		or
+		<a class="alert-link" ng-href="{{ $ctrl.pageUrls.register }}"
+			>Create an Account</a
+		>
+		to view this page.
+	</div>
+
+	<div ng-if="$ctrl.isSignedIn">
+		<form
+			name="orderBySkuForm"
+			class="mb-3"
+			ng-submit="$ctrl.submit($ctrl.sku, $ctrl.qty)"
+		>
+			<div class="row">
+				<div class="col">
+					<div class="mb-3">
+						<label for="sku" class="form-label">
+							<abbr title="Stock Keeping Unit">SKU</abbr>
+						</label>
+						<input
+							type="text"
+							required
+							name="sku"
+							class="form-control"
+							list="sku-list"
+							autocomplete="off"
+							ng-model="$ctrl.sku"
+							ng-disabled="$ctrl.isInProgress"
+							ng-min="1"
+						/>
+						<small class="form-text"
+							>If you don't know the SKU number, you can use the
+							search below to find your product's SKU.</small
+						>
+					</div>
+					<datalist name="sku-list" id="sku-list">
+						<option
+							ng-repeat="product in $ctrl.products"
+							value="{{ product.sku }}"
+						></option>
+					</datalist>
+				</div>
+				<div class="col">
+					<div class="mb-3">
+						<label for="qty" class="form-label"> Quantity </label>
+						<input
+							type="number"
+							min="1"
+							name="qty"
+							class="form-control"
+							ng-model="$ctrl.qty"
+							ng-disabled="$ctrl.isInProgress"
+						/>
+					</div>
+				</div>
+			</div>
+			<button
+				class="btn btn-primary"
+				type="submit"
+				ng-disabled="orderBySkuForm.$invalid"
+			>
+				Add to Cart
+			</button>
+		</form>
+		<order-by-sku-search></order-by-sku-search>
+	</div>
+</layout-component>

@@ -1,0 +1,15 @@
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li
+			ng-class="['breadcrumb-item', { active: $last }]"
+			ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index"
+		>
+			<span ng-switch on="$last">
+				<span ng-switch-when="true">{{ breadcrumb.label }}</span>
+				<a ng-switch-default ng-href="{{ breadcrumb.href }}">{{
+					breadcrumb.label
+				}}</a>
+			</span>
+		</li>
+	</ol>
+</nav>

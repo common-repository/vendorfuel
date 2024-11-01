@@ -1,0 +1,8 @@
+body:not(.vf-signed-in) .show-vf-signed-in,
+body.vf-signed-in .hide-vf-signed-in,
+body:not(.vf-group-admin) .show-vf-group-admin,
+body.vf-group-admin .hide-vf-group-admin,
+body:not(.vf-punchout-only) .show-vf-punchout-only,
+body.vf-punchout-only .hide-vf-punchout-only {
+	display: none;
+}

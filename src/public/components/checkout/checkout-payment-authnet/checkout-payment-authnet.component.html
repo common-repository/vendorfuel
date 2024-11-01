@@ -1,0 +1,193 @@
+<alert-list></alert-list>
+
+<form
+	class="mb-3"
+	id="creditCardForm"
+	name="creditCardForm"
+	ng-hide="$ctrl.isComplete"
+>
+	<fieldset ng-disabled="$ctrl.isComplete">
+		<legend class="visually-hidden">Credit/Debit Card</legend>
+		<div class="row mb-3">
+			<div class="col">
+				<label class="form-label" for="ccNum">Card Number</label>
+				<input
+					type="text"
+					class="form-control"
+					placeholder="Card Number"
+					name="ccNum"
+					id="ccNum"
+					required
+					minlength="13"
+					maxlength="16"
+					pattern="[0-9]{13,16}"
+					required
+					autocomplete="cc-number"
+					ng-model="$ctrl.card.number"
+					ng-class="{
+						'is-valid': creditCardForm.ccNum.$valid,
+						'is-invalid':
+							creditCardForm.ccNum.$touched &&
+							creditCardForm.ccNum.$invalid
+					}"
+				/>
+				<div class="invalid-feedback">
+					Please enter a valid credit card number.
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<p class="control-label fw-bold mb-2">Expiration Date</p>
+				<div class="row">
+					<div class="col">
+						<label class="visually-hidden" for="ccExpMonth"
+							>Expiration Month</label
+						>
+						<select
+							class="form-control"
+							placeholder="Expiration Month"
+							name="ccExpMonth"
+							id="ccExpMonth"
+							required
+							ng-model="$ctrl.card.expMonth"
+							ng-class="{
+								'is-valid': creditCardForm.ccExpMonth.$valid,
+								'is-invalid':
+									creditCardForm.ccExpMonth.$touched &&
+									creditCardForm.ccExpMonth.$invalid
+							}"
+						>
+							<option value="" selected disabled>Month</option>
+							<option value="01">01 JAN</option>
+							<option value="02">02 FEB</option>
+							<option value="03">03 MAR</option>
+							<option value="04">04 APR</option>
+							<option value="05">05 MAY</option>
+							<option value="06">06 JUNE</option>
+							<option value="07">07 JULY</option>
+							<option value="08">08 AUG</option>
+							<option value="09">09 SEPT</option>
+							<option value="10">10 OCT</option>
+							<option value="11">11 NOV</option>
+							<option value="12">12 DEC</option>
+						</select>
+						<div class="invalid-feedback">
+							Please select the month your card expires.
+						</div>
+					</div>
+					<div class="col">
+						<label class="visually-hidden" for="ccExpYear"
+							>Expiration Year</label
+						>
+						<select
+							class="form-control"
+							placeholder="Expiration Year"
+							name="ccExpYear"
+							id="ccExpYear"
+							required
+							ng-model="$ctrl.card.expYear"
+							ng-class="{
+								'is-valid': creditCardForm.ccExpYear.$valid,
+								'is-invalid':
+									creditCardForm.ccExpYear.$touched &&
+									creditCardForm.ccExpYear.$invalid
+							}"
+						>
+							<option value="" selected disabled>Year</option>
+							<option
+								ng-repeat="year in $ctrl.years track by $index"
+								value="{{ year }}"
+							>
+								{{ year }}
+							</option>
+						</select>
+						<div class="invalid-feedback">
+							Please select the year your card expires.
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-2">
+				<label class="form-label" for="ccCvv">Card CVV</label>
+				<input
+					type="text"
+					class="form-control"
+					placeholder="Card CVV"
+					id="ccCvv"
+					name="ccCvv"
+					minlength="3"
+					maxlength="4"
+					required
+					pattern="[0-9]{3,4}"
+					title="Card verification code"
+					autocomplete="cc-csc"
+					ng-model="$ctrl.card.cardCode"
+					ng-class="{
+						'is-valid': creditCardForm.ccCvv.$valid,
+						'is-invalid':
+							creditCardForm.ccCvv.$touched &&
+							creditCardForm.ccCvv.$invalid
+					}"
+				/>
+				<div class="invalid-feedback">
+					Please enter your CVV or card verification code.
+				</div>
+			</div>
+			<div class="col-sm-2">
+				<label class="form-label" for="ccPostal">Postal Code</label>
+				<input
+					type="text"
+					class="form-control"
+					placeholder="Card Postal Code"
+					name="ccPostal"
+					id="ccPostal"
+					required
+					minlength="5"
+					maxlength="10"
+					required
+					ng-model="$ctrl.card.postalCode"
+					ng-class="{
+						'is-valid': creditCardForm.ccPostal.$valid,
+						'is-invalid':
+							creditCardForm.ccPostal.$touched &&
+							creditCardForm.ccPostal.$invalid
+					}"
+				/>
+				<div class="invalid-feedback">
+					Please enter your billing zip code.
+				</div>
+			</div>
+		</div>
+		<button
+			class="btn btn-primary"
+			ng-click="$ctrl.sendPaymentDataToAnet()"
+			ng-disabled="creditCardForm.$invalid || $ctrl.isInProgress || $ctrl.isComplete"
+		>
+			<span
+				class="spinner-border spinner-border-sm"
+				role="status"
+				aria-hidden="true"
+				ng-show="$ctrl.isInProgress"
+			></span>
+			Complete Order
+		</button>
+	</fieldset>
+</form>
+
+<div
+	class="alert alert-warning"
+	ng-if="$ctrl.isInProgress && !$ctrl.isComplete"
+>
+	Completing order, please wait and do not refresh the page.
+</div>
+
+<div class="alert alert-success" role="alert" ng-if="$ctrl.isComplete">
+	<h3>Checkout Complete for Order {{ $ctrl.orderId }}</h3>
+	<p>
+		{{
+			$ctrl.isPending
+				? 'Your order is now pending approval.'
+				: 'Your order has been submitted!'
+		}}
+	</p>
+	<a class="btn btn-primary" href="/"> Go to Home </a>
+</div>

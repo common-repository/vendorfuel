@@ -1,0 +1,99 @@
+<vf-product-card class="d-block" product-id="ID_OF_PRODUCT"></vf-product-card>
+
+<!-- Product Card template -->
+<script type="text/ng-template" id="vfProductCard.html">
+	 <div class="card shadow-sm mb-3">
+	     <div class="d-flex justify-content-center py-5"
+	         ng-show="$ctrl.isLoading">
+	         <div class="spinner-border" role="status">
+	             <span class="visually-hidden">Loading...</span>
+	         </div>
+	     </div>
+	     <div class="alert alert-warning alert-dismissible fade show mb-0" role="alert"
+	         ng-repeat="error in $ctrl.errors">
+	         {{ error }}
+			 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	     </div>
+
+	     <div class="row g-0 align-items-center"
+	ng-hide="$ctrl.isLoading || $ctrl.errors.length > 0">
+	         <div class="col-2 col-md-4 col-lg-12 p-1 pt-2 px-2 pt-lg-3 px-lg-3">
+	             <a ng-href="{{$ctrl.url}}"
+	                 ng-attr-title="{{$ctrl.product.description}}">
+	                 <div class="ratio ratio-1x1">
+	                     <img class="card-img-top lazy" loading="lazy" style="object-fit:contain;"
+					ng-attr-alt="{{ $ctrl.product.description }}"
+					ng-src="{{ $ctrl.imageSrc }}">
+	                 </div>
+	             </a>
+	         </div>
+	         <div class="col col-md-8 col-lg-12 p-2 p-lg-3">
+	             <h3 class="h6 card-title mb-0 text-break">
+	                 <a ng-href="{{$ctrl.url}}"
+	                     ng-attr-title="{{$ctrl.product.description}}">
+	                     {{$ctrl.product.description}}
+	                 </a>
+	             </h3>
+		<strong>{{$ctrl.price | currency}}</strong>
+		<small class="text-nowrap" ng-if="$ctrl.product.uom">/{{$ctrl.product.uom}}</small>
+	</div>
+	<div class="col-auto col-md-12 p-0">
+		<div class="btn-toolbar p-1 p-lg-2">
+			<button class="btn btn-link"
+				ng-if="$ctrl.isSignedIn"
+				ng-click="$ctrl.onClickFavorites()">
+				<i ng-class="['bi',
+					{'bi-heart': !$ctrl.isFavorite,
+					'bi-heart-fill': $ctrl.isFavorite}]"
+					ng-hide="$ctrl.isTogglingFavorite"></i>
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+					ng-show="$ctrl.isTogglingFavorite"></span>
+			</button>
+			<a class="btn btn-primary flex-grow-1"
+				ng-href="/{{$ctrl.productSlug}}/{{$ctrl.product.slug}}"
+				ng-if="$ctrl.product.prop65 ||
+					$ctrl.product.status !== 'active' ||
+					$ctrl.product.additional_shipping ||
+					$ctrl.getAvailableQty($ctrl.product) <= 0">
+				<i class="bi bi-zoom-in"></i>
+				<span ng-class="{'d-none d-md-inline': $ctrl.viewAs === 'list'}">
+					View <span class="d-none d-lg-inline">
+						Details
+					</span>
+				</span>
+			</a>
+			<button class="btn btn-primary flex-grow-1"
+				ng-if="!$ctrl.product.prop65 &&
+					$ctrl.product.status === 'active' &&
+					!$ctrl.product.additional_shipping &&
+					$ctrl.getAvailableQty($ctrl.product) !== 0"
+				ng-click="$ctrl.onClickAddToCart()"										>
+				<i class="bi bi-cart-plus-fill"
+					ng-hide="$ctrl.isAddingToCart"></i>
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+					ng-show="$ctrl.isAddingToCart"></span>
+				<span class="d-none d-md-inline">
+					{{ $ctrl.isAddingToCart ? 'Adding' : 'Add to Cart' }}
+				</span>
+			</button>
+		</div>
+		<div class="has-text-align-center px-1 px-lg-2 pb-md-2"
+			ng-show="$ctrl.product['cart_qty'] > 0">
+			<small
+				ng-show="$ctrl.product['cart_qty'] > 0">
+				{{$ctrl.product['cart_qty']}} in your cart
+			<small>
+		</div>
+	         </div>
+	     </div>
+	 </div>
+</script>
+
+<!-- Product Card Image template -->
+<script type="text/ng-template" id="productCardImage.html">
+	<div class="ratio ratio-1x1">
+		<img class="card-img-top lazy" loading="lazy" style="object-fit:contain;"
+			ng-attr-alt="{{$ctrl.imageTitle}}"
+			ng-src="{{ $ctrl.imageSrc ? $ctrl.imageSrc : $ctrl.imgPlaceholder }}">
+	</div>
+</script>

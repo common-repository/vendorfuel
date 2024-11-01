@@ -1,0 +1,7 @@
+<button
+	class="btn btn-outline-primary"
+	ng-click="$ctrl.send()"
+	ng-disabled="$ctrl.isLoading"
+>
+	Send {{ $ctrl.emailType === 'register' ? 'Welcome' : 'Verified' }} Email
+</button>

@@ -1,0 +1,37 @@
+<div class="hstack">
+	<h1 class="wp-heading-inline">Settings</h1>
+	<a class="button ms-auto" href="?page=vf-admin#/settings/clearsale"
+		>ClearSale settings</a
+	>
+</div>
+
+<div
+	class="alert alert-warning is-dismissible"
+	ng-if="!$ctrl.isAuthed && $ctrl.hasAPIKey"
+>
+	You must be signed in to VendorFuel to view all the store settings.
+	<a class="alert-link" href="#!/login">Sign In</a>
+</div>
+
+<div class="alert alert-danger" ng-if="!$ctrl.hasAPIKey">
+	A VendorFuel API is required to access your VendorFuel store settings and
+	data. Please enter your provided VendorFuel API key below. For help, please
+	contact
+	<a class="alert-link" href="mailto:support@vendorfuel.com"
+		>support@vendorfuel.com</a
+	>.
+</div>
+
+<section>
+	<nav-tab-wrapper
+		active="$ctrl.active"
+		tabs="$ctrl.tabs"
+		authed="$ctrl.isAuthed"
+		handle-change="$ctrl.setActive(id)"
+	></nav-tab-wrapper>
+	<settings-plugin ng-if="$ctrl.active === 'general'"></settings-plugin>
+	<settings-store ng-if="$ctrl.active === 'store'"></settings-store>
+	<settings-analytics ng-if="$ctrl.active === 'analytics'">
+	</settings-analytics>
+	<settings-mapping ng-if="$ctrl.active === 'mapping'"></settings-mapping>
+</section>

@@ -1,0 +1,178 @@
+<div class="card mb-3" ng-if="$ctrl.isAuthed">
+  <div class="card-body">
+    <h2>Welcome to Vendor<span class="has-orange-color">Fuel</span>!</h2>
+    <p class="lead">
+      Here are some steps we highly recommend to get your store up and running.
+    </p>
+    <p>You can always access this information in the Help menu.</p>
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        name="showTutorial"
+        type="checkbox"
+        id="showTutorial"
+        ng-model="$ctrl.isHidingTutorial"
+        ng-change="$ctrl.toggle( 'showTutorial' )"
+      />
+      <label class="form-check-label" for="showTutorial">
+        Don't show me this page again.
+      </label>
+    </div>
+  </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-3">
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Supported Themes</div>
+      <div class="card-body">
+        <a
+          class="button button-primary button-hero"
+          href="https://wordpress.org/themes/vendorfuel/"
+        >
+          Download the VendorFuel theme
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Add Products to your store</div>
+      <div class="card-body">
+        <ol class="ps-0">
+          <li>Add a SKU to your product(s).</li>
+          <li>Add the name of your product(s).</li>
+          <li>Add your product to a price Sheet.</li>
+          <li>Add a price to your product(s).</li>
+        </ol>
+        <p class="card-text">
+          You can add add and remove products by heading over to the
+          <a ui-sref="products({ activeTab: 0 })">Products</a>
+          section of the plugin. Make sure you go through each of the steps for
+          adding a product as they are all required in order for your product to
+          available for purchase in your catalog!
+        </p>
+      </div>
+      <div class="card-footer">
+        <a class="button" ui-sref="products({ activeTab: 0 })"
+          >Go to Products</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Add Payment Processor</div>
+      <div class="card-body">
+        <p class="card-text">
+          To accept credit card payments, you will need to add a payment
+          processor for your store transactions.
+        </p>
+        <p class="card-text">
+          Adding a payment processor is easy! You can add your payment processor
+          by heading over to the
+          <a ui-sref="payments">Payments</a>
+          section of the plugin.
+        </p>
+        <p class="card-text">
+          Don't know what a payment processor is or how to sign up for one? Take
+          a look at a few of the payment processors that we recommend!
+        </p>
+        <ul class="list-unstyled">
+          <li>
+            <a href="https://www.qualpay.com/" target="_blank">Qualpay</a>
+          </li>
+          <li>
+            <a href="https://www.authorize.net/" target="_blank"
+              >AuthorizeNet</a
+            >
+          </li>
+          <li>
+            <a href="https://www.paypal.com/" target="_blank">PayPal</a>
+          </li>
+          <li>
+            <a href="https://www.squareup.com/" target="_blank">Square</a>
+          </li>
+          <li>
+            <a href="https://www.stripe.com/" target="_blank">Stripe</a>
+          </li>
+          <li>
+            <a href="https://www.payfabric.com/" target="_blank">PayFabric</a>
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <a class="button" ui-sref="payments">Go to Payments</a>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Add Shipping Methods</div>
+      <div class="card-body">
+        <p class="card-text">
+          Add shipping rates or connect to Shippo for Live Rates.
+        </p>
+        <p class="card-text">
+          If you don't add a shipping method, your store will default shipping
+          to free. You can change this via the
+          <a ui-sref="shipping">Shipping</a>
+          section of the plugin. If you would like to sign up with Shippo for
+          live rates, use the link below.
+        </p>
+        <a class="card-link" href="https://www.goshippo.com/" target="_blank"
+          >Go to Shippo website</a
+        >
+      </div>
+      <div class="card-footer">
+        <a class="button" ui-sref="shipping">Go to Shipping</a>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Set up Store Emails</div>
+      <div class="card-body">
+        <ol class="ps-0">
+          <li>Setup SMTP for your store emails.</li>
+          <li>Customize Your Store's Communication Emails.</li>
+        </ol>
+        <p class="card-text">
+          SMTP is not required for your store however your emails will be sent
+          by the store administrator's email (the email that was used for the
+          store sign up) by default. You can customize emails sent by your store
+          such as the checkout email, registration email and more by heading
+          over to the
+          <a ui-sref="email">Emails</a>
+          section of the plugin.
+        </p>
+        <p class="card-text">
+          You do not need to customize these emails but until you do they will
+          be branded with VendorFuel logos and information.
+        </p>
+      </div>
+      <div class="card-footer">
+        <a class="button" ui-sref="email">Go to Email</a>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">Set State Tax Rates</div>
+      <div class="card-body">
+        <p>
+          You can select the states that you will be collecting taxes in via the
+          <a ui-sref="taxes">Taxes</a>
+          section of the plugin. We recommend using Avalara to make generating
+          taxes easier.
+        </p>
+        <a class="card-link" href="https://www.avalara.com/" target="_blank">
+          Go to Avalara website
+        </a>
+      </div>
+      <div class="card-footer">
+        <a class="button" ui-sref="taxes">Go to Taxes</a>
+      </div>
+    </div>
+  </div>
+</div>

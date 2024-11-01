@@ -1,0 +1,12 @@
+[
+	{
+		"name": "payments",
+		"url": "/payments",
+		"component": "paymentsPage",
+		"params": {
+			"activeTab": {
+				"dynamic": true
+			}
+		}
+	}
+]

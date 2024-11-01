@@ -1,0 +1,104 @@
+<div class="hstack justify-content-between">
+	<div class="hstack gap-2">
+		<label for="rpp" class="small text-nowrap"
+			>Number of items per page:
+		</label>
+		<select
+			class="form-select"
+			id="rpp"
+			ng-change="$ctrl.changeRpp()"
+			ng-disabled="$ctrl.isLoading"
+			ng-model="$ctrl.rpp"
+			ng-options="value for value in $ctrl.rppValues"
+		></select>
+	</div>
+	<div class="hstack gap-2">
+		<small> {{ $ctrl.data.total }} items </small>
+		<ul
+			class="pagination pagination-sm mb-0"
+			ng-if="$ctrl.data.last_page > 1"
+		>
+			<li
+				ng-class="['page-item mb-0', {
+                'disabled': $ctrl.data.current_page === 1 || $ctrl.isLoading }]"
+			>
+				<a
+					class="page-link"
+					href="#"
+					ng-click="$ctrl.changePage(1, $event)"
+				>
+					<span class="screen-reader-text"> First page </span>
+					<i
+						class="dashicons dashicons-arrow-left-alt2"
+						aria-hidden="true"
+					></i>
+					<i
+						class="dashicons dashicons-arrow-left-alt2"
+						aria-hidden="true"
+					></i>
+				</a>
+			</li>
+			<li
+				ng-class="['page-item mb-0', {
+                'disabled': $ctrl.data.current_page === 1 || $ctrl.isLoading }]"
+			>
+				<a
+					class="page-link"
+					href="#"
+					ng-click="$ctrl.changePage( $ctrl.data.current_page - 1, $event )"
+					ng-disabled="$ctrl.data.current_page === 1"
+				>
+					<span class="screen-reader-text"> Previous page </span>
+					<i
+						class="dashicons dashicons-arrow-left-alt2"
+						aria-hidden="true"
+					></i>
+				</a>
+			</li>
+		</ul>
+		<small ng-if="$ctrl.data.last_page > 1">
+			{{ $ctrl.data.current_page }} to {{ $ctrl.data.last_page }}
+		</small>
+		<ul
+			class="pagination pagination-sm mb-0"
+			ng-if="$ctrl.data.last_page > 1"
+		>
+			<li
+				ng-class="['page-item mb-0', {
+                'disabled': $ctrl.data.current_page === $ctrl.data.last_page || $ctrl.isLoading }]"
+			>
+				<a
+					class="page-link"
+					href="#"
+					ng-click="$ctrl.changePage( $ctrl.data.current_page + 1, $event )"
+				>
+					<span class="screen-reader-text"> Next page </span>
+					<i
+						class="dashicons dashicons-arrow-right-alt2"
+						aria-hidden="true"
+					></i>
+				</a>
+			</li>
+			<li
+				ng-class="['page-item mb-0', {
+                'disabled': $ctrl.data.current_page === $ctrl.data.last_page || $ctrl.isLoading }]"
+			>
+				<a
+					class="page-link"
+					href="#"
+					ng-click="$ctrl.changePage( $ctrl.data.last_page, $event )"
+				>
+					<span class="screen-reader-text"> Last page </span>
+					<i
+						class="dashicons dashicons-arrow-right-alt2"
+						aria-hidden="true"
+					></i>
+					<i
+						class="dashicons dashicons-arrow-right-alt2"
+						aria-hidden="true"
+					></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>

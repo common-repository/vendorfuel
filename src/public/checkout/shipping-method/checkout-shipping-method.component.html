@@ -1,0 +1,90 @@
+<h2 class="mt-3 py-3">Delivery Method</h2>
+<div class="d-flex justify-content-center" ng-show="$ctrl.isLoading">
+	<div class="spinner-border" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+</div>
+<div class="row row-cols-1 row-cols-md-4">
+	<div
+		class="col mb-4"
+		ng-repeat="item in $ctrl.shippingMethods track by $index"
+	>
+		<div class="card h-100 text-center">
+			<div class="card-header">
+				{{ item.label }}
+			</div>
+			<div class="card-body d-flex flex-column">
+				<p
+					ng-class="[
+						'card-text fs-3',
+						{
+							'mb-0':
+								(item.freeIfTotal && item.freeOrderTotal) ||
+								item.description
+						}
+					]"
+				>
+					<span ng-if="item.amount">
+						{{ item.amount | currency }}
+					</span>
+					<span ng-if="!item.amount">FREE</span>
+				</p>
+				<p
+					class="card-text"
+					ng-if="item.freeIfTotal && item.freeOrderTotal"
+				>
+					Get free shipping on orders of
+					{{ item.freeOrderTotal | currency }} or more.
+				</p>
+				<p class="card-text text-secondary" ng-if="item.description">
+					{{ item.description }}
+				</p>
+				<button
+					class="btn btn-outline-primary mt-auto"
+					ng-disabled="$ctrl.shippingMethods.length === 1"
+					ng-click="
+						$ctrl.setShippingMethod(
+							item.id,
+							item.shipping_method,
+							$index
+						)
+					"
+				>
+					{{ $ctrl.isSelected[$index] ? 'Selected' : 'Select' }}
+					<i
+						class="bi bi-check-circle"
+						ng-if="$ctrl.isSelected[$index]"
+					></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col">
+		<button
+			class="btn btn-link"
+			ng-if="!$ctrl.isShippingSameAsBilling"
+			ng-click="$ctrl.checkoutCtrl.showTab('billing')"
+		>
+			<i class="bi bi-chevron-left"></i> Go Back to Billing
+		</button>
+		<button
+			class="btn btn-link"
+			ng-if="$ctrl.isShippingSameAsBilling"
+			ng-click="$ctrl.checkoutCtrl.showTab('shipping')"
+		>
+			<i class="bi bi-chevron-left"></i> Go Back to Shipping
+		</button>
+	</div>
+	<div class="col-md text-end">
+		<button
+			class="btn btn-primary"
+			ng-click="$ctrl.confirmDeliveryMethod()"
+		>
+			Go to
+			{{ $ctrl.hasAdditionalInfo ? 'Additional Info' : 'Review Order' }}
+		</button>
+	</div>
+</div>

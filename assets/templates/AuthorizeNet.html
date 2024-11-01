@@ -1,0 +1,82 @@
+<div
+	ng-controller="PaymentProcessorController"
+	ng-init="processorIndex = 'authnet';attributeIndex1 = 'key';attributeIndex2 = 'id'; attributeIndex3 = 'transaction_key';attributeCount = 3;"
+>
+	<form name="authorize">
+		<div class="form-check mb-3">
+			<input
+				id="enabled"
+				class="form-check-input"
+				type="checkbox"
+				ng-model="enabled"
+				ng-true-value="1"
+				ng-false-value="0"
+			/>
+			<label for="enabled" class="form-check-label">
+				Enable as primary payment card processor
+			</label>
+		</div>
+		<div class="mb-3">
+			<label for="att1" class="form-label">Public Key</label>
+			<input
+				id="att1"
+				class="form-control"
+				ng-class="{'is-invalid': authorize.att1.$invalid}"
+				name="att1"
+				type="text"
+				ng-model="attribute1"
+				ng-required="enabled"
+			/>
+			<p class="description">
+				Your Key/ID Combination is not validated via our plugin so make
+				sure you have entered the information correctly.
+			</p>
+		</div>
+		<div class="mb-3">
+			<label for="att3" class="form-label">Transaction Key</label>
+			<input
+				id="att3"
+				class="form-control"
+				ng-class="{'is-invalid': authorize.att3.$invalid}"
+				name="att3"
+				type="text"
+				ng-model="attribute3"
+				required
+			/>
+			<p class="description">
+				Your Key/ID Combination is not validated via our plugin so make
+				sure you have entered the information correctly.
+			</p>
+		</div>
+		<div class="mb-3">
+			<label for="att2" class="form-label">ID</label>
+			<input
+				id="att2"
+				class="form-control"
+				ng-class="{'is-invalid': authorize.att2.$invalid}"
+				name="att2"
+				type="text"
+				ng-model="attribute2"
+				ng-required="enabled"
+			/>
+			<p class="description">
+				Your Key/ID Combination is not validated via our plugin so make
+				sure you have entered the information correctly.
+			</p>
+		</div>
+		<input
+			class="btn btn-primary"
+			type="button"
+			ng-click="updateGateway()"
+			title="{{authorize.$invalid ? 'Please fill out the form completely.' : ''}}"
+			ng-disabled="authorize.$invalid"
+			value="Update"
+		/>
+		<input
+			class="btn btn-danger"
+			type="button"
+			ng-click="disableGateway()"
+			value="Disable"
+		/>
+	</form>
+</div>

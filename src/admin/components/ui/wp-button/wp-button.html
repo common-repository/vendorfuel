@@ -1,0 +1,32 @@
+<button
+	type="button"
+	ng-class="['btn', {
+        'btn-primary': $ctrl.isPrimary,
+        'btn-danger': $ctrl.onDelete
+    }]"
+	ng-click="$ctrl.click()"
+	ng-disabled="$ctrl.isLoading"
+	ng-hide="$ctrl.isConfirming"
+>
+	<ng-transclude></ng-transclude>
+</button>
+
+<div class="ms-2 hstack gap-2 align-items-center" ng-if="$ctrl.isConfirming">
+	<strong class="small">Delete this?</strong>
+	<button
+		class="btn btn-outline-primary"
+		type="button"
+		ng-click="$ctrl.isConfirming = false"
+		ng-disabled="$ctrl.isLoading"
+	>
+		Cancel, keep this
+	</button>
+	<button
+		class="btn btn-danger"
+		type="button"
+		ng-click="$ctrl.onDelete()"
+		ng-disabled="$ctrl.isLoading"
+	>
+		{{ $ctrl.isDeleting ? 'Deleting' : 'Yes, delete this' }}
+	</button>
+</div>

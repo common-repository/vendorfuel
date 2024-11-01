@@ -1,0 +1,4 @@
+[
+	{ "label": "Customers", "href": "?page=vf-admin#/customers" },
+	{ "label": "Groups", "href": "?page=vendorfuel#!/customers/groups" }
+]

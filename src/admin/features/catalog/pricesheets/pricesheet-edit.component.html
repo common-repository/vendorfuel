@@ -1,0 +1,441 @@
+<breadcrumb-component breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-component>
+<h1>Edit Price Sheet</h1>
+
+<form name="form">
+	<fieldset ng-disabled="$ctrl.isBusy">
+
+		<nav-tab-wrapper
+			active="$ctrl.active"
+			tabs="$ctrl.tabs"
+			handle-change="$ctrl.setActive(id)"
+		></nav-tab-wrapper>
+
+		<section ng-show="$ctrl.active === 'general'">
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="name">Name</label>
+						</th>
+						<td
+							ng-class="[
+								'form-required',
+								{
+									'form-invalid':
+										form.name.$invalid && form.name.$touched
+								}
+							]"
+						>
+							<input
+								class="regular-text"
+								id="name"
+								name="name"
+								ng-model="$ctrl.pricesheet.sheet"
+								required
+								type="text"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Default</th>
+						<td>
+							<label for="default_price_sheet">
+								<input
+									type="checkbox"
+									ng-model="$ctrl.pricesheet.default_price_sheet"
+									id="default_price_sheet"
+								/>
+								Make default price sheet
+							</label>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<h2>Third-party Integration</h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="view_site_id">GP Export Site ID</label>
+						</th>
+						<td>
+							<input
+								class="regular-text"
+								type="text"
+								id="view_site_id"
+								ng-model="$ctrl.pricesheet.site_id"
+							/>
+							<p class="description">For Microsoft Dynamics</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<label for="view_gp_ps">GP Price Sheet</label>
+						</th>
+						<td>
+							<input
+								class="regular-text"
+								type="text"
+								id="view_gp_ps"
+								ng-model="$ctrl.pricesheet.gp_price_sheet"
+							/>
+							<p class="description">For Microsoft Dynamics</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">PayFabric</th>
+						<td>
+							<fieldset>
+								<label for="transaction_type-book">
+									<input
+										type="radio"
+										name="transaction_type"
+										id="transaction_type-book"
+										ng-model="$ctrl.pricesheet.transaction_type"
+										value="Book"
+									/>
+									Book </label
+								><br />
+								<label for="transaction_type-sale">
+									<input
+										type="radio"
+										name="transaction_type"
+										id="transaction_type-sale"
+										ng-model="$ctrl.pricesheet.transaction_type"
+										value="Sale"
+									/>
+									Sale
+								</label>
+							</fieldset>
+							<button
+								class="components-button is-tertiary"
+								ng-click="$ctrl.resetTransactionType()"
+								ng-if="$ctrl.pricesheet.transaction_type"
+								type="button"
+							>
+								Reset
+							</button>
+							<p class="description">
+								Selecting a transaction type will override PayFabric
+								default.
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">ClearSale</th>
+						<td>
+							<label for="clearSaleDisabled">
+								<input
+									type="checkbox"
+									ng-model="$ctrl.pricesheet.clearSaleDisabled"
+									id="clearSaleDisabled"
+								/>
+								Disable ClearSale
+							</label>
+							<p class="description">
+								Disables ClearSale fraud protection for orders
+								placed on this price sheet.
+							</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+		<section ng-show="$ctrl.active === 'products'">
+			<div class="hstack gap-2 align-items-baseline">
+				<h2>Products</h2>
+				<button
+					class="components-button is-secondary is-small"
+					ng-click="OpenSearchModalUpdate()"
+					type="button"
+				>
+					{{ $ctrl.pricesheet.pricesheetItems.data.length ? 'Edit' : 'Add' }}
+					Products
+				</button>
+				<button
+					class="components-button is-tertiary is-small"
+					type="button"
+					ng-if="$ctrl.updatedProducts.length"
+					ng-click="$ctrl.isShowingChanges = !$ctrl.isShowingChanges"
+				>
+					Show {{ $ctrl.isShowingChanges ? 'Current' : 'Changes' }}
+				</button>
+			</div>
+			<div ng-show="!$ctrl.isShowingChanges">
+				<div class="mb-3">
+					<label for="searchProducts" class="visually-hidden"
+						>Search</label
+					>
+					<div class="input-group" ng-form>
+						<input
+							class="form-control"
+							type="text"
+							id="searchProducts"
+							ng-model="searchParams.q"
+							placeholder="Search products"
+						/>
+						<button
+							class="components-button is-secondary"
+							ng-click="SearchPricesheet(1)"
+						>
+							Search
+						</button>
+					</div>
+				</div>
+				<table class="wp-list-table widefat striped table-view-list">
+					<thead>
+						<tr>
+							<th>SKU</th>
+							<th class="column-primary">Name</th>
+							<th>Price</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat="item in $ctrl.pricesheet.pricesheetItems.data track by $index"
+						>
+							<td>{{ item.sku }}</td>
+							<td>
+								<div class="hstack gap-1 align-items-start">
+									<span
+										class="media-icon image-icon"
+										ng-if="item.product.image"
+									>
+										<img
+											class="size-60x60"
+											loading="lazy"
+											width="60"
+											height="60"
+											ng-src="{{
+												item.product.image.thumb_url
+											}}"
+											alt=""
+										/>
+									</span>
+									<strong>
+										<a
+											class="row-title"
+											ng-href="?page=vendorfuel#!/catalog/products/{{
+												item.product_id
+											}}"
+										>
+											{{ item.product.description }}
+										</a>
+									</strong>
+								</div>
+							</td>
+							<td
+								ng-class="[
+									'form-required',
+									{
+										'form-invalid':
+											form['price' + $index].$invalid ||
+											!item.price
+									}
+								]"
+							>
+								<label
+									class="screen-reader-text"
+									ng-attr-for="price{{ $index }}"
+									>Price</label
+								>
+								<span class="text-nowrap"
+									>$
+									<input
+										min="0.01"
+										name="price{{ $index }}"
+										ng-attr-id="price{{ $index }}"
+										ng-change="editParams(item)"
+										ng-disabled="$ctrl.isBusy"
+										ng-model="item.price"
+										required
+										step="0.01"
+										type="number"
+									/>
+								</span>
+							</td>
+							<td class="text-end">
+								<button type="button" class="components-button is-destructive is-tertiary is-small" ng-click="$ctrl.handleRemoveProduct( item.product_id )" ng-disabled="$ctrl.isB
+								">Remove</button>
+							</td>
+						</tr>
+						<tr
+							ng-if="
+								!$ctrl.isBusy &&
+								!$ctrl.pricesheet.pricesheetItems.data.length
+							"
+						>
+							<td colspan="3">No products found.</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="hstack justify-content-between mt-2" ng-if="$ctrl.pricesheet.pricesheetItems.total">
+					<div class="hstack align-items-baseline gap-2">
+						<label for="per-page" class="form-label text-nowrap"
+							>Number of items per page:
+						</label>
+						<select
+							class="form-select"
+							id="per-page"
+							ng-model="searchParams.perPage"
+							ng-change="SearchPricesheet(1)"
+							ng-options="value for value in $ctrl.perPageOptions"
+						></select>
+					</div>
+					<div class="tablenav-pages">
+						<span class="displaying-num">{{ $ctrl.pricesheet.pricesheetItems.total | number }} items</span>
+						<span class="pagination-links">
+							<button class="components-button is-secondary" aria-label="First page" type="button" ng-disabled="!$ctrl.pricesheet.pricesheetItems.prev_page_url" ng-click="$ctrl.handlePageChange( 1 )">
+								<i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+							</button>
+							<button class="components-button is-secondary" aria-label="Previous page" type="button" ng-disabled="!$ctrl.pricesheet.pricesheetItems.prev_page_url" ng-click="$ctrl.handlePageChange( $ctrl.pricesheet.pricesheetItems.current_page - 1 )">
+								<i class="bi bi-chevron-left" aria-hidden="true"></i>
+							</button>
+							<span class="paging-input">
+								<span class="tablenav-paging-text">
+									{{ $ctrl.pricesheet.pricesheetItems.current_page }} of
+								{{ $ctrl.pricesheet.pricesheetItems.last_page }}
+								</span>
+							</span>
+							<button class="components-button is-secondary" aria-label="Next page" type="button" ng-disabled="!$ctrl.pricesheet.pricesheetItems.next_page_url" ng-click="$ctrl.handlePageChange( $ctrl.pricesheet.pricesheetItems.current_page + 1 )">
+								<i class="bi bi-chevron-right" aria-hidden="true"></i>
+							</button>
+							<button class="components-button is-secondary" aria-label="Last page" type="button" ng-disabled="!$ctrl.pricesheet.pricesheetItems.next_page_url" ng-click="$ctrl.handlePageChange( $ctrl.pricesheet.pricesheetItems.last_page )">
+								<i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+							</button>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div ng-show="$ctrl.isShowingChanges">
+				<div class="mb-3" ng-hide="productsLoading">
+					<div class="input-group">
+						<input
+							class="form-control"
+							type="text"
+							id="filterChanges"
+							ng-model="filterEdited"
+							placeholder="Filter products"
+						/>
+					</div>
+				</div>
+
+				<table class="wp-list-table widefat striped table-view-list">
+					<thead>
+						<tr>
+							<th>SKU</th>
+							<th class="column-primary">Name</th>
+							<th>Price</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							ng-repeat="item in $ctrl.updatedProducts | filter: filterEdited as results track by $index"
+						>
+							<td>{{ item.value.product.sku }}</td>
+							<td>
+								<div class="hstack gap-1 align-items-start">
+									<span
+										class="media-icon image-icon"
+										ng-if="item.value.product.image"
+									>
+										<img
+											class="size-60x60"
+											loading="lazy"
+											width="60"
+											height="60"
+											ng-src="{{
+												item.value.product.image.thumb_url
+											}}"
+											alt=""
+										/>
+									</span>
+									<strong>
+										<span class="row-title">
+											{{ item.value.product.description }}
+										</span>
+									</strong>
+									<mark class="text-capitalize">
+										{{ item.action }}
+									</mark>
+								</div>
+							</td>
+							<td
+								ng-class="[
+									'form-required',
+									{
+										'form-invalid': form['newPrice' + $index].$invalid || !item.value.price
+									}
+								]"
+							>
+								<label
+									class="screen-reader-text"
+									ng-attr-for="newPrice{{ $index }}"
+									>Price</label
+								>
+								<span class="text-nowrap"
+									>$
+									<input
+										min="0.01"
+										name="newPrice{{ $index }}"
+										ng-attr-id="newPrice{{ $index }}"
+										ng-disabled="item.action == 'edited' || item.action == 'remove'"
+										ng-model="item.value.price"
+										required
+										step="0.01"
+										type="number"
+									/>
+								</span>
+							</td>
+						</tr>
+						<tr
+							ng-if="
+								!$ctrl.isBusy &&
+								!results.length
+							"
+						>
+							<td colspan="3">No items found matching <q>{{ filterBy }}</q>'.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+		<p class="submit">
+			<button
+				class="components-button is-primary"
+				type="button"
+				ng-click="$ctrl.update($ctrl.pricesheet.price_sheet_id)"
+				ng-disabled="$ctrl.isBusy"
+			>
+				Update
+			</button>
+			<button
+				class="components-button is-tertiary is-destructive"
+				ng-click="$ctrl.isConfirmingDeletion = true"
+				ng-hide="$ctrl.isConfirmingDeletion"
+				type="button"
+			>
+				Delete
+			</button>
+			<div class="mt-2" ng-if="$ctrl.isConfirmingDeletion">
+				<p class="mb-2">Delete this price sheet?</p>
+				<div class="btn-toolbar">
+					<button
+						class="components-button is-destructive"
+						ng-click="$ctrl.deletePricesheet($ctrl.pricesheet.price_sheet_id)"
+						ng-disabled="$ctrl.isDeleting"
+					>
+						{{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+					</button>
+					<button
+						class="components-button is-tertiary"
+						ng-click="$ctrl.isConfirmingDeletion = false"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		</p>
+	</fieldset>
+</form>

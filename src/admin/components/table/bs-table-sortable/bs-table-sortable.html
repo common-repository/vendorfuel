@@ -1,0 +1,16 @@
+<a
+	href="#"
+	class="hstack d-inline-block text-decoration-none text-nowrap"
+	ng-attr-title="{{ 'Sort by ' + $ctrl.label }}"
+	ng-click="$ctrl.click( $event )"
+>
+	{{ $ctrl.label }}
+	<i
+		ng-class="['dashicons', {
+        'dashicons-arrow-down': $ctrl.isAscending,
+        'dashicons-arrow-up': !$ctrl.isAscending,
+    }]"
+		ng-if="$ctrl.params.orderBy === $ctrl.field"
+	>
+	</i>
+</a>

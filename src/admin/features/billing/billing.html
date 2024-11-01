@@ -1,0 +1,60 @@
+<breadcrumb-control breadcrumbs="$ctrl.breadcrumbs"></breadcrumb-control>
+<vf-check-auth></vf-check-auth>
+<div ng-if="!tenant.Authed() && localized.api_key" class="col px-0 py-3 text-center">{{
+    utils.setLocation('/tenant-login',true) }}</div>
+<div class="container-fluid p-0">
+    <div class="col p-0">
+        <wp-spinner
+            type="2x"
+            ng-show="loading">
+        </wp-spinner>
+        <div ng-if="!loading && tenant.Authed()" class="col-xs-12 py-3 vf-tab-body" resize>
+            <div ng-style="!isXS && {'max-width' : '500px'}" class="w-100 my-0 mx-auto">
+                <h5 class="m-0"><strong>Account Status:</strong> {{settings.billing.saved.status| uppercase}}
+                </h5>
+                <h5 class="m-0" ng-if="settings.billing.saved.status === 'active'"><strong>Next Payment
+                        Date:</strong> {{settings.billing.saved.next_payment_date}}</h5>
+                <h5 class="m-0" ng-if="settings.billing.saved.status != 'active'"><strong>Account Active
+                        Until:</strong> {{settings.billing.saved.next_payment_date}}</h5>
+                <h5 class="m-0" ng-if="settings.billing.saved.status === 'active'"><strong>Card on
+                        file:</strong> XXXX-XXXX-XXXX-{{settings.billing.saved.card_ending}}</h5>
+
+                <div class="d-flex justify-content-center py-5"
+                    ng-if="settings.billing.saved.status === 'active' && settings.billing.cancelling">
+                    <div class="spinner is-active" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>                
+                
+                
+                <h5 class="m-0 mt-1" ng-if="settings.billing.saved.status != 'active'"><small>Update billing
+                        information below to renew subscription.</small></h5>
+                <div ng-if="cancelled" class="col-xs-12 p-5 mb-0 mt-3 alert alert-success">
+                    <a class="cursor-pointer close m-r-5" data-bs-dismiss="alert" aria-label="close"></a>
+                    <strong>Success!</strong> Your subscription has been cancelled.
+                </div>
+                <div class="my-3 py-3 border-top" ng-if="walletUrl">
+                    <iframe id="payfabricFrame" class="payfabric-frame w-100" ng-src="{{walletUrl}}"></iframe>
+                </div>
+                <div class="col-xs-12 p-5 mb-0 mt-3 alert alert-danger" ng-repeat="error in cancelErrors">
+                    <a class="cursor-pointer close m-r-5" data-bs-dismiss="alert" aria-label="close"></a>
+                    <strong>Error:</strong> {{error}}.
+                </div>
+                <hr class="col-xs-12 p-0">
+                <div ng-if="!walletUrl">
+                    <button class="button w-140 mx-auto" ng-click="ConfirmCancelSubscription()">Cancel
+                        Subscription</button>
+                    <button class="button button-primary w-140 mx-auto" ng-click="retrieveWalletUrl()">Update Payment
+                        Information</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<style>
+    .payfabric-frame {
+        background: url("/wp-content/plugins/vendorfuel/assets/img/payfabric_loading.gif") center center no-repeat;
+        min-height: 787px;
+    }
+</style>

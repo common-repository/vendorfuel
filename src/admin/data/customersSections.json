@@ -1,0 +1,67 @@
+[
+	{
+		"header": "Accounts",
+		"icon": "admin-users",
+		"href": "#!/customers/accounts",
+		"links": [
+			{
+				"text": "Manage accounts",
+				"href": "#!/customers/accounts"
+			},
+			{
+				"text": "Add new account",
+				"href": "#!/customers/accounts/create"
+			},
+			{
+				"text": "Upload accounts",
+				"href": "#!/customers/accounts/uploads/create"
+			},
+			{
+				"text": "Manage uploads",
+				"href": "#!/customers/accounts/uploads"
+			},
+			{
+				"text": "Settings",
+				"href": "#!/customers/accounts/settings"
+			}
+		]
+	},
+	{
+		"header": "Groups",
+		"icon": "groups",
+		"href": "#!/customers/groups",
+		"links": [
+			{
+				"text": "Manage groups",
+				"href": "#!/customers/groups"
+			},
+			{
+				"text": "Add new group",
+				"href": "#!/customers/groups/create"
+			},
+			{
+				"text": "Upload groups",
+				"href": "#!/customers/groups/uploads/create"
+			},
+			{
+				"text": "Manage uploads",
+				"href": "#!/customers/groups/uploads"
+			}
+		]
+	},
+	{
+		"header": "Roles",
+		"icon": "admin-generic",
+		"href": "#!/customers/roles",
+		"links": [
+			{
+				"text": "Manage roles",
+				"href": "#!/customers/roles"
+			},
+			{
+				"text": "Add new role",
+				"href": "#!/customers/roles/create"
+			}
+		]
+	}
+]

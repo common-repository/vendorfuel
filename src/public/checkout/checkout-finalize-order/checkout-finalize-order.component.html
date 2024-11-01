@@ -1,0 +1,310 @@
+<h2 class="my-3 py-3 border-bottom">Review Order</h2>
+
+<price-availability
+    ng-if="$ctrl.priceAvailability && !$ctrl.isOrderConfirmed"
+    price-availability="$ctrl.priceAvailability"
+    on-complete="$ctrl.completePriceAvailability( data )"
+    order="$ctrl.order">
+</price-availability>
+
+<div class="d-flex justify-content-center"
+    ng-if="!$ctrl.isOrderConfirmed && !$ctrl.priceAvailability">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div ng-if="$ctrl.isOrderConfirmed">
+    <h3>Address</h3>
+    <div class="row">
+        <div class="col-sm-4">
+            <h4 ng-if="!$ctrl.isShippingSameAsBilling">
+                Shipping Address
+            </h4>
+            <address>
+                <strong>{{ $ctrl.confirmedOrder.first_name }} {{ $ctrl.confirmedOrder.last_name }}</strong><br />
+                {{ $ctrl.confirmedOrder.address1 }}<br />
+                <span ng-if="$ctrl.confirmedOrder.address2">{{ $ctrl.confirmedOrder.address2 }}<br /></span>
+                {{ $ctrl.confirmedOrder.city }}, {{ $ctrl.confirmedOrder.state }} {{ $ctrl.confirmedOrder.zip }}<br />
+                <a href="mailto:{{$ctrl.confirmedOrder.email}}">{{$ctrl.confirmedOrder.email}}</a><br />
+                {{ $ctrl.confirmedOrder.phone | tel }}
+            </address>
+			<button class="btn btn-secondary btn-sm"
+				ng-click="$ctrl.checkoutCtrl.showTab('shipping')">
+				Edit Address
+			</button>
+        </div>
+
+		<div class="col-sm-4"
+            ng-if="!$ctrl.isShippingSameAsBilling">
+            <h4>Billing Address</h4>
+            <address>
+                <strong>{{ $ctrl.confirmedOrder.bill_first_name }} {{ $ctrl.confirmedOrder.bill_last_name }}</strong><br />
+                {{ $ctrl.confirmedOrder.bill_address1 }}<br />
+                <span ng-if="$ctrl.confirmedOrder.bill_address2">{{ $ctrl.confirmedOrder.bill_address2 }}<br /></span>
+                {{ $ctrl.confirmedOrder.bill_city }}, {{ $ctrl.confirmedOrder.bill_state }} {{ $ctrl.confirmedOrder.bill_zip }}<br />
+                <a href="mailto:{{$ctrl.confirmedOrder.bill_email}}">{{$ctrl.confirmedOrder.bill_email}}</a><br />
+                {{ $ctrl.confirmedOrder.bill_phone | tel }}
+            </address>
+			<button class="btn btn-secondary btn-sm"
+				ng-click="$ctrl.checkoutCtrl.showTab('billing')">
+				Edit Address
+			</button>
+        </div>
+
+		<div class="col-sm-4"
+            ng-if="$ctrl.extraFields.length > 0">
+			<table class="tables">
+				<tbody>
+					<tr ng-repeat="field in $ctrl.extraFields track by $index">
+						<th scope="row">
+							{{ field.key }}
+						</th>
+						<td>
+							{{ field.value }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+        </div>
+    </div>
+
+    <div class="row mt-3 pt-3 border-top">
+        <div class="col">
+            <h3>Items <a class="btn btn-link"
+                ng-href="{{ $ctrl.pageUrls.cart }}">Edit Cart</a></h3>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-link"
+                ng-href="{{ $ctrl.pageUrls.catalog }}">Forget something? Go back to Shopping</a></h3>
+        </div>
+    </div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="row" id="item">
+					Item
+				</th>
+				<th scope="row" id="quantity">
+					<abbr title="Quantity">
+						QTY
+					</abbr>
+				</th>
+				<th scope="row" id="price" class="text-end" >
+					Price
+				</th>
+				<th scope="row" id="extended" class="text-end" >
+					Extended
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="item in $ctrl.confirmedItems track by $index">
+				<td headers="item">
+					<div class="hstack gap-2 align-items-start">
+						<img alt="" ng-if="item.images.length" ng-src="{{ item.images[0].thumb_url }}" height="40" width="40" />
+						<div>
+							<a ng-href="/{{ $ctrl.productSlug }}/{{item.slug}}">
+								{{item.description}}
+							</a>
+							<div class="small text-secondary">SKU: {{ item.sku }}</div>
+							<div>
+								<small ng-if="item.prop65">
+									<img loading="lazy" style="width:1rem;" ng-src="{{ $ctrl.warningIcon }}"
+									ng-attr-alt="{{item.prop65.warning}}">
+									<a tabindex="0" class="prop65-popover" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-content="{{item.prop65.warning}}"
+									ng-init="$ctrl.initPopover()">
+									<span class="d-none d-md-inline">
+										California residents: See Prop. 65 warning
+									</span>
+									<span class="d-md-none">
+										CA Prop. 65 Warning
+									</span>
+									</a>
+								</small>
+								<em class="small" ng-if="item.additional_shipping">Subject to additional shipping charges.</em>
+							</div>
+						</div>
+					</div>
+				</td>
+				<td headers="quantity">
+					{{item.qty}}
+				</td>
+				<td headers="price" class="text-end" >
+					{{item.price | currency }}
+				</td>
+				<td headers="extended" class="text-end" >
+					{{item.price * item.qty | currency}}
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr class="text-end" >
+				<th id="subtotal" colspan="3">
+					Subtotal
+				</th>
+				<td headers="subtotal">
+					{{$ctrl.confirmedOrder.subtotal | currency}}
+				</td>
+			</tr>
+			<tr class="text-end" >
+				<td colspan="2">
+					<em class="small" ng-if="$ctrl.hasAdditionalShipping">*One or more items in this order is subject to additional shipping charges.</em>
+				</td>
+				<th id="shipping">
+					Shipping
+				</th>
+				<td headers="shipping">
+					{{ $ctrl.confirmedOrder.shipping | currency }}{{ $ctrl.hasAdditionalShipping ? '*' : '' }}
+				</td>
+			</tr>
+			<tr class="text-end text-success"
+				ng-if="$ctrl.confirmedOrder.discount">
+				<td id="discount" colspan="3">
+					Discounts
+				</td>
+				<td headers="discount">
+					-{{$ctrl.confirmedOrder.discount | currency}}
+				</td>
+			</tr>
+			<tr class="text-end" >
+				<th id="tax" colspan="3">
+					Tax
+				</th>
+				<td headers="tax">
+					{{$ctrl.confirmedOrder.tax | currency}}
+				</td>
+			</tr>
+			<tr class="text-end" >
+				<th id="total" colspan="3">
+					Total
+				</th>
+				<td headers="total">
+					<b>{{$ctrl.confirmedOrder.total_amt | currency}}</b>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+
+    <a class="btn btn-link btn-sm"
+        ng-href="{{ $ctrl.pageUrls.cart }}"
+        ng-if="!$ctrl.confirmedOrder.discount">
+        Add a promo code?
+    </a>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-link"
+                ng-click="$ctrl.checkoutCtrl.showTab('additional')"
+                ng-if="$ctrl.extraFields.length">
+                <i class="bi bi-chevron-left"></i>
+                Go Back to Additional Info
+            </button>
+            <button class="btn btn-link"
+                ng-click="$ctrl.checkoutCtrl.showTab('delivery')"
+                ng-if="!$ctrl.extraFields.length">
+                <i class="bi bi-chevron-left"></i> Go Back to Delivery Method
+            </button>
+        </div>
+    </div>
+
+    <div class="my-3 py-3 border-top">
+        <h3>Payment</h3>
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation"
+                ng-if="$ctrl.acceptedPaymentTypes.credit_line">
+                <a id="credit-line-tab" data-bs-toggle="tab" href="#credit-line" role="tab" aria-controls="credit-line" aria-selected="false"
+                    ng-class="['nav-link', {
+                        'active': $ctrl.acceptedPaymentTypes.credit_line
+                    }]">
+                    Credit Line
+                </a>
+            </li>
+            <li class="nav-item" role="presentation"
+                ng-if="
+                    $ctrl.acceptedPaymentTypes.payfabric ||
+                    $ctrl.acceptedPaymentTypes.stripe ||
+                    $ctrl.acceptedPaymentTypes.squareup ||
+                    $ctrl.acceptedPaymentTypes.qualpay ||
+                    $ctrl.acceptedPaymentTypes.authnet">
+                <a id="card-tab" data-bs-toggle="tab" href="#card" role="tab" aria-controls="card" aria-selected="true"
+                    ng-class="['nav-link', {
+                        'active':
+                            ! $ctrl.acceptedPaymentTypes.credit_line && (
+                            $ctrl.acceptedPaymentTypes.payfabric ||
+                            $ctrl.acceptedPaymentTypes.stripe ||
+                            $ctrl.acceptedPaymentTypes.squareup ||
+                            $ctrl.acceptedPaymentTypes.qualpay ||
+                            $ctrl.acceptedPaymentTypes.authnet )
+                    }]">
+                    <i class="bi bi-credit-card-fill"></i>
+                    Credit/Debit Card</a>
+            </li>
+            <li class="nav-item" role="presentation"
+                ng-if="$ctrl.acceptedPaymentTypes.paypal_checkout">
+                <a class="nav-link" id="paypal-tab" data-bs-toggle="tab" href="#paypal" role="tab" aria-controls="paypal" aria-selected="false">
+                    PayPal
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div id="credit-line" role="tabpanel" aria-labelledby="credit-line-tab"
+                ng-if="$ctrl.acceptedPaymentTypes.credit_line"
+                ng-class="['tab-pane fade', {
+                    'show active': $ctrl.acceptedPaymentTypes.credit_line
+                }]">
+                <checkout-payment-credit-line
+                    order-id="$ctrl.order.order_id">
+                </checkout-payment-credit-line>
+            </div>
+            <div id="card" role="tabpanel" aria-labelledby="card-tab"
+                ng-class="['tab-pane fade', {
+                    'show active':
+                        ! $ctrl.acceptedPaymentTypes.credit_line && (
+                        $ctrl.acceptedPaymentTypes.payfabric ||
+                        $ctrl.acceptedPaymentTypes.stripe ||
+                        $ctrl.acceptedPaymentTypes.squareup ||
+                        $ctrl.acceptedPaymentTypes.qualpay ||
+                        $ctrl.acceptedPaymentTypes.authnet )
+                }]">
+                <iframe id="payfabricFrame" class="payfabric-frame w-100" style="border:none;min-height:15rem;background:url('/wp-content/plugins/vendorfuel/assets/img/payfabric_loading.gif') center center no-repeat;"
+                    ng-src="{{$ctrl.payfabricUrl}}"
+                    ng-if="$ctrl.acceptedPaymentTypes.payfabric">
+                </iframe>
+
+                <checkout-payment-stripe
+                    ng-if="$ctrl.acceptedPaymentTypes.stripe"
+                    order-id="$ctrl.order.order_id">
+                </checkout-payment-stripe>
+
+                <checkout-payment-square
+                    ng-if="$ctrl.acceptedPaymentTypes.squareup"
+                    confirmed-order="$ctrl.confirmedOrder"
+                    order-id="$ctrl.order.order_id">
+                </checkout-payment-square>
+
+                <checkout-payment-qualpay
+                    ng-if="$ctrl.acceptedPaymentTypes.qualpay"
+                    confirmed-order="$ctrl.confirmedOrder"
+                    order-id="$ctrl.order.order_id"
+                    qualpay="$ctrl.qualpay">
+                </checkout-payment-qualpay>
+
+                <checkout-payment-authnet
+                    ng-if="$ctrl.acceptedPaymentTypes.authnet"
+                    order-id="$ctrl.order.order_id"
+                    confirmed-order="$ctrl.confirmedOrder">
+                </checkout-payment-authnet>
+
+            </div>
+            <div class="tab-pane fade" id="paypal" role="tabpanel" aria-labelledby="paypal-tab"
+                ng-if="$ctrl.acceptedPaymentTypes.paypal_checkout">
+                <checkout-payment-paypal
+                    order-id="$ctrl.order.order_id"
+                    confirmed-order="$ctrl.confirmedOrder"
+                    paypal-create-order="$ctrl.paypalCreateOrder">
+                </checkout-payment-paypal>
+            </div>
+        </div>
+    </div>
+</div>

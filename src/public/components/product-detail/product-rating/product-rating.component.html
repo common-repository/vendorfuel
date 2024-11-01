@@ -1,0 +1,17 @@
+<p class="product-rating">
+	<i
+		aria-hidden="true"
+		ng-repeat="r in $ctrl.getRepeater() track by $index"
+		ng-class="
+			$ctrl.rating >= $index + 1
+				? 'bi-star-fill has-luminous-vivid-amber-color'
+				: $ctrl.rating >= $index + 0.5
+				? 'bi-star-half has-luminous-vivid-amber-color'
+				: 'bi-star'
+		"
+	>
+	</i>
+	<span class="ms-1"
+		>{{ $ctrl.rating | number }} out of {{ $ctrl.ratingTotal }}</span
+	>
+</p>

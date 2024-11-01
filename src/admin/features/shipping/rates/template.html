@@ -1,0 +1,576 @@
+<layout-component heading="Rates" breadcrumbs="$ctrl.breadcrumbs">
+	<uib-tabset active="$ctrl.activeTab">
+		<uib-tab index="0" select="$ctrl.tabChanged(0)" heading="Rates">
+			<spinner-component ng-if="$ctrl.loading"></spinner-component>
+
+			<div ng-if="!$ctrl.loading">
+				<bs-search-box-legacy
+					q="$ctrl.searchParams.q"
+					on-submit="$ctrl.searchRates(1, query)"
+					is-loading="$ctrl.isBusy">
+				</bs-search-box-legacy>
+
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th ng-click="SortIndex('id')">ID</th>
+							<th ng-click="SortIndex('name')">Name</th>
+							<th ng-click="SortIndex('enabled')">Enabled</th>
+							<th ng-click="SortIndex('name')">Label</th>
+							<th ng-click="SortIndex('amount')">Amount</th>
+							<th ng-click="SortIndex('freeIfTotal')">Free shipping for min. order</th>
+						</tr>
+					</thead>
+					<tbody>
+						<spinner-component ng-if="$ctrl.isBusy"></spinner-component>
+
+						<tr class="text-center" ng-if="$ctrl.rates.data.length <= 0 && !$ctrl.isBusy">
+							<td colspan="6">
+								No results found<span ng-if="$ctrl.searchTerm.length >= 1"> matching
+										'{{$ctrl.searchTerm}}'</span>.
+								</td>
+						</tr>
+						<tr class="cursor-pointer" ng-if="!$ctrl.isBusy"
+							ng-repeat="rate in $ctrl.rates.data track by $index">
+							<td>{{ rate.id }}</td>
+							<td>
+								<strong>
+									<a href="#" ng-click="$ctrl.changeTab( 2, $index, $event )">
+										{{ rate.name }}
+									</a>
+								</strong>
+							</td>
+							<td class="text-capitalize">{{ rate.enabled }}</td>
+							<td>{{ rate.label }}</td>
+							<td>{{ rate.amount | currency }}</td>
+							<td class="text-capitalize">{{ rate.freeIfTotal }}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row  mb-3">
+					<div class="col-sm-4">
+						<span>Showing {{$ctrl.rates.from || 0}} to {{$ctrl.rates.to || 0}} of {{$ctrl.rates.total ||
+							0}} entries<span>
+					</div>
+					<div class="col-sm-4 text-center mt-2">
+						<button class="btn btn-outline-primary" ng-if="$ctrl.rates.prev_page_url"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page - 1)">&lsaquo; Prev</button>
+						<button class="btn btn-outline-primary" ng-if="$ctrl.rates.current_page - 2 > 0"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page - 2)">{{$ctrl.rates.current_page
+							- 2}}</button>
+						<button class="btn btn-outline-primary" ng-if="$ctrl.rates.current_page - 1 > 0"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page - 1)">{{$ctrl.rates.current_page
+							- 1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-disabled="true">{{$ctrl.rates.current_page}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="$ctrl.rates.current_page + 1 <= $ctrl.rates.last_page"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page + 1)">{{$ctrl.rates.current_page
+							+ 1}}</button>
+						<button class="btn btn-outline-primary"
+							ng-if="$ctrl.rates.current_page + 2 <= $ctrl.rates.last_page"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page + 2)">{{$ctrl.rates.current_page
+							+ 2}}</button>
+						<button class="btn btn-outline-primary" ng-if="$ctrl.rates.next_page_url"
+							ng-click="$ctrl.searchRates($ctrl.rates.current_page + 1)">Next &rsaquo;</button>
+					</div>
+					<div class="col-sm-4  justify-content-end">
+						<label for="rpp">Number of items per page:</label>
+						<select class="form-select" id="rpp"
+							ng-model="$ctrl.searchParams.rpp" ng-change="$ctrl.searchRates(1)"
+							ng-options="value for value in $ctrl.rppValues">
+						</select>
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="1" select="$ctrl.tabChanged(1)" heading="Add new">
+			<spinner-component ng-if="$ctrl.loading"></spinner-component>
+
+			<div ng-if="!$ctrl.loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="addFlatRate" ng-submit="$ctrl.save()">
+							<div class="mb-3">
+								<label for="rate-name" class="form-label">Name <span class="description">(required)</span></label>
+								<input autocomplete="none" spellcheck="false" id="rate-name" class="form-control" ng-class="{'is-invalid': addFlatRate['rate-name'].$invalid}"
+									type="text" name="rate-name" ng-model="$ctrl.rate.name" required>
+								<p class="description">Name for admin purposes only.</p>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Label <span class="description">(required)</span></label>
+								<input class="form-control" ng-class="{'is-invalid': addFlatRate.label.$invalid}"
+									type="text" name="label" ng-model="$ctrl.rate.label" required>
+								<p class="description">Rate label to display on frontend checkout page.</p>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Description</label>
+								<textarea class="form-control"
+									name="description" ng-model="$ctrl.rate.description" required></textarea>
+							</div>
+							<div class="form-check mb-3">
+								<input class="form-check-input" type="checkbox" id="isPercentage" ng-model="$ctrl.rate.isPercentage">
+								<label class="form-check-label" for="isPercentage">
+									Enable percentage rate
+								</label>
+								<p class="description">If enabled then amount will be calculated as a percentage against subtotal.</p>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">{{ $ctrl.rate.isPercentage ? 'Percentage' : 'Flat' }}  amount</small></label>
+								<div class="input-group">
+									<span class="input-group-text" ng-if="!$ctrl.rate.isPercentage">
+										$
+									</span>
+									<input class="form-control" ng-class="{'is-invalid': addFlatRate.amount.$invalid}"
+										type="number" name="amount" min="0" step="0.01"
+										ng-model="$ctrl.rate.amount"
+										required>
+									<span class="input-group-text" ng-if="$ctrl.rate.isPercentage">
+										%
+									</span>
+								</div>
+							</div>
+							<div class="form-check mb-3">
+								<input class="form-check-input" type="checkbox" id="freeIfTotal" ng-model="$ctrl.rate.freeIfTotal">
+								<label class="form-check-label" for="freeIfTotal">
+									Enable free shipping for minimum order amount
+								</label>
+							</div>
+							<div class="mb-3" ng-if="$ctrl.rate.freeIfTotal">
+								<label for="freeOrderTotal" class="form-label">Minimum order amount for free shipping</label>
+								<div class="input-group">
+									<span class="input-group-text">$</span>
+									<input type="number" class="form-control" id="freeOrderTotal" step="0.01" ng-model="$ctrl.rate.freeOrderTotal" min="0">
+								</div>
+							</div>
+							<div class="border-top pt-3 mt-3 mb-3">
+								<h2>Modifiers</h2>
+								<div class="list-group mb-3"
+									ng-if="$ctrl.rate.modifiers.length">
+									<div class="list-group-item"
+										ng-repeat="modifier in $ctrl.rate.modifiers track by $index" ng-if="!modifier.deleted">
+										<div class="hstack align-items-baseline">
+											<h3 class="h6 text-muted">Modifier {{ $index + 1 }}</h3>
+											<button class="btn btn-sm btn-outline-danger border-0 ms-auto" type="button"
+											ng-click="$ctrl.removeModifier( $index, modifier )">Remove</button>
+										</div>
+										<div class="form-check mb-3">
+											<input class="form-check-input" type="checkbox" ng-attr-id="modifier-is-percentage-{{ $index }}" ng-model="$ctrl.rate.modifiers[$index].isPercentage">
+											<label class="form-check-label" ng-attr-for="modifier-is-percentage-{{ $index }}">
+												Enable percentage rate for this modifier
+											</label>
+										</div>
+										<div class="mb-3">
+											<label class="form-label" ng-attr-for="modifier-amount-{{ $index }}">Amount</label>
+											<div class="input-group">
+												<span class="input-group-text" ng-if="!$ctrl.rate.modifiers[$index].isPercentage">$</span>
+												<input ng-attr-id="modifier-amount-{{ $index }}"
+													ng-class="['form-control', {'is-invalid': addFlatRate['amount'+$index].$invalid}]"
+													name="amount{{$index}}" type="number" min="0" step="0.01"
+													ng-model="$ctrl.rate.modifiers[$index].amount">
+												<span class="input-group-text" ng-if="$ctrl.rate.modifiers[$index].isPercentage">%</span>
+											</div>
+										</div>
+										<div class="mb-3">
+											<div class="form-label">
+												If the order total is in the range of:
+											</div>
+											<div class="hstack align-items-baseline">
+												<div class="input-group">
+													<span class="input-group-text">$</span>
+													<input
+														ng-class="['form-control', {'is-invalid': addFlatRate['min'+$index].$invalid}]"
+														 name="min{{$index}}"
+														ng-model="$ctrl.rate.modifiers[$index].orderTotalMin"
+														type="number" min="0" step="0.01" />
+
+												</div>
+												<span class="mx-2">to</span>
+												<div class="input-group">
+													<span class="input-group-text">$</span>
+													<input
+														ng-class="['form-control', {'is-invalid': addFlatRate['max'+$index].$invalid}]"
+														name="max{{$index}}]"
+														ng-model="$ctrl.rate.modifiers[$index].orderTotalMax"
+														type="number" min="0" step="0.01"/>
+												</div>
+
+											</div>
+										</div>
+
+									</div>
+								</div>
+								<button class="btn btn-outline-primary" type="button" ng-if="$ctrl.modifierLimit > $ctrl.rate.modifiers.length"
+									ng-click="$ctrl.addModifier()">
+									Add New Modifier
+								</button>
+							</div>
+							<div class="form-check mb-3">
+								<input class="form-check-input" type="checkbox" name="enabled" id="enabled" ng-model="$ctrl.rate.enabled"
+									>
+								<label class="form-check-label" for="enabled">Enabled</label>
+							</div>
+							<div ng-if="!$ctrl.updating">
+								<button class="btn btn-primary"
+									type="submit"
+									ng-disabled="addFlatRate.$invalid">
+									Save
+								</button>
+							</div>
+
+							<div class="d-flex align-items-center"
+								ng-if="$ctrl.updating">
+								<strong>Creating rate, please wait...</strong>
+							</div>
+						</form>
+					</div>
+					<div class="col-lg-8"></div>
+				</div>
+			</div>
+		</uib-tab>
+		<uib-tab index="2" select="$ctrl.tabChanged(2)" ng-hide="!$ctrl.rate.id" heading="Edit rate">
+			<spinner-component ng-if="$ctrl.loading"></spinner-component>
+
+			<div ng-if="!$ctrl.loading">
+				<div class="row">
+					<div class="col-lg-4">
+						<form name="viewFlatRate" ng-submit="$ctrl.update()">
+							<fieldset ng-disabled="$ctrl.updating || $ctrl.deleting">
+								<div class="mb-3">
+									<label for="rate-name" class="form-label">Name <span class="description">(required)</span></label>
+									<input autocomplete="none" spellcheck="false" class="form-control" ng-class="{'is-invalid': viewFlatRate['rate-name'].$invalid}"
+										type="text" name="rate-name" ng-model="$ctrl.rate.name"
+										required>
+									<p class="description">Name for admin purposes only.</p>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Label <span class="description">(required)</span></label>
+									<input class="form-control" ng-class="{'is-invalid': viewFlatRate.label.$invalid}"
+										type="text" name="label" ng-model="$ctrl.rate.label" required>
+									<p class="description">Rate label to display on frontend checkout page.</p>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Description</label>
+									<textarea class="form-control"
+										name="description" ng-model="$ctrl.rate.description" required></textarea>
+								</div>
+								<div class="form-check mb-3">
+									<input class="form-check-input" type="checkbox" id="isPercentage" ng-model="$ctrl.rate.isPercentage">
+									<label class="form-check-label" for="isPercentage">
+										Enable percentage rate
+									</label>
+									<p class="description">If enabled then amount will be calculated as percentage against subtotal.</p>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">{{ $ctrl.rate.isPercentage ? 'Percentage' : 'Flat' }}  amount</small></label>
+									<div class="input-group">
+										<span class="input-group-text" ng-if="!$ctrl.rate.isPercentage">
+											$
+										</span>
+										<input class="form-control" ng-class="{'is-invalid': viewFlatRate.amount.$invalid}"
+											type="number" name="amount" min="0" step="0.01"
+											ng-model="$ctrl.rate.amount"
+											required>
+										<span class="input-group-text" ng-if="$ctrl.rate.isPercentage">
+											%
+										</span>
+									</div>
+								</div>
+								<div class="form-check mb-3">
+									<input class="form-check-input" type="checkbox" id="freeIfTotal" ng-model="$ctrl.rate.freeIfTotal">
+									<label class="form-check-label" for="freeIfTotal">
+										Enable free shipping for minimum order amount
+									</label>
+								</div>
+								<div class="mb-3" ng-if="$ctrl.rate.freeIfTotal">
+									<label for="freeOrderTotal" class="form-label">Minimum order amount for free shipping</label>
+									<div class="input-group">
+										<span class="input-group-text">$</span>
+										<input type="number" class="form-control" id="freeOrderTotal" step="0.01" ng-model="$ctrl.rate.freeOrderTotal" min="0">
+									</div>
+								</div>
+								<div class="border-top pt-3 mt-3 mb-3">
+									<h2>Modifiers</h2>
+									<div class="list-group mb-3"
+									ng-if="$ctrl.rate.modifiers.length">
+										<div class="list-group-item"
+											ng-repeat="modifier in $ctrl.rate.modifiers track by $index" ng-if="!modifier.deleted">
+											<div class="hstack align-items-baseline">
+												<h3 class="h6 text-muted">Modifier {{ $index + 1 }}</h3>
+												<button class="btn btn-sm btn-outline-danger border-0 ms-auto" type="button"
+												ng-click="$ctrl.removeModifier( $index, modifier )">Remove</button>
+											</div>
+											<div class="form-check mb-3">
+												<input class="form-check-input" type="checkbox" ng-attr-id="modifier-is-percentage-{{ $index }}" ng-model="$ctrl.rate.modifiers[$index].isPercentage">
+												<label class="form-check-label" ng-attr-for="modifier-is-percentage-{{ $index }}">
+													Enable percentage rate for modifier
+												</label>
+											</div>
+											<div class="mb-3">
+												<label class="form-label" ng-attr-for="modifier-amount-{{ $index }}">Amount</label>
+												<div class="input-group">
+													<span class="input-group-text" ng-if="!$ctrl.rate.modifiers[$index].isPercentage">$</span>
+													<input ng-attr-id="modifier-amount-{{ $index }}"
+														ng-class="['form-control', {'is-invalid': viewFlatRate['amount'+$index].$invalid}]"
+														name="amount{{$index}}" type="number" min="0" step="0.01"
+														ng-model="$ctrl.rate.modifiers[$index].amount">
+													<span class="input-group-text" ng-if="$ctrl.rate.modifiers[$index].isPercentage">%</span>
+												</div>
+											</div>
+											<div class="mb-3">
+												<div class="form-label">
+													If the order total is in the range of:
+												</div>
+												<div class="hstack align-items-baseline">
+													<div class="input-group">
+														<span class="input-group-text">$</span>
+														<input
+															ng-class="['form-control', {'is-invalid': viewFlatRate['min'+$index].$invalid}]"
+															name="min{{$index}}"
+															ng-model="$ctrl.rate.modifiers[$index].orderTotalMin"
+															type="number" min="0" step="0.01" />
+
+													</div>
+													<span class="mx-2">to</span>
+													<div class="input-group">
+														<span class="input-group-text">$</span>
+														<input
+															ng-class="['form-control', {'is-invalid': viewFlatRate['max'+$index].$invalid}]"
+															name="max{{$index}}]"
+															ng-model="$ctrl.rate.modifiers[$index].orderTotalMax"
+															type="number" min="0" step="0.01"/>
+													</div>
+
+												</div>
+											</div>
+										</div>
+									</div>
+									<button class="btn btn-outline-primary" type="button"
+										ng-click="$ctrl.addModifier()" ng-if="$ctrl.modifierLimit > $ctrl.rate.modifiers.length">
+										Add New Modifier
+									</button>
+								</div>
+								<div class="form-check mb-3">
+									<input class="form-check-input" type="checkbox" name="enabled"
+									id="enabled"
+									ng-model="$ctrl.rate.enabled">
+									<label class="form-check-label" for="enabled">Enabled</label>
+								</div>
+								<div>
+									<button class="btn btn-primary" type="submit"
+										ng-disabled="viewFlatRate.$invalid">
+										Update
+									</button>
+									<button type="button" class="btn btn-outline-danger border-0" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+										Delete
+									</button>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+					<div class="col-lg-8">
+						<p ng-if="$ctrl.isNotApplied()">This rate is not currently applied to any customers, groups or price sheets. It will not be available during the checkout process until applied to at least one of either.</p>
+						<uib-tabset>
+							<uib-tab index="0" heading="Customers">
+								<table class="table align-top">
+									<caption ng-if="!$ctrl.rate.customers.length">
+										This rate is not currently being applied to any customers.
+									</caption>
+									<colgroup>
+										<col />
+										<col class="w-100" />
+										<col />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col">ID</th>
+											<th scope="col">Name</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-class="{
+												'table-success': item.action === 'add',
+												'table-danger': item.action === 'remove'
+											}"
+											ng-repeat="item in $ctrl.rate.customers track by $index">
+											<td>{{ item.id }}</td>
+											<td><a ng-href="?page=vendorfuel#!/customers/accounts/{{ item.id }}">
+												{{ item.name }}
+											</a></td>
+											<td class="text-end">
+												<button class="btn btn-outline-danger border-0 btn-sm" ng-click="$ctrl.handleRemove( 'customers', item.id )">Remove</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<select-modal
+									api-path="/admin/customers"
+									excluded-field="shipping_rate_id"
+									excluded-id="$ctrl.rate.id"
+									excluded-table="shipping_rate_customer"
+									handle-select="$ctrl.handleSelect( modelName, modelIds )"
+									name-property="name"
+									model-name="customers"
+									></select-modal>
+							</uib-tab>
+							<uib-tab index="1" heading="Groups">
+								<table class="table align-top">
+									<caption ng-if="!$ctrl.rate.groups.length">
+										This rate is not currently being applied to any groups.
+									</caption>
+									<colgroup>
+										<col />
+										<col class="w-100" />
+										<col />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col">ID</th>
+											<th scope="col">Name</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-class="{
+												'table-success': item.action === 'add',
+												'table-danger': item.action === 'remove'
+											}"
+											ng-repeat="item in $ctrl.rate.groups track by $index">
+											<td>{{ item.group_id }}</td>
+											<td><a ng-href="?page=vendorfuel#!/customers/groups/{{ item.group_id }}">
+												{{ item.name }}
+											</a></td>
+											<td class="text-end">
+												<button class="btn btn-outline-danger border-0 btn-sm" ng-click="$ctrl.handleRemove( 'groups', item.group_id )">Remove</button>
+											</td>
+										</td>
+										</tr>
+									</tbody>
+								</table>
+								<select-modal
+									api-path="/admin/customers/groups"
+									excluded-field="shipping_rate_id"
+									excluded-id="$ctrl.rate.id"
+									excluded-table="shipping_rate_group"
+									handle-select="$ctrl.handleSelect( modelName, modelIds )"
+									id-property="group_id"
+									model-name="groups"
+									></select-modal>
+							</uib-tab>
+							<uib-tab index="2" heading="Price sheets">
+								<table class="table align-top">
+									<caption ng-if="!$ctrl.rate.price_sheets.length">
+										This rate is not currently being applied to any price sheets.
+									</caption>
+									<colgroup>
+										<col />
+										<col class="w-100" />
+										<col />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col">ID</th>
+											<th scope="col">Name</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-class="{
+												'table-success': item.action === 'add',
+												'table-danger': item.action === 'remove'
+											}"
+											ng-repeat="item in $ctrl.rate.price_sheets track by $index">
+											<td>{{ item.price_sheet_id }}</td>
+											<td><a ng-href="?page=vendorfuel#!/catalog/pricesheets/{{ item.price_sheet_id }}">
+												{{item.sheet || item.name }}
+											</a></td>
+											<td class="text-end">
+												<button class="btn btn-outline-danger border-0 btn-sm" ng-click="$ctrl.handleRemove( 'price_sheets', item.price_sheet_id )">Remove</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<select-modal
+									api-path="/admin/pricesheets"
+									excluded-field="shipping_rate_id"
+									excluded-id="$ctrl.rate.id"
+									excluded-table="shipping_rate_price_sheet"
+									handle-select="$ctrl.handleSelect( modelName, modelIds )"
+									id-property="price_sheet_id"
+									model-name="pricesheets"
+									name-property="sheet"
+									></select-modal>
+							</uib-tab>
+							<uib-tab index="3" heading="Restricted items">
+								<table class="table align-top">
+									<caption ng-if="!$ctrl.rate.restricted_items.length">
+										This rate does not currently have any free shipping items.
+									</caption>
+									<colgroup>
+										<col />
+										<col class="w-100" />
+										<col />
+									</colgroup>
+									<thead>
+										<tr>
+											<th scope="col">ID</th>
+											<th scope="col">Name</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-class="{
+												'table-success': item.action === 'add',
+												'table-danger': item.action === 'remove'
+											}"
+											ng-repeat="item in $ctrl.rate.restricted_items track by $index">
+											<td>{{ item.product_id }}</td>
+											<td><a ng-href="?page=vendorfuel#!/catalog/products/{{ item.product_id }}">
+												{{ item.description }}
+											</a></td>
+											<td class="text-end">
+												<button class="btn btn-outline-danger border-0 btn-sm" ng-click="$ctrl.handleRemove( 'restricted_items', item.product_id )">Remove</button>
+											</td>
+										</td>
+										</tr>
+									</tbody>
+								</table>
+								<select-modal
+									api-path="/admin/products"
+									excluded-field="shipping_rate_id"
+									excluded-id="$ctrl.rate.id"
+									excluded-table="shipping_rate_restricted_items"
+									handle-select="$ctrl.handleSelect( modelName, modelIds )"
+									id-property="product_id"
+									model-name="products"
+									name-property="description"
+								></select-modal>
+							</uib-tab>
+						</uib-tabset>
+
+					</div>
+				</div>
+			</div>
+		</uib-tab>
+	</uib-tabset>
+</layout-component>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h1 class="modal-title fs-5" id="exampleModalLabel">Delete rate?</h1>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			This will delete this rate. Are you sure?
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+		  <button type="button" class="btn btn-danger" ng-click="$ctrl.destroy()" data-bs-dismiss="modal">Delete</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+

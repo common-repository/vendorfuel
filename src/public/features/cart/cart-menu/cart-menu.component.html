@@ -1,0 +1,92 @@
+<div class="dropdown">
+	<button
+		ng-class="['btn dropdown-toggle', $ctrl.btnClass]"
+		type="button"
+		data-bs-toggle="dropdown"
+		aria-expanded="false"
+	>
+		<i
+			ng-class="[
+				'bi',
+				{
+					'bi-cart': !$ctrl.cartCount,
+					'bi-cart-fill': $ctrl.cartCount
+				}
+			]"
+		></i>
+		<span class="badge rounded-pill text-bg-danger" ng-if="$ctrl.cartCount">
+			{{ $ctrl.cartCount }}
+		</span>
+		<span class="d-none d-md-inline ms-1">Cart</span>
+	</button>
+	<div class="dropdown-menu dropdown-menu-end">
+		<div class="d-flex justify-content-center" ng-if="$ctrl.isInProgress">
+			<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		<div ng-if="!$ctrl.isInProgress">
+			<a
+				class="dropdown-item dropdown-header text-decoration-none"
+				title="Edit Cart"
+				ng-href="{{ $ctrl.cartUrl }}"
+			>
+				<ng-pluralize
+					count="$ctrl.cartCount"
+					when="{'0': 'No items in your cart.',
+						'one': 'One item in your cart.',
+						'other': '{} items in your cart.'}"
+				>
+				</ng-pluralize>
+				<span
+					class="badge text-bg-success"
+					ng-if="$ctrl.totalAmount > 0"
+				>
+					Total: {{ $ctrl.totalAmount | currency }}
+				</span>
+			</a>
+			<div
+				class="alert alert-info small mx-2 my-2 p-2 lh-sm"
+				ng-if="
+					$ctrl.showFreeShipping &&
+					$ctrl.cartCount &&
+					$ctrl.minOrderAmount &&
+					$ctrl.minOrderAmount > $ctrl.totalAmount
+				"
+			>
+				Add {{ $ctrl.minOrderAmount - $ctrl.totalAmount | currency }} to
+				your cart to qualify for free shipping.
+			</div>
+			<div class="dropdown-divider" ng-if="$ctrl.cartCount"></div>
+			<a
+				class="dropdown-item small lh-sm py-2 text-wrap text-decoration-none"
+				ng-attr-title="View {{ item.description }}"
+				ng-repeat="item in $ctrl.cartItems track by $index"
+				ng-href="/{{ $ctrl.productSlug }}/{{ item.slug }}"
+			>
+				<div class="d-flex justify-content-between align-items-start">
+					{{ item.description }}
+					<span class="badge text-bg-secondary rounded-pill">
+						{{ item.qty }}
+					</span>
+				</div>
+				<div class="small">
+					<span class="text-muted">SKU:</span> {{ item.sku }}
+				</div>
+				<span class="text-success">{{ item.price | currency }}</span>
+				{{ item.uom ? '/' + item.uom : '' }}
+			</a>
+		</div>
+		<div ng-if="$ctrl.cartCount">
+			<div class="dropdown-divider"></div>
+			<a
+				class="dropdown-item text-decoration-none"
+				title="Edit Cart"
+				ng-href="{{ $ctrl.cartUrl }}"
+			>
+				<i class="bi bi-cart-fill me-1"></i>
+				Go to Cart
+			</a>
+		</div>
+	</div>
+</div>

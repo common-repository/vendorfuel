@@ -1,0 +1,163 @@
+<layout-component
+	breadcrumbs="$ctrl.breadcrumbs"
+	heading="{{ $ctrl.isNew ? 'Add' : 'Edit' }} manufacturer"
+>
+	<spinner-component ng-if="$ctrl.isLoading"></spinner-component>
+
+	<div class="row">
+		<div class="col-lg-4">
+			<form
+				name="form"
+				ng-if="$ctrl.manufacturer && !$ctrl.isLoading"
+				ng-submit="$ctrl.submit()"
+			>
+				<fieldset
+					ng-disabled="$ctrl.isUpdating || $ctrl.isDeleting || $ctrl.isSaving"
+				>
+					<div class="mb-3">
+						<label for="name" class="form-label">
+							Name <small>(required)</small>
+						</label>
+						<input
+							type="text"
+							class="form-control"
+							id="name"
+							required
+							ng-model="$ctrl.manufacturer.name"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="info" class="form-label">Description</label>
+						<textarea
+							type="text"
+							class="form-control"
+							id="info"
+							ng-model="$ctrl.manufacturer.info"
+						></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="website" class="form-label">
+							Website
+						</label>
+						<input
+							type="url"
+							class="form-control"
+							id="website"
+							ng-model="$ctrl.manufacturer.website"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="image-url" class="form-label">
+							{{
+								$ctrl.manufacturer.images.logo ? 'Change ' : ''
+							}}Logo
+						</label>
+						<input
+							class="form-control"
+							type="file"
+							id="logo"
+							name="logo"
+							onchange="angular.element( this ).scope().$ctrl.changeLogo( this )"
+						/>
+					</div>
+					<div ng-if="$ctrl.manufacturer.images.logo">
+						<figure class="figure">
+							<img
+								alt=""
+								class="figure-img img-fluid"
+								ng-src="{{
+									$ctrl.manufacturer.images.logo.medium ||
+										$ctrl.manufacturer.images.logo.default
+								}}"
+							/>
+							<figcaption class="figure-caption">
+								{{ $ctrl.logoFilename }}
+							</figcaption>
+						</figure>
+
+						<button
+							class="btn btn-danger"
+							ng-click="$ctrl.isConfirmingRemoveLogo = true"
+							ng-hide="$ctrl.isConfirmingRemoveLogo"
+						>
+							Delete logo
+						</button>
+						<span
+							class="hstack gap-2 align-items-center"
+							ng-if="$ctrl.isConfirmingRemoveLogo"
+						>
+							<strong class="text-dark small ms-2">
+								Delete logo?
+							</strong>
+							<button
+								class="btn btn-secondary"
+								ng-click="$ctrl.isConfirmingRemoveLogo = false"
+								ng-disabled="$ctrl.isRemovingLogo"
+							>
+								Cancel
+							</button>
+							<button
+								class="btn btn-danger"
+								ng-click="$ctrl.removeLogo($ctrl.manufacturer.images.logo.id)"
+								ng-disabled="$ctrl.isRemovingLogo"
+							>
+								{{
+									$ctrl.isRemovingLogo ? 'Deleting' : 'Delete'
+								}}
+							</button>
+						</span>
+					</div>
+					<div class="btn-toolbar">
+						<button
+							class="btn btn-primary me-1"
+							type="submit"
+							ng-if="$ctrl.isNew"
+							ng-disabled="form.$invalid"
+						>
+							{{ $ctrl.isSaving ? 'Saving' : 'Save' }}
+						</button>
+						<button
+							class="btn btn-primary me-1"
+							type="submit"
+							ng-if="!$ctrl.isNew"
+						>
+							{{ $ctrl.isUpdating ? 'Updating' : 'Update' }}
+						</button>
+						<button
+							class="btn btn-danger me-1"
+							type="button"
+							ng-click="$ctrl.isConfirming = true"
+							ng-hide="$ctrl.isConfirming"
+							ng-if="!$ctrl.isNew"
+						>
+							{{ $ctrl.isDeleting ? 'Deleting' : 'Delete' }}
+						</button>
+						<div
+							class="ms-2 hstack gap-2 align-items-center"
+							ng-if="$ctrl.isConfirming"
+						>
+							<strong class="small">
+								Delete this manufacturer?
+							</strong>
+							<button
+								class="btn btn-secondary"
+								type="button"
+								ng-click="$ctrl.isConfirming = false"
+							>
+								Cancel, keep manufacturer
+							</button>
+							<button
+								class="btn btn-danger"
+								type="button"
+								ng-click="$ctrl.remove()"
+							>
+								Yes, delete manufacturer
+							</button>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		<div class="col-lg-8"></div>
+	</div>
+</layout-component>

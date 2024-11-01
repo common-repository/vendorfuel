@@ -1,0 +1,30 @@
+<ol class="wp-block-latest-comments has-dates has-excerpts ps-0">
+	<li
+		class="wp-block-latest-comments__comment"
+		ng-repeat="comment in $ctrl.comments track by comment.id"
+	>
+		<article>
+			<i
+				aria-hidden="true"
+				ng-repeat="r in $ctrl.getRepeater() track by $index"
+				ng-class="comment.rating >= ( $index + 1 ) ? 'bi-star-fill has-luminous-vivid-amber-color' :
+                comment.rating >= ( $index + .5 ) ? 'bi-star-half has-luminous-vivid-amber-color' :
+                'bi-star'
+                "
+			>
+			</i>
+			<strong>{{ comment.title }}</strong>
+			<footer class="wp-block-latest-comments__comment-meta">
+				<span class="wp-block-latest-comments__comment-author">
+					{{ comment.display_name }}
+				</span>
+				<time class="wp-block-latest-comments__comment-date">
+					{{ comment.created_at | date: 'mediumDate' }}
+				</time>
+			</footer>
+			<div class="wp-block-latest-comments__comment-excerpt">
+				<p>{{ comment.content }}</p>
+			</div>
+		</article>
+	</li>
+</ol>

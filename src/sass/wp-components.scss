@@ -1,0 +1,40 @@
+/* Overrides for WordPress Components (@wordpress/components) */
+
+th {
+	&.sortable,
+	&.sorted {
+		button {
+			background: none;
+			border: none;
+			display: flex;
+			overflow: hidden;
+			padding: 0.5rem;
+		}
+	}
+}
+
+button.row-title {
+	font-weight: 600;
+	&.is-link {
+		text-decoration: none;
+	}
+}
+
+/* WordPress Component: BaseControl */
+.components-base-control {
+	width: 100%;
+}
+
+.components-card-body fieldset:not(:first-child) > legend {
+	margin-top: 1rem;
+}
+
+/* WordPress Component: Panel */
+.components-panel .components-panel__header h2 {
+	font-size: inherit;
+}
+
+/* WordPress Component: SelectControl */
+.components-select-control select {
+	max-width: 100%;
+}
